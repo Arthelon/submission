@@ -1,0 +1,7 @@
+extends ./layout
+
+block content
+    form(method='POST', action='/login')
+        input(name='username')
+        input(name='password')
+        button(type='submit')

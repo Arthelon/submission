@@ -2,6 +2,13 @@ doctype html
 html
     head
         block head
+        title #{title}
         link(rel='stylesheet', href='/stylesheets/darkly.min.css')
     body
+        if !{flash}
+            ul Flashed Messages
+            each message in !{flash}
+                li=message
         block content
+        script(type='text/javascript')
+            block script

@@ -5,8 +5,23 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//routes
 var root = require('./routes/index');
 var room = require('./routes/room');
+var login = require('./routes/login')
+
+//Authentication setup
+var passport = require('passport');
+var session = require('express-session');
+var LocalStrategy = require('passport-local').Strategy
+
+//Mongoose
+var mongoose = require('mongoose')
+var models = require('./models')
+
+//Misc
+var flash = require('connect-flash')
+
 var app = express();
 
 // view engine setup
@@ -19,11 +34,59 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
+app.use(session({secret: 'mySecretKey', resave: false, saveUninitialized: false}));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash())
+
+//Passport and express-session
+var User = models.User
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(function(user, done) {
+    done(null, user._id);
+});
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
+});
+
+//Passport Strategies
+passport.use('login', new LocalStrategy({
+        passReqToCallback : true
+    },
+    function(req, username, password, done) {
+        User.findOne({'username' : username },
+            function(err, user) {
+                if (err)
+                    return done(err);
+                if (!user){
+                    console.log('User Not Found with username '+username);
+                    return done(null, false,
+                        req.flash('msg', 'User Not found.'));
+                }
+                if (!user.verifyPassword(password)){
+                    console.log('Invalid Password');
+                    return done(null, false,
+                        req.flash('msg', 'Invalid Password'));
+                }
+                return done(null, user);
+            }
+        );
+    }));
 
 //Routing
 app.use('/', root);
+app.use('/login', login)
 app.use('/room', room)
+
+app.use(function(req, res, next) {
+    "use strict";
+    res.locals.err_msg = req.flash('err_msg')
+    next()
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
