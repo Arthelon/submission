@@ -20,6 +20,12 @@ var RoomSchema = new Schema({
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
 })
+RoomSchema.methods.verifyID = function(id) {
+    this.findById(id, function(err, found) {
+        if (err) throw err
+        return !found
+    })
+}
 
 var UserSchema = new Schema({
     username: {type:String, unique: true, required: true},
