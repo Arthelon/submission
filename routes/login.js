@@ -4,10 +4,16 @@ var passport = require('passport')
 
 router.route('/')
     .get(function(req, res) {
-        res.render('login')
+        res.render('login', {
+            errors: req.flash('error'),
+            title: 'submission | login'
+        })
     })
-    .post(passport.authenticate('login'),
-    function(req, res) {
+    .post(passport.authenticate('login', {
+        successRedirect: '/',
+        failureRedirect: '/login',
+        failureFlash: true
+    }), function(req, res) {
         res.send('Successful')
     })
 

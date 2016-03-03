@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var root = require('./routes/index');
 var room = require('./routes/room');
 var login = require('./routes/login')
+var register = require('./routes/register')
 
 //Authentication setup
 var passport = require('passport');
@@ -58,29 +59,68 @@ passport.use('login', new LocalStrategy({
         passReqToCallback : true
     },
     function(req, username, password, done) {
-        User.findOne({'username' : username },
+        User.findOne({username: username},
             function(err, user) {
                 if (err)
                     return done(err);
                 if (!user){
-                    console.log('User Not Found with username '+username);
                     return done(null, false,
-                        req.flash('msg', 'User Not found.'));
+                        req.flash('error', 'User Not found.'));
                 }
                 if (!user.verifyPassword(password)){
                     console.log('Invalid Password');
                     return done(null, false,
-                        req.flash('msg', 'Invalid Password'));
+                        req.flash('error', 'Invalid Password'));
                 }
                 return done(null, user);
             }
         );
     }));
 
+
+passport.use('register', new LocalStrategy({
+        passReqToCallback: true
+    },
+    function(req, username, password, done) {
+        User.findOne({username: username}, function(err, user) {
+            if (err){
+                return done(err, false,
+                    req.flash('error', 'Error occurred'))
+            } else if (user) {
+                return done(null, false,
+                    req.flash('error', 'Username already exists'))
+            } else {
+                var new_user = new User({
+                    username: username,
+                    password: password,
+                    first_name: req.param('first_name'),
+                    last_name: req.param('last_name'),
+                    email: req.param('email')
+                })
+                if (new_user.validatePassword()) {
+                    new_user.save(function(err) {
+                        if (err) {
+                            return done(err, false,
+                                req.flash('error', 'Error occurred'))
+                        }
+                        else {
+                            return done(null, user,
+                                req.flash('msg', 'Success'))
+                        }
+                    })
+                } else {
+                    return done(null, false,
+                        req.flash('error', 'Invalid password'))
+                }
+            }
+        })
+}))
+
 //Routing
 app.use('/', root);
 app.use('/login', login)
 app.use('/room', room)
+app.use('/register', register)
 
 app.use(function(req, res, next) {
     "use strict";
@@ -118,6 +158,20 @@ app.use(function (err, req, res, next) {
         error: {}
     });
 });
+
+//Mongoose
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/pre', function(err) {
+    if (err) throw err
+    else {
+        User.findOrCreate({
+            username: 'Arthelon',
+            password: 't050103',
+            email: 'hsing.daniel@gmail.com',
+            first_name: 'Daniel',
+            last_name: 'Hsing'
+        }, (err, doc, created) => null)
+    }
+})
 
 
 module.exports = app;
