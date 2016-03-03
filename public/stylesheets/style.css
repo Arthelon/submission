@@ -1,0 +1,22 @@
+.header {
+    display: block;
+    min-height:50px;
+    margin-bottom:20px;
+    padding: 30px 100px;
+}
+.header-btns {
+    float: right;
+}
+.header-btns a:link, a:visited {
+    margin-left:30px;
+    font-size: 16px;
+    padding: 10px 15px;
+    border: solid 1px white;
+    border-radius:5%;
+    text-decoration: none;
+    cursor: auto;
+}
+.header-btns a:hover, a:active {
+    background-color: white;
+    text-decoration: none;
+}

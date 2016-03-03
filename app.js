@@ -8,8 +8,7 @@ var bodyParser = require('body-parser');
 //routes
 var root = require('./routes/index');
 var room = require('./routes/room');
-var login = require('./routes/login')
-var register = require('./routes/register')
+var dashboard = require('./routes/dashboard')
 
 //Authentication setup
 var passport = require('passport');
@@ -83,12 +82,15 @@ passport.use('register', new LocalStrategy({
     },
     function(req, username, password, done) {
         User.findOne({username: username}, function(err, user) {
-            if (err){
+            if (err) {
                 return done(err, false,
                     req.flash('error', 'Error occurred'))
             } else if (user) {
                 return done(null, false,
                     req.flash('error', 'Username already exists'))
+            } else if (req.param.password2 != password) {
+                return done(null, false,
+                    req.flash('error', 'Passwords don\'t match'))
             } else {
                 var new_user = new User({
                     username: username,
@@ -118,9 +120,8 @@ passport.use('register', new LocalStrategy({
 
 //Routing
 app.use('/', root);
-app.use('/login', login)
 app.use('/room', room)
-app.use('/register', register)
+app.use('/dashboard', dashboard)
 
 app.use(function(req, res, next) {
     "use strict";
@@ -165,7 +166,7 @@ mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/pre', fu
     else {
         User.findOrCreate({
             username: 'Arthelon',
-            password: 't050103',
+            password: '123456789',
             email: 'hsing.daniel@gmail.com',
             first_name: 'Daniel',
             last_name: 'Hsing'

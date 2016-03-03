@@ -1,26 +1,29 @@
 extends ./layout
 
 block content
-    .container-fluid
-        h3 Login Here
-        hr
-        .row
-            .col-md-6
-                .panel.panel-default
-                    .panel-heading.clearfix
-                        h3.panel-title Register
-                    .panel-body
-                        form(method='POST', action='/login')
-                            .form-group
-                                label(for='usernameInput') Username
-                                input#usernameInput.form-control(name='username', placeholder='username')
-                            .form-group
-                                label(for='passwordInput') Password
-                                input#passwordInput.form-control(name='password', placeholder='password')
-                            .checkbox
-                                label
-                                    input(type='checkbox')
-                                    |  Remember me
-                            if errors
-                                p #{errors}
-                            button.btn.btn-success(type='submit') Submit
+    .container
+        .container-fluid
+            h3 Register Here
+            hr
+            .row
+                .col-md-6
+                    .panel.panel-default
+                        .panel-heading.clearfix
+                            h3.panel-title Register
+                        .panel-body
+                            form(method='POST', action='/register')
+                                .form-group
+                                    label(for='usernameInput') Username
+                                    input#usernameInput.form-control(name='username', placeholder='username')
+                                .form-group
+                                    label(for='passwordInput') Password
+                                    input#passwordInput.form-control(name='password', type='password', placeholder='password')
+                                .form-group
+                                    input#passwordDupInput.form-control(name='password2', type='password', placeholder='re-enter password')
+                                .checkbox
+                                    label
+                                        input(type='checkbox')
+                                        |  Remember me
+                                if errors
+                                    p #{errors}
+                                button.btn.btn-success(type='submit') Submit

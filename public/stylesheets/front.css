@@ -1,0 +1,10 @@
+.container {
+    padding-left: 50px;
+}
+#intro {
+    float: left;
+}
+h1 {
+    font-weight: bold;
+    font-size:56px;
+}

@@ -1,5 +1,14 @@
 extends layout
+block head
+    link(rel='stylesheet' href='/stylesheets/front.css')
 
 block content
-    h1= title
-    p Welcome to #{title}
+    .header
+        //LOGO
+        .header-btns
+            a(href='login') Login
+            a(href='register') Register
+    .container
+        #intro
+            h1 submission
+            p Welcome to #{title}
