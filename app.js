@@ -40,6 +40,7 @@ app.use(flash())
 
 //Passport and express-session
 var User = models.User
+var Room = models.Room
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -138,8 +139,8 @@ app.use(function (req, res, next) {
 
 // error handlers
 
-// development error handler
-// will print stacktrace
+ //development error handler
+ //will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
@@ -161,18 +162,24 @@ app.use(function (err, req, res, next) {
 });
 
 //Mongoose
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/pre', function(err) {
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function(err) {
     if (err) throw err
-    else {
+    Room.findOrCreate({
+        path: 'hello',
+        name: 'MyRoom',
+        desc: 'test'
+    }, (err, room, created) => {
         User.findOrCreate({
             username: 'Arthelon',
             password: '123456789',
             email: 'hsing.daniel@gmail.com',
             first_name: 'Daniel',
-            last_name: 'Hsing'
-        }, (err, doc, created) => null)
-    }
+            last_name: 'Hsing',
+            rooms: [room._id]
+        }, (err, doc, created) => {
+            if (err) throw err
+        })
+    })
 })
-
 
 module.exports = app;

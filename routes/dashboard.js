@@ -1,13 +1,23 @@
 var express = require('express')
 var router = express.Router()
+var models = require('../models')
 
 router.route('/')
     .get(function(req, res) {
         if (req.isAuthenticated()) {
-            res.render('dashboard', {
-                name: req.user.username,
-                title: 'submission | Dashboard'
-            })
+            models.User
+                .findOne({
+                    username: req.user.username
+                })
+                .populate('rooms')
+                .exec(function(err, user) {
+                    console.log(user.rooms)
+                    res.render('dashboard', {
+                        name: user.username,
+                        title: 'submission | Dashboard',
+                        rooms: user.rooms
+                    })
+                })
         } else {
             res.redirect('/')
         }

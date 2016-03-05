@@ -13,8 +13,8 @@ var SubmissionSchema = new Schema({
 })
 
 var RoomSchema = new Schema({
-    _id: {type: String, required:true, unique: true},
-    name: {type: String, required:true},
+    path: {type: String, required: true, unique: true},
+    name: {type: String, required:true, unique: true},
     desc: String,
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
@@ -26,6 +26,7 @@ RoomSchema.methods.verifyID = function(id) {
         return !found
     })
 }
+RoomSchema.plugin(findOrCreate)
 
 var UserSchema = new Schema({
     username: {type:String, unique: true, required: true},

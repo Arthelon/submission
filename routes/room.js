@@ -1,9 +1,26 @@
 var express = require('express')
 var router = express.Router()
+var models = require('../models')
 
-router.get('/', function(req, res) {
-    "use strict";
-    res.redirect('/')
-})
+var Room = models.Room
+
+router.route('/:room_name')
+    .get(function(req, res) {
+        var room_name = req.params.room_name
+        Room.findOne({
+            path: room_name
+        }, function(err, room) {
+            if (err) throw err
+            if (!room) {
+                res.status(404)
+                res.render('error', {
+                    message: 'Room does not exist, did you enter in the room path correctly?',
+                    error: {}
+                })
+            } else {
+                res.send('Room exists!')
+            }
+        })
+    })
 
 module.exports = router
