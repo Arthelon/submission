@@ -11,7 +11,6 @@ router.route('/')
                 })
                 .populate('rooms')
                 .exec(function(err, user) {
-                    console.log(user.rooms)
                     res.render('dashboard', {
                         name: user.username,
                         title: 'submission | Dashboard',

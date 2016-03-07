@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport')
+var Room = require('../models').Room
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -15,8 +16,8 @@ router.get('/', function(req, res) {
 router.get('/logout', function(req, res) {
     if (req.isAuthenticated()) {
         req.logout()
-        res.redirect('/')
     }
+    res.redirect('/')
 })
 
 router.route('/register')
@@ -28,10 +29,9 @@ router.route('/register')
     })
     .post(passport.authenticate('register', {
         failureRedirect: '/register',
-        failureFlash: true
-    }), function(req, res) {
-        res.redirect('/')
-    })
+        failureFlash: true,
+        successRedirect: '/'
+    }))
 
 router.route('/login')
     .get(function(req, res) {
@@ -44,8 +44,37 @@ router.route('/login')
         successRedirect: '/',
         failureRedirect: '/login',
         failureFlash: true
-    }), function(req, res) {
-        res.send('Successful')
+    }))
+router.route('/create_room')
+    .get(function(req, res) {
+        if (req.isAuthenticated()) {
+            res.render('create_room', {
+                errors: req.flash('error')
+            })
+        } else {
+            res.redirect('/')
+        }
+    })
+    .post(function(req, res) {
+        if (req.isAuthenticated()) {
+            Room.findOrCreate({
+                path: req.body.path,
+                name: req.body.name,
+                desc: req.body.desc
+            }, function (err, room, created) {
+                if (err) {
+                    req.flash('error', 'Error Occured')
+                } else if (!created) {
+                    req.flash('error', 'Room already exists')
+                    res.redirect('/create_room')
+                } else {
+                    req.flash('msg', 'Room created')
+                    res.redirect('/dashboard')
+                }
+            })
+        } else {
+            res.redirect('/')
+        }
     })
 
 module.exports = router;

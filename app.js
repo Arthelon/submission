@@ -14,6 +14,7 @@ var dashboard = require('./routes/dashboard')
 var passport = require('passport');
 var session = require('express-session');
 var LocalStrategy = require('passport-local').Strategy
+var CustomStrategy = require('passport-custom').Strategy
 
 //Mongoose
 var mongoose = require('mongoose')
@@ -68,7 +69,6 @@ passport.use('login', new LocalStrategy({
                         req.flash('error', 'User Not found.'));
                 }
                 if (!user.verifyPassword(password)){
-                    console.log('Invalid Password');
                     return done(null, false,
                         req.flash('error', 'Invalid Password'));
                 }
@@ -89,16 +89,16 @@ passport.use('register', new LocalStrategy({
             } else if (user) {
                 return done(null, false,
                     req.flash('error', 'Username already exists'))
-            } else if (req.param.password2 != password) {
+            } else if (req.body.password2 != password) {
                 return done(null, false,
                     req.flash('error', 'Passwords don\'t match'))
             } else {
                 var new_user = new User({
                     username: username,
                     password: password,
-                    first_name: req.param('first_name'),
-                    last_name: req.param('last_name'),
-                    email: req.param('email')
+                    email: req.body.email,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name,
                 })
                 if (new_user.validatePassword()) {
                     new_user.save(function(err) {

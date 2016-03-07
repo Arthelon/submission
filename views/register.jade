@@ -1,5 +1,11 @@
 extends ./layout
 
+block head
+    .header
+        //LOGO
+        .float-left.btns
+            a(href='/') Main
+
 block content
     .container
         .container-fluid
@@ -13,8 +19,17 @@ block content
                         .panel-body
                             form(method='POST', action='/register')
                                 .form-group
+                                    label(for='fnameInput') First Name
+                                    input#fnameInput.form-control(name='first_name', placeholder='first name')
+                                .form-group
+                                    label(for='lnameInput') Last Name
+                                    input#lnameInput.form-control(name='last_name', placeholder='last name')
+                                .form-group
                                     label(for='usernameInput') Username
                                     input#usernameInput.form-control(name='username', placeholder='username')
+                                .form-group
+                                    label(for='emailInput') Email
+                                        input#emailInput.form-control(name='email', placeholder='email')
                                 .form-group
                                     label(for='passwordInput') Password
                                     input#passwordInput.form-control(name='password', type='password', placeholder='password')

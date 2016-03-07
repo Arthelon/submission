@@ -1,0 +1,31 @@
+extends ./layout
+
+block content
+    .header
+        .btns
+            .float-left
+                a(href='/') Home
+            .float-right
+                a(href='/logout') Logout
+    .container
+        h3 Create Room Here
+        hr
+        .row
+            .col-md-6
+                .panel.panel-default
+                    .panel-heading.clearfix
+                        h3.panel-title Create Room
+                    .panel-body
+                        form(method='POST' action='/create_room')
+                            .form-group
+                                label.col-lg-4.control-label(for='roomName') Room Name
+                                input#roomName.form-control(name='name' type='text', placeholder='Room Name')
+                            .form-group
+                                label.col-lg-4.control-label(for='roomPath') Path
+                                input#roomPath.form-control(name='path' type='text', placeholder='/room/ROOM_NAME')
+                            .form-group
+                                label.col-lg-4.control-label(for='roomDesc') Description
+                                input#roomDesc.form-control(name='desc' type='text', placeholder='Optional')
+                            if errors
+                                p #{errors}
+                            button.btn.btn-success(type='submit') Submit
