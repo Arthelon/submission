@@ -16,6 +16,7 @@ var RoomSchema = new Schema({
     path: {type: String, required: true, unique: true},
     name: {type: String, required: true, unique: true},
     desc: String,
+    owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]

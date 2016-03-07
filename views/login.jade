@@ -24,10 +24,6 @@ block content
                                 .form-group
                                     label(for='passwordInput') Password
                                     input#passwordInput.form-control(name='password', type='password', placeholder='password')
-                                .checkbox
-                                    label
-                                        input(type='checkbox')
-                                        |  Remember me
                                 if errors
                                     p #{errors}
                                 button.btn.btn-success(type='submit') Submit

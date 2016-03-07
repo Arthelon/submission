@@ -64,7 +64,8 @@ router.route('/create_room')
             Room.findOrCreate({
                 path: req.body.path,
                 name: req.body.name,
-                desc: req.body.desc
+                desc: req.body.desc,
+                owner: req.user._id
             }, function (err, room, created) {
                 if (err) {
                     req.flash('error', 'Error Occured')
@@ -91,7 +92,14 @@ router.delete('/_remove_room', function(req, res) {
     if (req.isAuthenticated()) {
         Room.findOneAndRemove({
             name: req.query.room_name
-        }, (err) => {
+        }, (err, room) => {
+            User.findOneAndUpdate({
+                username: req.user.username
+            }, {
+                $pull: {rooms: room._id}
+            }, (err, docs) => {
+                if (err) throw err
+            })
             if (err) res.end(JSON.stringify({status: 'FAILED', msg: err.message}))
             else res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
         })

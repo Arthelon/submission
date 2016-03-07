@@ -37,10 +37,6 @@ block content
                                     input#passwordInput.form-control(name='password', type='password', placeholder='password')
                                 .form-group
                                     input#passwordDupInput.form-control(name='password2', type='password', placeholder='re-enter password')
-                                .checkbox
-                                    label
-                                        input(type='checkbox')
-                                        |  Remember me
                                 if errors
                                     p #{errors}
                                 button.btn.btn-success(type='submit') Submit
