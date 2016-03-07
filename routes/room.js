@@ -18,7 +18,10 @@ router.route('/:room_name')
                     error: {}
                 })
             } else {
-                res.send('Room exists!')
+                res.render('room', {
+                    room_name: room.name,
+                    room_desc: room.desc
+                })
             }
         })
     })

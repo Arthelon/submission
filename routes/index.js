@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport')
-var Room = require('../models').Room
+var models = require('../models')
+
+var User = models.User
+var Room = models.Room
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -64,10 +67,16 @@ router.route('/create_room')
             }, function (err, room, created) {
                 if (err) {
                     req.flash('error', 'Error Occured')
+                    res.redirect('/create_room')
                 } else if (!created) {
                     req.flash('error', 'Room already exists')
                     res.redirect('/create_room')
                 } else {
+                    User.findOneAndUpdate({username: req.user.username}, {
+                        $push: {rooms: room._id}
+                    }, (err, doc) => {
+                        if(err) throw err
+                    })
                     req.flash('msg', 'Room created')
                     res.redirect('/dashboard')
                 }
