@@ -52,6 +52,7 @@ router.route('/create_room')
     .get(function(req, res) {
         if (req.isAuthenticated()) {
             res.render('create_room', {
+                title: 'submission | Create Room',
                 errors: req.flash('error')
             })
         } else {
@@ -85,5 +86,21 @@ router.route('/create_room')
             res.redirect('/')
         }
     })
+
+router.delete('/_remove_room', function(req, res) {
+    if (req.isAuthenticated()) {
+        Room.findOneAndRemove({
+            name: req.query.room_name
+        }, (err) => {
+            if (err) res.end(JSON.stringify({status: 'FAILED', msg: err.message}))
+            else res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
+        })
+    } else {
+        res.end(JSON.stringify({
+            status: 'FAILED',
+            msg: 'Unvalidated user'
+        }))
+    }
+})
 
 module.exports = router;
