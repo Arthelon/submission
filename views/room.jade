@@ -4,5 +4,14 @@ block head
 
 block content
     .container
-        h1 #{room_name}
-        p #{room_desc}
+        .text-center
+            h1 #{room_name}
+            p #{room_desc}
+            form#uploadForm(action='/room/'+room_name method='post' encType='multipart/form-data')
+                input(type='file' name='file')
+                input(type='submit' value='Upload!')
+                .errors
+                    if errors
+                        p #{errors}
+block script
+    script(type='text/javascript' src='/javascripts/room_client.js')
