@@ -1,21 +1,42 @@
 $(function() {
     var valid_types = ['.py']
-    var input_elem = $('input[name=file]')
 
-    input_elem.change(function() {
-        if (this.files) {
-            var file = this.files[0]
-            if (!file.name.endsWith('.py')) {
-                $('#uploadForm').find('.errors').append('<p>Please upload a valid filetype</p>')
-                input_elem.wrap('<form>').closest('form').get(0).reset();
-                input_elem.unwrap();
+    $('input[name=file]').each( function() {
+        var $input	 = $( this ),
+            $label	 = $input.next('label'),
+            labelVal = $label.html();
 
-                // Prevent form submission
-                //input_elem.stopPropagation();
-                //input_elem.preventDefault();
-            } else {
-                $('#uploadForm').find('.errors').empty()
+        $input.on('change', function(e) {
+            var fileName = '';
+            var form = $('#uploadForm')
+
+            form.find('.errors').empty()
+            if (this.files) {
+                var files = this.files
+                for (var i in files) {
+                    if (!files[i].name.endsWith('.py')) {
+                        form.find('.errors').append('<p>Please upload valid filetypes</p>')
+                        $input.wrap('<form>').closest('form').get(0).reset();
+                        $input.unwrap();
+                        return
+                    }
+                }
             }
-        }
-    })
+
+            if(this.files && this.files.length > 1 )
+                fileName = (this.getAttribute('data-multiple-caption') || '' ).replace( '{count}', this.files.length );
+            else if( e.target.value )
+                fileName = e.target.value.split( '\\' ).pop();
+
+            if(fileName)
+                $label.find('span').html( fileName );
+            else
+                $label.html(labelVal);
+        });
+
+        // Firefox bug fix
+        $input
+            .on( 'focus', function(){ $input.addClass( 'has-focus' ); })
+            .on( 'blur', function(){ $input.removeClass( 'has-focus' ); });
+    });
 })

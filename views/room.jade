@@ -7,11 +7,16 @@ block content
         .text-center
             h1 #{room_name}
             p #{room_desc}
-            form#uploadForm(action='/room/'+room_name method='post' encType='multipart/form-data')
-                input(type='file' name='file')
-                input(type='submit' value='Upload!')
-                .errors
-                    if errors
-                        p #{errors}
+    .container
+        form#uploadForm(action='/room/'+room_name method='post' encType='multipart/form-data')
+            .fileinput
+                input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
+                label(for="file")
+                    i.fa.fa-upload
+                    span Choose a file...
+            input(type='submit' value='Upload!')
+            .errors
+                if errors
+                    p #{errors}
 block script
     script(type='text/javascript' src='/javascripts/room_client.js')
