@@ -91,22 +91,27 @@ router.route('/create_room')
 
 router.delete('/_remove_room', function(req, res) {
     if (req.user) {
-        Room.findOneAndRemove({
+        Room.findOne({
             name: req.query.room_name
         }, (err, room) => {
             if (!req.user._id == room.owner) {
                 res.end(JSON.stringify({status: 'FAILED', msg: 'Room does not belong to you'}))
-                return
+            } else {
+                Room.findOneAndRemove({
+                    name: req.query.room_name
+                }, (err) => {
+                    if (err) throw err
+                })
+                User.findOneAndUpdate({
+                    username: req.user.username
+                }, {
+                    $pull: {rooms: room._id}
+                }, (err, docs) => {
+                    if (err) throw err
+                })
+                if (err) res.end(JSON.stringify({status: 'FAILED', msg: err.message}))
+                else res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
             }
-            User.findOneAndUpdate({
-                username: req.user.username
-            }, {
-                $pull: {rooms: room._id}
-            }, (err, docs) => {
-                if (err) throw err
-            })
-            if (err) res.end(JSON.stringify({status: 'FAILED', msg: err.message}))
-            else res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
         })
     } else {
         res.end(JSON.stringify({

@@ -3,28 +3,49 @@ extends ./layout
 block head
 
 block content
+    if submissions
+        .header.btns
+            .float-left
+                a(href='/dashboard') Main
+            .float-right
+                a(href='/logout') Logout
     .container
         .text-center
             h1 #{room_name}
             p #{room_desc}
     .container
-        .panel.panel-default
-            .panel-body
-                form#uploadForm(action='/room/'+room_name method='POST' encType='multipart/form-data')
-                    .form-group
-                        label(for='nameInput') Submission Title
-                        input#nameInput(type='text' name='name' placeholder='Title')
-                    .form-group
-                        label(for='descInput') Description
-                        input#descInput(type='text' name='desc' placeholder='Optional')
-                    .fileInput
-                        input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
-                        label(for="file")
-                            i.fa.fa-upload
-                            span Choose a file...
-                    input(type='submit' value='Upload!')
-                    .errors
-                        if errors
-                            p #{errors}
+        if submissions
+            table.table.table-striped.table-hover
+                thead
+                    tr
+                        th Name
+                        th Description
+                        th Timestamp
+                tbody
+                    each submission in submissions
+                        tr
+                            td #{submission.name}
+                            td #{submission.desc}
+                            td #{submission.timestamp}
+                                i.fa.fa-times.cross
+        else
+            .panel.panel-default
+                .panel-body
+                    form#uploadForm(action='/room/'+room_name method='POST' encType='multipart/form-data')
+                        .form-group
+                            label(for='nameInput') Submission Title
+                            input#nameInput(type='text' name='name' placeholder='Title')
+                        .form-group
+                            label(for='descInput') Description
+                            input#descInput(type='text' name='desc' placeholder='Optional')
+                        .fileInput
+                            input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
+                            label(for="file")
+                                i.fa.fa-upload
+                                span Choose a file...
+                        input(type='submit' value='Upload!')
+                        .errors
+                            if errors
+                                p #{errors}
 block script
     script(type='text/javascript' src='/javascripts/room_client.js')

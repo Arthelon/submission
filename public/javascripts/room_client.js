@@ -48,4 +48,8 @@ $(function() {
             e.preventDefault()
         }
     })
+
+    $('.cross').click(function() {
+
+    })
 })
