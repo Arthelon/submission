@@ -42,6 +42,10 @@ $(function() {
             form.find('.errors').empty()
             form.find('.errors').append('<p>No files selected</p>')
             e.preventDefault()
+        } else if (!$('input[name=name]').val()) {
+            form.find('.errors').empty()
+            form.find('.errors').append('<p>Please enter a submission title</p>')
+            e.preventDefault()
         }
     })
 })

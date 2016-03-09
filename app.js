@@ -22,7 +22,6 @@ var models = require('./models')
 
 //Misc
 var flash = require('connect-flash')
-var bb = require('express-busboy')
 
 var app = express();
 
@@ -39,11 +38,6 @@ app.use(cookieParser());
 app.use(session({secret: 'mySecretKey', resave: false, saveUninitialized: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash())
-
-//Busboy setup
-bb.extend(app, {
-    upload: true
-})
 
 //Passport and express-session
 var User = models.User

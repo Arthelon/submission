@@ -2,14 +2,30 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var findOrCreate = require('mongoose-findorcreate')
 
-var models = {}
-
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    name: String,
+    name: {type: String, required: true},
     desc: String,
-    user: {type: String, require: true},
-    files: [{type: Buffer, required: true}]
+    files: [
+        {type: Schema.Types.ObjectId, ref: 'File'}
+    ]
+})
+
+var FileSchema = new Schema({
+    name: String,
+    type: String,
+    loc: String
+})
+
+var UserSchema = new Schema({
+    username: {type:String, unique: true, required: true},
+    password: {type:String, required: true},
+    first_name: {type:String, required: true},
+    last_name: {type:String, required: true},
+    email: {type:String, unique: true, required: true},
+    rooms: [
+        {type: Schema.Types.ObjectId, ref: 'Room'}
+    ]
 })
 
 var RoomSchema = new Schema({
@@ -27,18 +43,10 @@ RoomSchema.methods.verifyID = function(id) {
         return !found
     })
 }
-RoomSchema.plugin(findOrCreate)
 
-var UserSchema = new Schema({
-    username: {type:String, unique: true, required: true},
-    password: {type:String, required: true},
-    first_name: {type:String, required: true},
-    last_name: {type:String, required: true},
-    email: {type:String, unique: true, required: true},
-    rooms: [
-        {type: Schema.Types.ObjectId, ref: 'Room'}
-    ]
-})
+
+var models = {}
+
 UserSchema.methods.verifyPassword = function (password) {
     "use strict";
     return this.password == password;
@@ -47,8 +55,12 @@ UserSchema.methods.verifyPassword = function (password) {
 UserSchema.methods.validatePassword = function() {
     return !!this.password.match(/^[\d\w]{8,}$/);
 }
-UserSchema.plugin(findOrCreate)
 
+//Plugins
+UserSchema.plugin(findOrCreate)
+RoomSchema.plugin(findOrCreate)
+
+models.File = mongoose.model('File', FileSchema)
 models.Submission = mongoose.model('Submission', SubmissionSchema)
 models.Room = mongoose.model('Room', RoomSchema)
 models.User = mongoose.model('User', UserSchema)
