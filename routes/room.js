@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var models = require('../models')
+var fs = require('fs')
 
 var Room = models.Room
 var Submission = models.Submission
@@ -32,11 +33,33 @@ router.route('/:room_name')
     })
     .post(function(req, res) {
         var room_name = req.params.room_name
-        //req.files.sampleFile gives you a FileStream object
-        //Room.findOne({
-        //    path: room_name
-        //}, function(err, room) {
+        var files = req.files //gives you a FileStream object
+        var submission_data = []
+        //{ $push: { <field>: { $each: [ <value1>, <value2> ... ] } } }
+
+        for (var key in files) {
+            var data = ''
+            //var buf = files[key].data.read(1024)
+            //while (buf) {
+            //    data += buf
+            //    buf = files[key].data.read(1024)
+            //}
+            //fs.readFile(files[key].path, function (err, data) {
+            //    var newPath = __dirname+"/uploads/uploadedFileName";
+            //    fs.writeFile(newPath, data, function (err) {
+            //        res.redirect("back");
+            //    });
+            //});
+        }
+        //Submission.create({
         //
+        //}, function(err, submission) {
+        //    Room.findOneAndUpdate({
+        //        name: room_name,
+        //        $push: {submissions: submission._id}
+        //    }, (err, room) => {
+        //        if (err) throw err
+        //    })
         //})
         res.redirect('back')
     })

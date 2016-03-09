@@ -9,7 +9,7 @@ var SubmissionSchema = new Schema({
     name: String,
     desc: String,
     user: {type: String, require: true},
-    file: {type: Buffer, required: true}
+    files: [{type: Buffer, required: true}]
 })
 
 var RoomSchema = new Schema({
