@@ -4,7 +4,7 @@ var models = require('../models')
 
 router.route('/')
     .get(function(req, res) {
-        if (req.isAuthenticated()) {
+        if (req.user) {
             models.User
                 .findOne({
                     username: req.user.username

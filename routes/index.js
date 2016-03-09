@@ -8,7 +8,7 @@ var Room = models.Room
 
 /* GET home page. */
 router.get('/', function(req, res) {
-    if (req.isAuthenticated()) {
+    if (req.user) {
         res.redirect('/dashboard')
     }
     res.render('index', {
@@ -17,7 +17,7 @@ router.get('/', function(req, res) {
 });
 
 router.get('/logout', function(req, res) {
-    if (req.isAuthenticated()) {
+    if (req.user) {
         req.logout()
     }
     res.redirect('/')
@@ -48,9 +48,10 @@ router.route('/login')
         failureRedirect: '/login',
         failureFlash: true
     }))
+
 router.route('/create_room')
     .get(function(req, res) {
-        if (req.isAuthenticated()) {
+        if (req.user) {
             res.render('create_room', {
                 title: 'submission | Create Room',
                 errors: req.flash('error')
@@ -60,7 +61,7 @@ router.route('/create_room')
         }
     })
     .post(function(req, res) {
-        if (req.isAuthenticated()) {
+        if (req.user) {
             Room.findOrCreate({
                 path: req.body.path,
                 name: req.body.name,
@@ -89,10 +90,14 @@ router.route('/create_room')
     })
 
 router.delete('/_remove_room', function(req, res) {
-    if (req.isAuthenticated()) {
+    if (req.user) {
         Room.findOneAndRemove({
             name: req.query.room_name
         }, (err, room) => {
+            if (!req.user._id == room.owner) {
+                res.end(JSON.stringify({status: 'FAILED', msg: 'Room does not belong to you'}))
+                return
+            }
             User.findOneAndUpdate({
                 username: req.user.username
             }, {

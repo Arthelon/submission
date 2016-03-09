@@ -33,8 +33,8 @@ router.route('/:room_name')
                     room_name: room.name,
                     room_desc: room.desc
                 }
-                if (req.isAuthenticated()) {
-
+                if (req.user &&req.user._id.toString() == room.owner.toString()) {
+                    console.log('isOwner')
                 }
                 res.render('room', payload)
             }
@@ -43,7 +43,7 @@ router.route('/:room_name')
     .post(upload.array('file'), function(req, res) {
         Submission.create({
             name: req.body.name,
-            desc: req.body.desc,
+            desc: req.body.desc
         }, function(err, submission) {
             if (err) throw err
             Room.findOneAndUpdate({

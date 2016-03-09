@@ -72,6 +72,7 @@ passport.use('login', new LocalStrategy({
                     return done(null, false,
                         req.flash('error', 'Invalid Password'));
                 }
+                req.session.user = user
                 return done(null, user);
             }
         );
@@ -164,20 +165,29 @@ app.use(function (err, req, res, next) {
 //Mongoose
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function(err) {
     if (err) throw err
-    //Room.findOrCreate({
-    //    path: 'hello',
-    //    name: 'MyRoom',
-    //    desc: 'test'
-    //}, (err, room, created) => {
-    //    User.findOrCreate({
-    //        username: 'Arthelon',
-    //        password: '123456789',
-    //        email: 'hsing.daniel@gmail.com',
-    //        first_name: 'Daniel',
-    //        last_name: 'Hsing',
-    //        rooms: [room._id]
-    //    }, (err, doc, created) => {
-    //        if (err) throw err
+    //User.findOrCreate({
+    //    username: 'Arthelon',
+    //    password: '123456789',
+    //    email: 'hsing.daniel@gmail.com',
+    //    first_name: 'Daniel',
+    //    last_name: 'Hsing',
+    //}, (err, doc, created) => {
+    //    if (err) throw err
+    //    Room.findOrCreate({
+    //        path: 'hello',
+    //        name: 'MyRoom',
+    //        desc: 'test',
+    //        owner: doc._id
+    //    }, (err, room, created) => {
+    //        User.findOneAndUpdate({
+    //            username: doc.username
+    //        }, {
+    //            $push: {
+    //                rooms: room._id
+    //            }
+    //        }, (err) => {
+    //            if (err) throw err
+    //        })
     //    })
     //})
 })
