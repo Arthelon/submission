@@ -10,6 +10,7 @@ router.route('/')
                     username: req.user.username
                 })
                 .populate('rooms')
+                .sort('username')
                 .exec(function(err, user) {
                     res.render('dashboard', {
                         name: user.username,
@@ -21,6 +22,5 @@ router.route('/')
             res.redirect('/')
         }
     })
-
 
 module.exports = router

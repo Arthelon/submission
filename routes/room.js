@@ -47,12 +47,14 @@ router.route('/:room_name')
                     room_name: room.name,
                     room_desc: room.desc
                 }
-                if (req.user &&req.user._id.toString() == room.owner.toString()) {
-                    Submission.find({},(err, submissions) => {
-                        if (err) throw err
-                        payload.submissions = submissions
-                        res.render('room', payload)
-                    })
+                if (req.user && req.user._id.toString() == room.owner.toString()) {
+                    Submission.find()
+                        .sort({'-timestamp': 'desc'})
+                        .exec((err, submissions) => {
+                            if (err) throw err
+                            payload.submissions = submissions
+                            res.render('room', payload)
+                        })
                 } else {
                     res.render('room', payload)
                 }
