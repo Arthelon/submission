@@ -21,6 +21,7 @@ block content
                         th Name
                         th Description
                         th Timestamp
+                        th Files
                 tbody
                     each submission in submissions
                         tr
@@ -28,6 +29,7 @@ block content
                                 a#downloadFile(href='/room/_download/'+room_name+'/'+submission.name) #{submission.name}
                             td #{submission.desc}
                             td #{submission.timestamp}
+                            td #{submission.files.length}
                                 i.fa.fa-times.cross
         else
             .panel.panel-default

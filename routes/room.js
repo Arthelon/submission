@@ -3,6 +3,7 @@ var router = express.Router()
 var models = require('../models')
 var multer = require('multer')
 var fs = require('fs')
+var archiver = require('archiver');
 
 var upload = multer({
     dest: 'uploads/',
@@ -119,9 +120,14 @@ router.get('/_download/:room_name/:submission', function(req, res) {
                                 if (err) throw err
                             })
                         } else {
+                            var file_bundle = archiver.create('zip', {})
+                            file_bundle.pipe(res)
                             sub.files.forEach(function (file) {
-                                console.log(file.name)
+                                file_bundle.append(fs.createReadStream('uploads/'+file.loc), {
+                                    name: file.name
+                                })
                             })
+                            file_bundle.finalize()
                         }
                     })
             }
