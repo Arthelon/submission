@@ -24,7 +24,8 @@ block content
                 tbody
                     each submission in submissions
                         tr
-                            td #{submission.name}
+                            td
+                                a#downloadFile(href='/room/_download/'+room_name+'/'+submission.name) #{submission.name}
                             td #{submission.desc}
                             td #{submission.timestamp}
                                 i.fa.fa-times.cross

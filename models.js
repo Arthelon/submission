@@ -4,7 +4,7 @@ var findOrCreate = require('mongoose-findorcreate')
 
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    name: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     desc: String,
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}

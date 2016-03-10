@@ -6,6 +6,19 @@ var fs = require('fs')
 
 var upload = multer({
     dest: 'uploads/',
+    changeDest: function (dest, req, res) {
+        var newDestination = dest + req.params.room_name;
+        var stat = null;
+        try {
+            stat = fs.statSync(newDestination);
+        } catch (err) {
+            fs.mkdirSync(newDestination);
+        }
+        if (stat && !stat.isDirectory()) {
+            throw new Error('Directory cannot be created because an inode of a different type exists at "' + dest + '"');
+        }
+        return newDestination
+    },
     limits: {
         fileSize: 100000000 //100 MB
     }
@@ -80,6 +93,47 @@ router.route('/:room_name')
         })
         res.redirect('back')
     })
+
+router.get('/_download/:room_name/:submission', function(req, res) {
+    if (req.user) {
+        var room_name = req.params.room_name
+        Room.findOne({
+            name: room_name
+        }, function(err, room) {
+            if (err) throw err
+            if (room.owner.toString() != req.user._id.toString()) {
+                res.end(JSON.stringify({
+                    status: 'FAILED',
+                    msg: 'User does not own room'
+                }))
+            } else {
+                Submission
+                    .findOne({
+                        name: req.params.submission
+                    })
+                    .populate('files')
+                    .exec(function(err, sub) {
+                        if (err) throw err
+                        if (sub.files.length == 1) {
+                            res.download('uploads/'+sub.files[0].loc, sub.files[0].name, (err) => {
+                                if (err) throw err
+                            })
+                        } else {
+                            sub.files.forEach(function (file) {
+                                console.log(file.name)
+                            })
+                        }
+                    })
+            }
+        })
+    } else {
+        res.status(404)
+        res.end(JSON.stringify({
+            status: 'FAILED',
+            msg: 'Unvalidated user'
+        }))
+    }
+})
 
 
 module.exports = router
