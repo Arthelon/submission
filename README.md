@@ -1,6 +1,6 @@
 # submission
 
-Basic submission platform + Online judge platform for students and teachers
+Basic submission + online judge platform for students and teachers
 
 ### To-do
 - [x] Basic webapp infrastructure (Rooms, Submissions, Files)
