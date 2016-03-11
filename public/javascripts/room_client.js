@@ -24,7 +24,7 @@ $(function() {
             if (this.files) {
                 var files = this.files
                 for (var i in files) {
-                    if (!files[i].name.endsWith('.py')) {
+                    if (files[i] && !files[i].name.endsWith('.py')) {
                         form.find('.errors').append('<p>Please upload valid filetypes</p>')
                         $input.val('')
                     }
@@ -50,6 +50,15 @@ $(function() {
     })
 
     $('.cross').click(function() {
+        var $index = $(this).index()+1
+        var $tableLink = $('tbody tr:nth-child('+$index+') td:nth-child(1) a')
+        var room_name = $tableLink.attr('room')
+        var sub_name = $tableLink.text()
 
+        $.ajax({
+            type: "DELETE",
+            url: '/room/'+room_name+'/_remove_sub/'+sub_name
+        });
+        $('tbody tr:nth-child('+$index+')').remove()
     })
 })

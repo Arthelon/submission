@@ -143,5 +143,42 @@ router.get('/_download/:room_name/:submission', function(req, res) {
     }
 })
 
+router.delete('/:room_name/_remove_sub/:submission', function(req, res) {
+    if (req.user) {
+        Room.findOne({name:req.params.room_name}, function(err, room) {
+            if (err) throw err
+            if (req.user._id.toString() != room.owner.toString()) {
+                res.end(JSON.stringify({
+                    status: 'FAILED',
+                    msg: 'User does not own room'
+                }))
+            } else {
+                console.log(req.params.submission)
+                Submission.findOneAndRemove({name: req.params.submission}, function(err, sub) {
+                    if (err) throw err
+                    Room.findOneAndUpdate({name: req.params.room_name},  {
+                        $pull: {
+                            submissions: sub._id
+                        }
+                    },function(err) {
+                        if (err) throw err
+                    })
+                    sub.files.forEach(function(id) {
+                        File.findOneAndRemove({_id: id}, (err) => {
+                            if (err) throw err
+                        })
+                    })
+                 })
+            }
+        })
+    } else {
+        res.status(404)
+        res.end(JSON.stringify({
+            status: 'FAILED',
+            msg: 'Unvalidated user'
+        }))
+    }
+})
+
 
 module.exports = router
