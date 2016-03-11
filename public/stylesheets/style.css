@@ -46,6 +46,10 @@ a:hover, a:active {
 #uploadForm {
     text-align:center;
 }
+
+#uploadForm > * {
+    margin-top:10px;
+}
 #file {
     width: 0.1px;
     height: 0.1px;
@@ -79,4 +83,10 @@ a:hover, a:active {
 #uploadForm label > * {
     margin-left: 3px;
     margin-right: 3px;
+}
+
+#editor {
+    text-align: left;
+    position: relative;
+    height: 300px;
 }

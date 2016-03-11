@@ -1,13 +1,22 @@
 $(function() {
     var valid_types = ['.py']
     var form = $('#uploadForm')
+    var $fileInp = $('input[name=file]')
+    var fillerCode = '# Enter code here'
 
-    $('input[name=file]').each( function() {
-        var $input	 = $(this),
-            $label	 = $input.next('label'),
+    //AceJS Code
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.$blockScrolling = Infinity
+    editor.getSession().setMode("ace/mode/python");
+    editor.insert(fillerCode)
+
+    //Event Handlers
+    $fileInp.each(function() {
+        var $label	 = $fileInp.next('label'),
             labelVal = $label.html();
 
-        $input.on('change', function(e) {
+        $fileInp.on('change', function(e) {
             var fileName = '';
 
             form.find('.errors').empty()
@@ -26,28 +35,45 @@ $(function() {
                 for (var i in files) {
                     if (files[i] && !files[i].name.endsWith('.py')) {
                         form.find('.errors').append('<p>Please upload valid filetypes</p>')
-                        $input.val('')
+                        $fileInp.val('')
                     }
                 }
             }
         });
         // Firefox bug fix
-        $input
-            .on( 'focus', function(){ $input.addClass( 'has-focus' ); })
-            .on( 'blur', function(){ $input.removeClass( 'has-focus' ); });
+        $fileInp
+            .on( 'focus', function(){ $fileInp.addClass( 'has-focus' ); })
+            .on( 'blur', function(){ $fileInp.removeClass( 'has-focus' ); });
     });
 
-    $('input[type=submit]').click(function(e) {
-        if (!$('input[name=file]').val()) {
-            form.find('.errors').empty()
-            form.find('.errors').append('<p>No files selected</p>')
+    $('input[type=submit]').on('click', function(e) {
+        console.log($fileInp.val())
+        if (!$('input[name=name]').val()) {
+            show_err('Please enter submission title', e)
+        } else if ($fileInp.val() && editor.getValue() == fillerCode) {
+            show_err('Can\'t accept submissions from both file(s) and text editor', e)
+        } else if (!$fileInp.val() && editor.getValue() == fillerCode) {
+            show_err('Please submit data', e)
+        } else if (editor.getValue() != fillerCode) {
             e.preventDefault()
-        } else if (!$('input[name=name]').val()) {
-            form.find('.errors').empty()
-            form.find('.errors').append('<p>Please enter a submission title</p>')
-            e.preventDefault()
+            var fd = new FormData(document.forms[0]);
+            var editor_file = new Blob(editor.getValue().split('\n'), {type: 'text/x-script.python'})
+            fd.append('file', editor_file, $('input[name=name]').val()+'.py')
+            $.ajax({
+                url: '/room/'+form.attr('room'),
+                method: 'post',
+                data: fd,
+                processData: false,  // tell jQuery not to process the data
+                contentType: false   // tell jQuery not to set contentType
+            })
         }
     })
+
+    function show_err(msg, e) {
+        form.find('.errors').empty()
+        form.find('.errors').append('<p>'+msg+'</p>')
+        e.preventDefault()
+    }
 
     $('.cross').click(function() {
         var $index = $(this).index()+1

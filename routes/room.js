@@ -7,19 +7,19 @@ var archiver = require('archiver');
 
 var upload = multer({
     dest: 'uploads/',
-    changeDest: function (dest, req, res) {
-        var newDestination = dest + req.params.room_name;
-        var stat = null;
-        try {
-            stat = fs.statSync(newDestination);
-        } catch (err) {
-            fs.mkdirSync(newDestination);
-        }
-        if (stat && !stat.isDirectory()) {
-            throw new Error('Directory cannot be created because an inode of a different type exists at "' + dest + '"');
-        }
-        return newDestination
-    },
+    //changeDest: function (dest, req, res) {
+    //    var newDestination = dest + req.params.room_name;
+    //    var stat = null;
+    //    try {
+    //        stat = fs.statSync(newDestination);
+    //    } catch (err) {
+    //        fs.mkdirSync(newDestination);
+    //    }
+    //    if (stat && !stat.isDirectory()) {
+    //        throw new Error('Directory cannot be created because an inode of a different type exists at "' + dest + '"');
+    //    }
+    //    return newDestination
+    //},
     limits: {
         fileSize: 100000000 //100 MB
     }
@@ -62,39 +62,50 @@ router.route('/:room_name')
         })
     })
     .post(upload.array('file'), function(req, res) {
-        Submission.create({
-            name: req.body.name,
-            desc: req.body.desc
-        }, function(err, submission) {
+        Submission.findOne({
+            name: req.body.name
+        }, (err, doc) => {
             if (err) throw err
-            Room.findOneAndUpdate({
-                name: req.params.room_name
-            }, {
-                $push: {
-                    submissions: submission._id
-                }
-            }, (err) => {
-                if (err) throw err
-            })
-            for (var i in req.files) {
-                var file = req.files[i]
-                File.create({
-                    name: file.originalname,
-                    type: file.mimetype,
-                    loc: file.filename
-                }, function (err, created_file) {
+            if (doc) {
+                //res.render('room', {errors: 'Submission name already exists'})
+            } else {
+                res.redirect('back')
+                console.log(req.body)
+                Submission.create({
+                    name: req.body.name,
+                    desc: req.body.desc
+                }, function (err, submission) {
                     if (err) throw err
-                    Submission.findByIdAndUpdate(submission._id, {
+                    Room.findOneAndUpdate({
+                        name: req.params.room_name
+                    }, {
                         $push: {
-                            files: created_file._id
+                            submissions: submission._id
                         }
                     }, (err) => {
                         if (err) throw err
                     })
+                    console.log(req.files)
+                    for (var i in req.files) {
+                        var file = req.files[i]
+                        File.create({
+                            name: file.originalname,
+                            type: file.mimetype,
+                            loc: file.filename
+                        }, function (err, created_file) {
+                            if (err) throw err
+                            Submission.findByIdAndUpdate(submission._id, {
+                                $push: {
+                                    files: created_file._id
+                                }
+                            }, (err) => {
+                                if (err) throw err
+                            })
+                        })
+                    }
                 })
             }
         })
-        res.redirect('back')
     })
 
 router.get('/_download/:room_name/:submission', function(req, res) {
@@ -153,7 +164,6 @@ router.delete('/:room_name/_remove_sub/:submission', function(req, res) {
                     msg: 'User does not own room'
                 }))
             } else {
-                console.log(req.params.submission)
                 Submission.findOneAndRemove({name: req.params.submission}, function(err, sub) {
                     if (err) throw err
                     Room.findOneAndUpdate({name: req.params.room_name},  {

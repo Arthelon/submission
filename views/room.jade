@@ -34,7 +34,7 @@ block content
         else
             .panel.panel-default
                 .panel-body
-                    form#uploadForm(action='/room/'+room_name method='POST' encType='multipart/form-data')
+                    form#uploadForm(room=room_name action='/room/'+room_name method='POST' encType='multipart/form-data')
                         .form-group
                             label(for='nameInput') Submission Title
                             input#nameInput(type='text' name='name' placeholder='Title')
@@ -46,9 +46,12 @@ block content
                             label(for="file")
                                 i.fa.fa-upload
                                 span Choose a file...
+                        #editor
                         input(type='submit' value='Upload!')
                         .errors
                             if errors
                                 p #{errors}
 block script
+    if !submissions
+        script(type='text/javascript' src='https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js')
     script(type='text/javascript' src='/javascripts/room_client.js')
