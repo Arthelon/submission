@@ -6,6 +6,7 @@ var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
     name: {type: String, required: true, unique: true},
     desc: String,
+    user: {type: String, required: true},
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}
     ]
@@ -35,8 +36,20 @@ var RoomSchema = new Schema({
     owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
+    ],
+    problems: [
+        {type: Schema.Types.ObjectId, ref: 'Problem'}
     ]
 })
+
+var ProblemSchema = new Schema({
+    name: {type: String, required: true, unique: true},
+    desc: {type: String, required: true},
+    submissions: [
+        {type: Schema.Types.ObjectId, ref: 'Submission'}
+    ]
+})
+
 RoomSchema.methods.verifyID = function(id) {
     this.findById(id, function(err, found) {
         if (err) throw err
@@ -64,5 +77,6 @@ models.File = mongoose.model('File', FileSchema)
 models.Submission = mongoose.model('Submission', SubmissionSchema)
 models.Room = mongoose.model('Room', RoomSchema)
 models.User = mongoose.model('User', UserSchema)
+models.Problem = mongoose.model('Problem', ProblemSchema)
 
 module.exports = models

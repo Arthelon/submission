@@ -6,25 +6,34 @@ block content
         .float-right.btns
             a(href='logout') Logout
     .container
-        h1 Welcome !{name}
-        if rooms
-            table.table.table-striped.table-hover
-                thead
-                    tr
-                        th URL
-                        th Room Name
-                        th Room Description
-                        th Number of Submissions
-                tbody
-                    each room in rooms
+        .row
+            h1.text-center Welcome !{name}
+        if rooms && rooms.length > 0
+            .row
+                table.table.table-striped.table-hover
+                    thead
                         tr
-                            td
-                                a(href='/room/#{room.path}') /#{room.path}
-                            td #{room.name}
-                            td #{room.desc}
-                            td #{room.submissions.length}
-                                i.fa.fa-times.cross
-            .btns
+                            th URL
+                            th Room Name
+                            th Room Description
+                            th Number of Submissions
+                    tbody
+                        each room in rooms
+                            tr
+                                td
+                                    a(href='/room/#{room.path}') /#{room.path}
+                                td #{room.name}
+                                td #{room.desc}
+                                td #{room.submissions.length}
+                                    i.fa.fa-times.cross
+        else
+            .row
+                .col-md-4.col-md-offset-4
+                    .alert.alert-dismissible.alert-warning
+                        button.fa.fa-close.close(type='button', data-dismiss='alert')
+                        p No rooms found
+        .row
+            .btns.text-center
                 a(href='/create_room') Create Room
 
 block script

@@ -34,6 +34,10 @@ a:hover, a:active {
     float: right;
 }
 
+.float-center {
+    margin: 0 auto;
+}
+
 .footer {
     bottom: 0;
     position: relative;
@@ -43,50 +47,11 @@ a:hover, a:active {
     margin-right: 20px;
 }
 
-#uploadForm {
-    text-align:center;
+.alert-warning {
+    background-color:#464545;
+    border-color: #464545;
 }
-
-#uploadForm > * {
-    margin-top:10px;
-}
-#file {
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    z-index: -1;
-}
-
-#file + label {
-    max-width: 80%;
-    font-size: 1.25rem;
-    font-weight: 700;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    display: inline-block;
-    overflow: hidden;
-    padding: 0.625rem 1.25rem;
-}
-
-#file:focus + label,
-#file + label:hover {
-    background-color: red;
-}
-
-#file:focus + label {
-    outline: 1px dotted #000;
-}
-
-#uploadForm label > * {
-    margin-left: 3px;
-    margin-right: 3px;
-}
-
-#editor {
-    text-align: left;
-    position: relative;
-    height: 300px;
+.row {
+    margin-top: 10px;
+    margin-bottom: 15px;
 }

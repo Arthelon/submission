@@ -38,10 +38,14 @@ router.route('/register')
 
 router.route('/login')
     .get(function(req, res) {
-        res.render('login', {
-            errors: req.flash('error'),
-            title: 'submission | Login'
-        })
+        if (req.user) {
+            res.redirect('/dashboard')
+        } else {
+            res.render('login', {
+                errors: req.flash('error'),
+                title: 'submission | Login'
+            })
+        }
     })
     .post(passport.authenticate('login', {
         successRedirect: '/',
@@ -94,13 +98,19 @@ router.delete('/_remove_room', function(req, res) {
         Room.findOne({
             name: req.query.room_name
         }, (err, room) => {
-            if (!req.user._id == room.owner) {
+            if (err) throw err
+            if (!room) {
+                res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
+            } else if (!req.user._id == room.owner) {
                 res.end(JSON.stringify({status: 'FAILED', msg: 'Room does not belong to you'}))
             } else {
                 Room.findOneAndRemove({
                     name: req.query.room_name
-                }, (err) => {
+                }, (err, room) => {
                     if (err) throw err
+                    if (!room) {
+                        res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
+                    }
                 })
                 User.findOneAndUpdate({
                     username: req.user.username
@@ -109,8 +119,7 @@ router.delete('/_remove_room', function(req, res) {
                 }, (err, docs) => {
                     if (err) throw err
                 })
-                if (err) res.end(JSON.stringify({status: 'FAILED', msg: err.message}))
-                else res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
+                res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
             }
         })
     } else {

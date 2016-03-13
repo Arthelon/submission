@@ -72,7 +72,6 @@ passport.use('login', new LocalStrategy({
                     return done(null, false,
                         req.flash('error', 'Invalid Password'));
                 }
-                req.session.user = user
                 return done(null, user);
             }
         );

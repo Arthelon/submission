@@ -7,6 +7,9 @@ var archiver = require('archiver');
 
 var upload = multer({
     dest: 'uploads/',
+    limits: {
+        fileSize: 100000000 //100 MB
+    }
     //changeDest: function (dest, req, res) {
     //    var newDestination = dest + req.params.room_name;
     //    var stat = null;
@@ -20,9 +23,6 @@ var upload = multer({
     //    }
     //    return newDestination
     //},
-    limits: {
-        fileSize: 100000000 //100 MB
-    }
 })
 
 var Room = models.Room
@@ -45,7 +45,8 @@ router.route('/:room_name')
             } else {
                 var payload = {
                     room_name: room.name,
-                    room_desc: room.desc
+                    room_desc: room.desc,
+                    errors: req.flash('error')
                 }
                 if (req.user && req.user._id.toString() == room.owner.toString()) {
                     Submission.find()
@@ -67,13 +68,15 @@ router.route('/:room_name')
         }, (err, doc) => {
             if (err) throw err
             if (doc) {
-                //res.render('room', {errors: 'Submission name already exists'})
+                req.flash('', 'Submission name already exists')
+                res.redirect('back')
             } else {
                 res.redirect('back')
                 console.log(req.body)
                 Submission.create({
                     name: req.body.name,
-                    desc: req.body.desc
+                    desc: req.body.desc,
+                    user: req.body.user
                 }, function (err, submission) {
                     if (err) throw err
                     Room.findOneAndUpdate({
@@ -174,8 +177,11 @@ router.delete('/:room_name/_remove_sub/:submission', function(req, res) {
                         if (err) throw err
                     })
                     sub.files.forEach(function(id) {
-                        File.findOneAndRemove({_id: id}, (err) => {
+                        File.findOneAndRemove({_id: id}, (err, file) => {
                             if (err) throw err
+                            fs.unlink('uploads/'+file.loc, (err) => {
+                                if (err) throw err
+                            })
                         })
                     })
                  })
@@ -190,5 +196,16 @@ router.delete('/:room_name/_remove_sub/:submission', function(req, res) {
     }
 })
 
+//router.get('/:room_name/_problems', function(req, res) {
+//    if (!req.user) {
+//        res.status(400)
+//        res.end(JSON.stringify({
+//            status: 'FAILED',
+//            msg: 'Unvalidated user'
+//        }))
+//    } else {
+//        Room.fin
+//    }
+//})
 
 module.exports = router
