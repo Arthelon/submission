@@ -1,0 +1,28 @@
+extends ./layout
+
+block content
+    .header
+        .btns
+            .float-left
+                a(href='/') Home
+            .float-right
+                a(href='/logout') Logout
+    .container
+        h3 Create Problem
+        hr
+        .row
+            .col-md-6
+                .panel.panel-default
+                    .panel-heading.clearfix
+                        h3.panel-title Create Problem
+                    .panel-body
+                        form(method='POST' action='/create_prob')
+                            .form-group
+                                label.col-lg-4.control-label(for='roomName') Problem
+                                input#roomName.form-control(name='name' type='text', placeholder='Room Name')
+                            .form-group
+                                label.col-lg-4.control-label(for='roomPath') Problem Description
+                                input#roomPath.form-control(name='path' type='text', placeholder='Room Path')
+                            if errors
+                                p #{errors}
+                            button.btn.btn-success(type='submit') Submit

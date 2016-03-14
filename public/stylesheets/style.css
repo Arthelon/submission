@@ -19,7 +19,7 @@ a:hover, a:active {
     border: solid 1px white;
     border-radius:5%;
     text-decoration: none;
-    cursor: auto;
+    cursor: pointer;
 }
 .btns a:hover, a:active {
     background-color: white;

@@ -6,6 +6,6 @@ $(function() {
             type: "DELETE",
             url: '/_remove_room?'+ $.param({room_name: roomName})
         });
-        $('table tr:nth-child('+index+')').remove()
+        $('table tr:nth-child('+index+')').fadeOut(400, () => $(this).remove())
     })
 })

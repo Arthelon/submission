@@ -93,7 +93,7 @@ $(function() {
                     sub_name: sub_name
                 }
             });
-            $('tbody tr:nth-child(' + $index + ')').remove()
+            $('tbody tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
         })
     }
 

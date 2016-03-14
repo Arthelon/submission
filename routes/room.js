@@ -33,9 +33,13 @@ var Problem = models.Problem
 router.route('/:room_name')
     .get(function(req, res) {
         var room_name = req.params.room_name
-        Room.findOne({
-            path: room_name
-        }, function(err, room) {
+        Room
+        .findOne({
+            path: room_name,
+        })
+        .populate('submissions')
+        .sort({'submissions.timestamp': -1})
+        .exec(function(err, room) {
             if (err) throw err
             if (!room) {
                 res.status(404)
@@ -50,16 +54,11 @@ router.route('/:room_name')
                     errors: req.flash('error')
                 }
                 if (req.user && req.user._id.toString() == room.owner.toString()) {
-                    Submission.find()
-                        .sort({'-timestamp': 'desc'})
-                        .exec((err, submissions) => {
-                            if (err) throw err
-                            payload.submissions = submissions
-                            Problem.find({}, function(err, problems) {
-                                payload.problems = problems
-                                res.render('room', payload)
-                            })
-                        })
+                    payload.submissions = room.submissions
+                    Problem.find({}, function(err, problems) {
+                        payload.problems = problems
+                        res.render('room', payload)
+                    })
                 } else {
                     res.render('room', payload)
                 }
@@ -165,25 +164,19 @@ router.delete('/_remove_sub', validateRoom,
             })
          })
     })
-//
-//router.get('/_problems', validateRoom, function(req, res) {
-//    Problem.find({}, function(err, problems) {
-//        if (err) throw err
-//        var payload = {
-//            status: 'OK',
-//            problems: []
-//        }
-//        problems.forEach(function(problem) {
-//            payload.problems.push({
-//                name: problem.name,
-//                desc: problem.desc,
-//                count: problem.submissions.length
-//            })
-//        })
-//        res.status(200)
-//        res.end(JSON.stringify(payload))
-//    })
-//})
+
+router.route('/problem')
+    .get(function(req, res) {
+        if (req.user) {
+            res.render('create_prob')
+        } else {
+            res.redirect('/')
+        }
+    })
+    .post(function(req, res) {
+
+    })
+
 
 function validateRoom(req, res, next) {
     var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
