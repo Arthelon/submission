@@ -55,7 +55,10 @@ router.route('/:room_name')
                         .exec((err, submissions) => {
                             if (err) throw err
                             payload.submissions = submissions
-                            res.render('room', payload)
+                            Problem.find({}, function(err, problems) {
+                                payload.problems = problems
+                                res.render('room', payload)
+                            })
                         })
                 } else {
                     res.render('room', payload)
@@ -134,21 +137,21 @@ router.get('/_download/:room_name/:submission', validateRoom,
                         })
                     })
                     file_bundle.finalize()
+                    res.sendStatus(200)
                 }
             })
     }
 )
 
-router.delete('/:room_name/_remove_sub/:submission', validateRoom,
+router.delete('/_remove_sub', validateRoom,
     function(req, res) {
-        var room = req.room
-        Submission.findOneAndRemove({name: req.params.submission}, function(err, sub) {
+        Submission.findOneAndRemove({name: req.body.sub_name}, function(err, sub) {
             if (err) throw err
-            Room.findOneAndUpdate({name: req.params.room_name},  {
+            Room.findOneAndUpdate({name: req.room},  {
                 $pull: {
                     submissions: sub._id
                 }
-            },function(err) {
+            }, function(err) {
                 if (err) throw err
             })
             sub.files.forEach(function(id) {
@@ -157,48 +160,50 @@ router.delete('/:room_name/_remove_sub/:submission', validateRoom,
                     fs.unlink('uploads/'+file.loc, (err) => {
                         if (err) throw err
                     })
+                    res.sendStatus(200)
                 })
             })
          })
     })
-
-router.get('/:room_name/_problems', validateRoom, function(req, res) {
-    var room = req.room
-    Problem.find({}, function(err, problems) {
-        if (err) throw err
-        var payload = {
-            status: 'OK',
-            problems: [
-
-            ]
-        }
-        problems.forEach(function(problem) {
-            payload.problems.push({
-                name: problem.name,
-                desc: problem.desc
-            })
-        })
-        res.end(JSON.stringify(payload))
-    })
-})
+//
+//router.get('/_problems', validateRoom, function(req, res) {
+//    Problem.find({}, function(err, problems) {
+//        if (err) throw err
+//        var payload = {
+//            status: 'OK',
+//            problems: []
+//        }
+//        problems.forEach(function(problem) {
+//            payload.problems.push({
+//                name: problem.name,
+//                desc: problem.desc,
+//                count: problem.submissions.length
+//            })
+//        })
+//        res.status(200)
+//        res.end(JSON.stringify(payload))
+//    })
+//})
 
 function validateRoom(req, res, next) {
+    var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
     if (!req.user) {
-        res.status(400)
+        res.status(401)
         res.end(JSON.stringify({
             status: 'FAILED',
             msg: 'Unvalidated user'
         }))
     } else {
-        Room.findOne({name:req.params.room_name}, function(err, room) {
+        Room.findOne({name:room_name}, function(err, room) {
             if (err) throw err
             if (req.user._id.toString() != room.owner.toString()) {
+                res.status(406)
                 res.end(JSON.stringify({
                     status: 'FAILED',
                     msg: 'User does not own room'
                 }))
             } else {
-                req.room = room
+                req.room = room_name
                 next()
             }
         })

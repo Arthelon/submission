@@ -33,31 +33,61 @@ block content
                                 else
                                     li
                                         a No Problems Found!
-                .col-md-9.content
-                    if submissions.length > 0
-                        table.table.table-striped.table-hover
-                            thead
-                                tr
-                                    th Submission Title
-                                    th Submitted by
-                                    th Description
-                                    th Timestamp
-                                    th Files
-                            tbody
-                                each submission in submissions
+                                li.divider
+                                li
+                                    a#createProb Create Problem
+                #subContent
+                    .col-md-9#subContent
+                        if submissions.length > 0
+                            table.table.table-striped.table-hover
+                                thead
                                     tr
-                                        td
-                                            a#downloadFile(href='/room/_download/'+room_name+'/'+submission.name) #{submission.name}
-                                        td #{submission.user}
-                                        td #{submission.desc}
-                                        td #{submission.timestamp}
-                                        td #{submission.files.length}
-                                            i.fa.fa-times.cross
-                    else
-                        .col-md-4.col-md-offset-2
-                            .alert.alert-dismissible.alert-warning
-                                button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                p No submissions found
+                                        th Submission Title
+                                        th Submitted by
+                                        th Description
+                                        th Timestamp
+                                        th Files
+                                tbody
+                                    each submission in submissions
+                                        tr
+                                            td
+                                                a#downloadFile(href='/room/_download/'+room_name+'/'+submission.name) #{submission.name}
+                                            td #{submission.user}
+                                            td #{submission.desc}
+                                            td #{submission.timestamp}
+                                            td #{submission.files.length}
+                                                i.fa.fa-times.cross
+                        else
+                            .text-center
+                                .alert.alert-dismissible.alert-warning
+                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                    p No submissions found
+                #probContent
+                    .col-md-9
+                        if problems.length > 0
+                            table.table.table-striped.table-hover
+                                thead
+                                    tr
+                                        th Problem Name
+                                        th Problem Description
+                                        th Number of Submissions
+                                tbody
+                                    each problem in problems
+                                        tr
+                                            td #{problem.name}
+                                            td #{problem.desc}
+                                            td #{problem.submissions.length}
+                                                i.fa.fa-times.cross
+                        else
+                            .text-center
+                                .alert.alert-dismissible.alert-warning
+                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                    p No problems found
+                    .row
+                        .col-md-9.col-md-offset-3
+                            .btns.text-center
+                                a Create Problem
+
         else
             .panel.panel-default
                 .panel-body

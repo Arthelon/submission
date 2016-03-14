@@ -100,8 +100,10 @@ router.delete('/_remove_room', function(req, res) {
         }, (err, room) => {
             if (err) throw err
             if (!room) {
+                res.status(404)
                 res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
             } else if (!req.user._id == room.owner) {
+                res.status(406)
                 res.end(JSON.stringify({status: 'FAILED', msg: 'Room does not belong to you'}))
             } else {
                 Room.findOneAndRemove({
@@ -109,6 +111,7 @@ router.delete('/_remove_room', function(req, res) {
                 }, (err, room) => {
                     if (err) throw err
                     if (!room) {
+                        res.status(404)
                         res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
                     }
                 })
@@ -119,14 +122,11 @@ router.delete('/_remove_room', function(req, res) {
                 }, (err, docs) => {
                     if (err) throw err
                 })
-                res.end(JSON.stringify({status: 'OK', msg: 'Success'}))
+                res.sendStatus(200)
             }
         })
     } else {
-        res.end(JSON.stringify({
-            status: 'FAILED',
-            msg: 'Unvalidated user'
-        }))
+        res.sendStatus(401)
     }
 })
 

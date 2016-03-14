@@ -76,29 +76,39 @@ $(function() {
             e.preventDefault()
         }
     } else {
-        $('.cross').click(function () {
+        var $subContent = $('#subContent')
+        var $probContent = $('#probContent')
+
+        $subContent.find('.cross').click(function () {
             var $index = $(this).index() + 1
             var $tableLink = $('tbody tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
 
             $.ajax({
                 type: "DELETE",
-                url: '/room/' + room_name + '/_remove_sub/' + sub_name
+                url: '/room/_remove_sub/',
+                dataType: 'json',
+                data: {
+                    room_name: room_name,
+                    sub_name: sub_name
+                }
             });
             $('tbody tr:nth-child(' + $index + ')').remove()
         })
     }
 
     $('.nav > li').click(function() {
-        if ($(this).index() == 0) {
-            location.reload()
-        } else {
-            var $content = $('.content')
+        $(this).attr('class', 'active')
+        if ($(this).index() != 0) {
             $('.nav > li:nth-child(1)').attr('class', '')
-            $(this).attr('class', 'active')
-            //$.ajax({
-            //
-            //})
+            $subContent.fadeOut(500, function() {
+                $probContent.fadeIn(300)
+            })
+        } else {
+            $('.nav > li:nth-child(2)').attr('class', '')
+            $probContent.fadeOut(500, function() {
+                $subContent.fadeIn(300)
+            })
         }
     })
 })

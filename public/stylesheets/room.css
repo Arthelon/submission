@@ -49,3 +49,7 @@
 label {
     margin-top:10px;
 }
+
+#probContent {
+    display: none;
+}
