@@ -136,7 +136,6 @@ router.get('/_download/:room_name/:submission', validateRoom,
                         })
                     })
                     file_bundle.finalize()
-                    res.sendStatus(200)
                 }
             })
     }
@@ -164,19 +163,6 @@ router.delete('/_remove_sub', validateRoom,
             })
          })
     })
-
-router.route('/problem')
-    .get(function(req, res) {
-        if (req.user) {
-            res.render('create_prob')
-        } else {
-            res.redirect('/')
-        }
-    })
-    .post(function(req, res) {
-
-    })
-
 
 function validateRoom(req, res, next) {
     var room_name = req.body.room_name ? req.body.room_name : req.params.room_name

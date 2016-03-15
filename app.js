@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var root = require('./routes/index');
 var room = require('./routes/room');
 var dashboard = require('./routes/dashboard')
+var problem = require('./routes/problem')
 
 //Authentication setup
 var passport = require('passport');
@@ -123,6 +124,7 @@ passport.use('register', new LocalStrategy({
 app.use('/', root);
 app.use('/room', room)
 app.use('/dashboard', dashboard)
+app.use('/problem', problem)
 
 app.use(function(req, res, next) {
     "use strict";

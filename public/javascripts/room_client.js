@@ -48,7 +48,6 @@ $(function() {
         });
 
         $('button[type=submit]').on('click', function(e) {
-            console.log($fileInp.val())
             if (!$('input[name=name]').val()) {
                 show_err('Please enter submission title', e)
             } else if ($fileInp.val() && editor.getValue() == fillerCode) {
@@ -57,8 +56,8 @@ $(function() {
                 show_err('Please submit data', e)
             } else if (editor.getValue() != fillerCode) {
                 e.preventDefault()
-                var fd = new FormData(document.forms[0]);
-                var editor_file = new Blob(editor.getValue().split('\n'), {type: 'text/x-script.python'})
+                var fd = new FormData(document.forms[0])
+                var editor_file = new Blob([editor.getValue()], {type: 'text/x-script.python'})
                 fd.append('file', editor_file, $('input[name=name]').val()+'.py')
                 $.ajax({
                     url: '/room/'+form.attr('room'),
@@ -67,6 +66,7 @@ $(function() {
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
                 })
+                location.reload()
             }
         })
 
@@ -80,7 +80,7 @@ $(function() {
         var $probContent = $('#probContent')
 
         $subContent.find('.cross').click(function () {
-            var $index = $(this).index() + 1
+            var $index = $('i').index(this)+1
             var $tableLink = $('tbody tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
 
@@ -93,7 +93,7 @@ $(function() {
                     sub_name: sub_name
                 }
             });
-            $('tbody tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+            $('tbody tr:nth-child('+ $index +')').fadeOut(400, () => $(this).remove())
         })
     }
 

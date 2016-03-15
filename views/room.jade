@@ -35,7 +35,7 @@ block content
                                         a No Problems Found!
                                 li.divider
                                 li
-                                    a#createProb Create Problem
+                                    a#createProb(href='/problem') Create Problem
                 #subContent
                     .col-md-9#subContent
                         if submissions.length > 0
@@ -86,7 +86,7 @@ block content
                     .row
                         .col-md-9.col-md-offset-3
                             .btns.text-center
-                                a Create Problem
+                                a(href='/problem') Create Problem
 
         else
             .panel.panel-default
