@@ -38,8 +38,7 @@ router.route('/:room_name')
         .findOne({
             path: room_name
         })
-        .populate('submissions')
-        .populate('problems')
+        .populate('submissions problems')
         .sort({'submissions.timestamp': -1})
         .exec(function(err, room) {
             if (err) throw err
@@ -66,7 +65,8 @@ router.route('/:room_name')
         })
     })
     .post(upload.array('file'), function(req, res) {
-        var prob = req.params.prob
+        var prob = req.body.prob
+        console.log(prob)
         Submission.findOne({
             name: req.body.name
         }, (err, doc) => {
@@ -89,18 +89,13 @@ router.route('/:room_name')
                         $push: {
                             submissions: submission._id
                         }
-                    }, (err) => {
-                        if (err) throw err
-
-                    })
+                    }, (err) => {if (err) throw err})
                     if (prob != 'None') {
                         Problem.findOneAndUpdate({
                             name: prob
                         }, {
                             $push: {submissions: submission._id}
-                        }, (err) => {
-                            if (err) throw err
-                        })
+                        }, (err) => {if (err) throw err})
                     }
                     for (var i in req.files) {
                         var file = req.files[i]
@@ -153,31 +148,40 @@ router.get('/_download/:room_name/:submission', validateRoom,
 
 router.delete('/_remove_sub', validateRoom,
     function(req, res) {
+        console.log(req.body.sub_name)
         Submission.findOneAndRemove({name: req.body.sub_name}, function(err, sub) {
             if (err) throw err
-            Room.findOneAndUpdate({name: req.room},  {
-                $pull: {
-                    submissions: sub._id
-                }
-            }, function(err) {
-                if (err) throw err
-            })
-            Problem.findOneAndUpdate({
-
-            }, {
-                $pull: {
-                    submissions: sub._id
-                }
-            })
-            sub.files.forEach(function(id) {
-                File.findOneAndRemove({_id: id}, (err, file) => {
+            if (sub) {
+                Room.findOneAndUpdate({name: req.room},  {
+                    $pull: {
+                        submissions: sub._id
+                    }
+                }, function(err) {
                     if (err) throw err
-                    fs.unlink('uploads/'+file.loc, (err) => {
-                        if (err) throw err
-                    })
-                    res.sendStatus(200)
                 })
-            })
+                Problem
+                    .find({
+                        submissions: { $elemMatch: {_id: sub._id} }
+                    })
+                    .exec(function(prob) {
+                        if (prob) {
+                            console.log(prob)
+                        }
+                    })
+                sub.files.forEach(function(id) {
+                    File.findOneAndRemove({_id: id}, (err, file) => {
+                        if (err) throw err
+                        fs.unlink('uploads/'+file.loc, (err) => {
+                            if (err) throw err
+                        })
+                        res.sendStatus(200)
+                    })
+                })
+            } else {
+                req.flash('error', 'Submission not found')
+                res.status(404)
+                res.redirect('back')
+            }
          })
     })
 

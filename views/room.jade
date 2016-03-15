@@ -64,7 +64,7 @@ block content
                                     p No submissions found
                 #probContent
                     .col-md-9
-                        if problems.length > 0
+                        if problems && problems.length > 0
                             table.table.table-striped.table-hover
                                 thead
                                     tr
@@ -88,7 +88,6 @@ block content
                         .col-md-9.col-md-offset-3
                             .btns.text-center
                                 a(href='/problem/#{room_name}') Create Problem
-
         else
             .panel.panel-default
                 .panel-body

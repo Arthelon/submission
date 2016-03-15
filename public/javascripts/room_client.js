@@ -78,11 +78,12 @@ $(function() {
     } else {
         var $subContent = $('#subContent')
         var $probContent = $('#probContent')
-
         $subContent.find('.cross').click(function () {
-            var $index = $('i').index(this)+1
-            var $tableLink = $('tbody tr:nth-child(' + $index + ') td:nth-child(1) a')
+            var $index = $('i').index(this) + 1
+            var $tableLink = $(this).parents('tbody').find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
+            console.log(sub_name)
+            console.log($tableLink)
 
             $.ajax({
                 type: "DELETE",
@@ -93,22 +94,22 @@ $(function() {
                     sub_name: sub_name
                 }
             });
-            $('tbody tr:nth-child('+ $index +')').fadeOut(400, () => $(this).remove())
+            $(this).parents('tbody').find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+        })
+
+        $('.nav > li').click(function() {
+            $(this).attr('class', 'active')
+            if ($(this).index() != 0) {
+                $('.nav > li:nth-child(1)').attr('class', '')
+                $subContent.fadeOut(500, function() {
+                    $probContent.fadeIn(300)
+                })
+            } else {
+                $('.nav > li:nth-child(2)').attr('class', '')
+                $probContent.fadeOut(500, function() {
+                    $subContent.fadeIn(300)
+                })
+            }
         })
     }
-
-    $('.nav > li').click(function() {
-        $(this).attr('class', 'active')
-        if ($(this).index() != 0) {
-            $('.nav > li:nth-child(1)').attr('class', '')
-            $subContent.fadeOut(500, function() {
-                $probContent.fadeIn(300)
-            })
-        } else {
-            $('.nav > li:nth-child(2)').attr('class', '')
-            $probContent.fadeOut(500, function() {
-                $subContent.fadeIn(300)
-            })
-        }
-    })
 })

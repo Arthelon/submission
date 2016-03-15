@@ -56,7 +56,13 @@ router.route('/:room_name/:problem')
     .get(validateRoom, function(req, res) {
         Room
         .findOne({name:req.room})
-        .populate('problems')
+        .populate({
+            path: 'problems',
+            populate: {
+                path: 'submissions',
+                model: 'Submission'
+            }
+        })
         .exec(function(err, room) {
             if (err) {
                 res.status(400)
@@ -69,6 +75,7 @@ router.route('/:room_name/:problem')
                             prob_name: prob.name,
                             prob_desc: prob.desc,
                             prob_subs: prob.submissions,
+                            room_name: req.room,
                             title: 'submission | ' + prob.name
                         })
                     }
