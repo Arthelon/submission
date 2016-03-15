@@ -25,8 +25,10 @@ router.route('/:room_name')
                     name: req.body.name,
                     desc: req.body.desc
                 }, (err, prob, created) => {
-                    if (err) throw err
-                    if (!created) {
+                    if (err) {
+                        req.flash('error', err.message)
+                        res.redirect('back')
+                    } else if (!created) {
                         req.flash('error', 'Problem already exists')
                         res.redirect('back')
                     } else {
@@ -52,7 +54,31 @@ router.route('/:room_name')
 
 router.route('/:room_name/:problem')
     .get(validateRoom, function(req, res) {
-        res.send(req.params.problem)
+        Room
+        .findOne({name:req.room})
+        .populate('problems')
+        .exec(function(err, room) {
+            if (err) {
+                res.status(400)
+                req.flash('error', err.message)
+                res.redirect('back')
+            } else {
+                room.problems.forEach(function(prob) {
+                    if (prob.name == req.params.problem) {
+                        res.render('problem', {
+                            prob_name: prob.name,
+                            prob_desc: prob.desc,
+                            prob_subs: prob.submissions,
+                            title: 'submission | ' + prob.name
+                        })
+                    }
+                }, function() {
+                    res.status(404)
+                    req.flash('error', 'Room not found')
+                    res.redirect('back')
+                })
+            }
+        })
     })
 
 module.exports = router

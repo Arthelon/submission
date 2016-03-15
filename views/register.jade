@@ -5,8 +5,9 @@ block head
         //LOGO
         .float-left.btns
             a(href='/') Main
-        .float-right
-            a(href='/logout') Logout
+        if user
+            .float-right
+                a(href='/logout') Logout
 
 block content
     .container

@@ -1,2 +1,39 @@
 extends ./layout
 
+block content
+    .header.btns
+        .float-left
+            a(href='/') Main
+        .float-right
+            a(href='/logout') Logout
+    .container
+        .row.text-center
+            h1 #{prob_name}
+            p #{prob_desc}
+    .container
+        .row
+            if prob_subs.length > 0
+                    table.table.table-striped.table-hover
+                        thead
+                            tr
+                                th Submission Title
+                                th Submitted by
+                                th Description
+                                th Timestamp
+                                th Files
+                        tbody
+                            each sub in prob_subs
+                                tr
+                                    td
+                                        a#downloadFile(href='/room/_download/#{room_name}/#{sub.name}') #{sub.name}
+                                    td #{sub.user}
+                                    td #{sub.desc}
+                                    td #{sub.timestamp}
+                                    td #{sub.files.length}
+                                        i.fa.fa-times.cross
+            else
+                .row
+                    .col-md-4.col-md-offset-4
+                        .alert.alert-dismissible.alert-warning
+                            button.fa.fa-close.close(type='button', data-dismiss='alert')
+                            p No submissions found

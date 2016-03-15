@@ -25,10 +25,15 @@ router.get('/logout', function(req, res) {
 
 router.route('/register')
     .get(function(req, res) {
-        res.render('register', {
+        payload = {
             errors: req.flash('error'),
-            title: 'submission | Register'
-        })
+            title: 'submission | Register',
+            user: false
+        }
+        if (req.user) {
+            payload.user = true
+        }
+        res.render('register', payload)
     })
     .post(passport.authenticate('register', {
         failureRedirect: '/register',

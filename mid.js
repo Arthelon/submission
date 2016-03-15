@@ -11,8 +11,14 @@ router.validateRoom = function(req, res, next) {
         }))
     } else {
         Room.findOne({name:room_name}, function(err, room) {
-            if (err) throw err
-            if (!room) {
+            if (err) {
+                res.status(400)
+                res.send(JSON.stringify({
+                    status: 'FAILED',
+                    msg: err.message
+                }))
+            }
+            else if (!room) {
                 res.status(404)
                 res.end(JSON.stringify({
                     status: 'FAILED',
