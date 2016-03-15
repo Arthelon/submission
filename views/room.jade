@@ -105,6 +105,13 @@ block content
                             label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
                             .col-lg-4
                                 input.form-control#descInput(type='text' name='desc' placeholder='Optional')
+                        .form-group.row
+                            label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
+                            .col-lg-4
+                                select#select.form-control(name='prob')
+                                    option None
+                                    each prob in problems
+                                        option #{prob.name}
                         .fileInput.form-group
                             input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
                             label(for="file")

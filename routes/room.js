@@ -39,6 +39,7 @@ router.route('/:room_name')
             path: room_name
         })
         .populate('submissions')
+        .populate('problems')
         .sort({'submissions.timestamp': -1})
         .exec(function(err, room) {
             if (err) throw err
@@ -52,14 +53,12 @@ router.route('/:room_name')
                 var payload = {
                     room_name: room.name,
                     room_desc: room.desc,
+                    problems: room.problems,
                     errors: req.flash('error')
                 }
                 if (req.user && req.user._id.toString() == room.owner.toString()) {
                     payload.submissions = room.submissions
-                    Problem.find({}, function(err, problems) {
-                        payload.problems = problems
-                        res.render('room', payload)
-                    })
+                    res.render('room', payload)
                 } else {
                     res.render('room', payload)
                 }
@@ -67,6 +66,7 @@ router.route('/:room_name')
         })
     })
     .post(upload.array('file'), function(req, res) {
+        var prob = req.params.prob
         Submission.findOne({
             name: req.body.name
         }, (err, doc) => {
@@ -76,11 +76,11 @@ router.route('/:room_name')
                 res.redirect('back')
             } else {
                 res.redirect('back')
-                console.log(req.body)
                 Submission.create({
                     name: req.body.name,
                     desc: req.body.desc,
                     user: req.body.user
+
                 }, function (err, submission) {
                     if (err) throw err
                     Room.findOneAndUpdate({
@@ -91,8 +91,17 @@ router.route('/:room_name')
                         }
                     }, (err) => {
                         if (err) throw err
+
                     })
-                    console.log(req.files)
+                    if (prob != 'None') {
+                        Problem.findOneAndUpdate({
+                            name: prob
+                        }, {
+                            $push: {submissions: submission._id}
+                        }, (err) => {
+                            if (err) throw err
+                        })
+                    }
                     for (var i in req.files) {
                         var file = req.files[i]
                         File.create({
@@ -152,6 +161,13 @@ router.delete('/_remove_sub', validateRoom,
                 }
             }, function(err) {
                 if (err) throw err
+            })
+            Problem.findOneAndUpdate({
+
+            }, {
+                $pull: {
+                    submissions: sub._id
+                }
             })
             sub.files.forEach(function(id) {
                 File.findOneAndRemove({_id: id}, (err, file) => {
