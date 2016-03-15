@@ -16,13 +16,13 @@ block content
                     .panel-heading.clearfix
                         h3.panel-title Create Problem
                     .panel-body
-                        form(method='POST' action='/create_prob')
+                        form(method='POST' action='/problem/#{room_name}')
                             .form-group
-                                label.col-lg-4.control-label(for='roomName') Problem
-                                input#roomName.form-control(name='name' type='text', placeholder='Room Name')
+                                label.col-lg-4.control-label(for='probName') Problem
+                                input#probName.form-control(name='name' type='text', placeholder='Name')
                             .form-group
-                                label.col-lg-4.control-label(for='roomPath') Problem Description
-                                input#roomPath.form-control(name='path' type='text', placeholder='Room Path')
+                                label.col-lg-4.control-label(for='probDesc') Problem Description
+                                input#probDesc.form-control(name='desc' type='text', placeholder='Description')
                             if errors
                                 p #{errors}
                             button.btn.btn-success(type='submit') Submit

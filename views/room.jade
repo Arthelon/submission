@@ -29,13 +29,13 @@ block content
                                 if problems
                                     each problem in problems
                                         li
-                                            a #{problem.name}
+                                            a(href='/problem/#{room_name}/#{problem.name}') #{problem.name}
                                 else
                                     li
                                         a No Problems Found!
                                 li.divider
                                 li
-                                    a#createProb(href='/problem') Create Problem
+                                    a#createProb(href='/problem/#{room_name}') Create Problem
                 #subContent
                     .col-md-9#subContent
                         if submissions.length > 0
@@ -51,7 +51,7 @@ block content
                                     each submission in submissions
                                         tr
                                             td
-                                                a#downloadFile(href='/room/_download/'+room_name+'/'+submission.name) #{submission.name}
+                                                a#downloadFile(href='/room/_download/#{room_name}/#{submission.name}') #{submission.name}
                                             td #{submission.user}
                                             td #{submission.desc}
                                             td #{submission.timestamp}
@@ -74,7 +74,8 @@ block content
                                 tbody
                                     each problem in problems
                                         tr
-                                            td #{problem.name}
+                                            td
+                                                a(href='/problem/#{room_name}/#{problem.name}') #{problem.name}
                                             td #{problem.desc}
                                             td #{problem.submissions.length}
                                                 i.fa.fa-times.cross
@@ -86,7 +87,7 @@ block content
                     .row
                         .col-md-9.col-md-offset-3
                             .btns.text-center
-                                a(href='/problem') Create Problem
+                                a(href='/problem/#{room_name}') Create Problem
 
         else
             .panel.panel-default

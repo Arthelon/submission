@@ -61,7 +61,6 @@ RoomSchema.methods.verifyID = function(id) {
 var models = {}
 
 UserSchema.methods.verifyPassword = function (password) {
-    "use strict";
     return this.password == password;
 
 }
@@ -72,6 +71,7 @@ UserSchema.methods.validatePassword = function() {
 //Plugins
 UserSchema.plugin(findOrCreate)
 RoomSchema.plugin(findOrCreate)
+ProblemSchema.plugin(findOrCreate)
 
 models.File = mongoose.model('File', FileSchema)
 models.Submission = mongoose.model('Submission', SubmissionSchema)

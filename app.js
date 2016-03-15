@@ -34,7 +34,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(session({secret: 'mySecretKey', resave: false, saveUninitialized: false}));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -99,7 +99,7 @@ passport.use('register', new LocalStrategy({
                     password: password,
                     email: req.body.email,
                     first_name: req.body.first_name,
-                    last_name: req.body.last_name,
+                    last_name: req.body.last_name
                 })
                 if (new_user.validatePassword()) {
                     new_user.save(function(err) {

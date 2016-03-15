@@ -3,7 +3,8 @@ var router = express.Router()
 var models = require('../models')
 var multer = require('multer')
 var fs = require('fs')
-var archiver = require('archiver');
+var archiver = require('archiver')
+var validateRoom = require('../mid').validateRoom
 
 var upload = multer({
     dest: 'uploads/',
@@ -35,7 +36,7 @@ router.route('/:room_name')
         var room_name = req.params.room_name
         Room
         .findOne({
-            path: room_name,
+            path: room_name
         })
         .populate('submissions')
         .sort({'submissions.timestamp': -1})
@@ -164,29 +165,5 @@ router.delete('/_remove_sub', validateRoom,
          })
     })
 
-function validateRoom(req, res, next) {
-    var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
-    if (!req.user) {
-        res.status(401)
-        res.end(JSON.stringify({
-            status: 'FAILED',
-            msg: 'Unvalidated user'
-        }))
-    } else {
-        Room.findOne({name:room_name}, function(err, room) {
-            if (err) throw err
-            if (req.user._id.toString() != room.owner.toString()) {
-                res.status(406)
-                res.end(JSON.stringify({
-                    status: 'FAILED',
-                    msg: 'User does not own room'
-                }))
-            } else {
-                req.room = room_name
-                next()
-            }
-        })
-    }
-}
 
 module.exports = router
