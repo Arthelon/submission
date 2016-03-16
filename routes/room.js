@@ -88,7 +88,6 @@ router.route('/:room_name')
                         $push: {submissions: submissions._id}
                     }, (err) => {
                         if (err) throw err
-                        prob.save()
                     })
                     submissions.prob = prob._id
                     createSubCb(submissions, req, res)
@@ -131,7 +130,6 @@ function createSubCb(sub, req, res) {
                         }
                     }, (err) => {
                         if (err) throw err
-                        submission.save()
                     })
                 })
             }

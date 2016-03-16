@@ -10,10 +10,11 @@ var Room = models.Room
 router.get('/', function(req, res) {
     if (req.user) {
         res.redirect('/dashboard')
+    } else {
+        res.render('index', {
+            title: 'submission | Home'
+        });
     }
-    res.render('index', {
-        title: 'submission | Home'
-    });
 });
 
 router.get('/logout', function(req, res) {

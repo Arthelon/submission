@@ -31,7 +31,7 @@ router.validateRoom = function(req, res, next) {
                     msg: 'User does not own room'
                 }))
             } else {
-                req.room = room_name
+                req.room = room
                 next()
             }
         })

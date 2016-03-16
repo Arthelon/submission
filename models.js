@@ -47,28 +47,48 @@ var RoomSchema = new Schema({
 var ProblemSchema = new Schema({
     name: {type: String, required: true, unique: true},
     desc: {type: String, required: true},
+    room: {type: Schema.Types.ObjectId, ref: 'Room'},
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
 })
+ProblemSchema.pre('remove', function(next) {
+    models.Submission.find({
+        prob: this._id
+    }, function(err, subs) {
+        if (err) throw err
+        else {
+            subs.forEach(function(sub) {
+                sub.update({
+                    prob: null
+                }, (err) => {
+                    if (err) throw err
+                })
+            })
+            next()
+        }
+    })
+})
+
 SubmissionSchema.pre('remove', function(next) {
-    models.Room.findOneAndUpdate({_id: this.room},  {
+    sub = this
+    models.Room.findOneAndUpdate({_id: sub.room},  {
         $pull: {
-            submissions: this._id
+            submissions: sub._id
         }
     }, function(err, room) {
         if (err) throw err
         if (!room) throw new Error('Room not found')
+        models.Problem.findOneAndUpdate({_id: sub.prob}, {
+            $pull: {
+                submissions: sub._id
+            }
+        }, (err, prob) => {
+            if (err) throw err
+            else if (!prob) throw new Error('Problem not found')
+            else next()
+        })
     })
-    models.Problem.findOneAndUpdate({_id: this.prob}, {
-        $pull: {
-            submissions: this._id
-        }
-    }, (err, prob) => {
-        if (err) throw err
-        if (!prob) throw new Error('Problem not found')
-    })
-    next()
 })
 
 RoomSchema.pre('remove', function(next) {
@@ -79,9 +99,10 @@ RoomSchema.pre('remove', function(next) {
     }, (err, user) => {
         if (err) throw err
         else if (!user) throw new Error('User not found')
+        else next()
     })
-    next()
 })
+
 
 RoomSchema.methods.verifyID = function(id) {
     this.findById(id, function(err, found) {

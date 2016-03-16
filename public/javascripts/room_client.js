@@ -79,8 +79,9 @@ $(function() {
         var $subContent = $('#subContent')
         var $probContent = $('#probContent')
         $subContent.find('.cross').click(function () {
-            var $index = $('i').index(this) + 1
-            var $tableLink = $(this).parents('tbody').find('tr:nth-child(' + $index + ') td:nth-child(1) a')
+            var $parentElem = $(this).parents('tbody')
+            var $index = $parentElem.find('i').index(this) + 1
+            var $tableLink =$parentElem.find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
 
             $.ajax({
@@ -92,11 +93,20 @@ $(function() {
                     sub_name: sub_name
                 }
             });
-            $(this).parents('tbody').find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+            $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
         })
 
         $probContent.find('.cross').click(function() {
-            //click event handler
+            var $parentElem = $(this).parents('tbody')
+            var $index = $parentElem.find('i').index(this) + 1
+            var $tableLink = $parentElem.find('tr:nth-child(' + $index + ') td:nth-child(1) a')
+            var prob_name = $tableLink.text()
+            $.ajax({
+                type: "DELETE",
+                url: '/problem/'+room_name+'/'+prob_name
+            });
+            $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+
         })
 
         $('.nav > li').click(function() {
