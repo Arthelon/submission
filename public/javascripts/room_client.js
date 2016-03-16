@@ -82,8 +82,6 @@ $(function() {
             var $index = $('i').index(this) + 1
             var $tableLink = $(this).parents('tbody').find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
-            console.log(sub_name)
-            console.log($tableLink)
 
             $.ajax({
                 type: "DELETE",
@@ -95,6 +93,10 @@ $(function() {
                 }
             });
             $(this).parents('tbody').find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+        })
+
+        $probContent.find('.cross').click(function() {
+            //click event handler
         })
 
         $('.nav > li').click(function() {

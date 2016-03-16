@@ -76,6 +76,7 @@ router.route('/:room_name/:problem')
                             prob_desc: prob.desc,
                             prob_subs: prob.submissions,
                             room_name: req.room,
+                            errors: req.flash('error'),
                             title: 'submission | ' + prob.name
                         })
                     }
