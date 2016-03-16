@@ -65,59 +65,79 @@ router.route('/:room_name')
         })
     })
     .post(upload.array('file'), function(req, res) {
-        var prob = req.body.prob
-        console.log(prob)
-        Submission.findOne({
-            name: req.body.name
-        }, (err, doc) => {
-            if (err) throw err
-            if (doc) {
-                req.flash('', 'Submission name already exists')
-                res.redirect('back')
-            } else {
-                res.redirect('back')
-                Submission.create({
-                    name: req.body.name,
-                    desc: req.body.desc,
-                    user: req.body.user
+        var prob_name = req.body.prob
+        var submissions = new Submission({
+            name: req.body.name,
+            desc: req.body.desc,
+            user: req.body.user
+        })
+        if (prob_name == 'None') {
+            createSubCb(submissions, req, res)
+        } else {
+            Problem.findOne({name: prob_name}, (err, prob) => {
+                if (err) {
+                    req.flash('error', err.message)
+                    res.status(400)
+                    res.redirect('back')
+                } else if (!prob) {
+                    req.flash('error', 'Problem not found')
+                    res.status(404)
+                    res.redirect('back')
+                } else {
+                    prob.update({
+                        $push: {submissions: submissions._id}
+                    }, (err) => {
+                        if (err) throw err
+                        prob.save()
+                    })
+                    submissions.prob = prob._id
+                    createSubCb(submissions, req, res)
+                }
+            })
+        }
+    })
 
-                }, function (err, submission) {
+function createSubCb(sub, req, res) {
+    sub.save((err, submission) => {
+        if (err) {
+            req.flash('error', err.message)
+            res.status(400)
+            res.redirect('back')
+        } else {
+            Room.findOneAndUpdate({
+                name: req.params.room_name
+            }, {$push: {submissions: submission._id}}, (err, room) => {
+                if (err) throw err
+                if (!room) {
+                    req.flash('error', 'Room not found')
+                    res.status(404)
+                    res.redirect('back')
+                } else {
+                    submission.room = room._id
+                    submission.save()
+                }
+            })
+            for (var i in req.files) {
+                var file = req.files[i]
+                File.create({
+                    name: file.originalname,
+                    type: file.mimetype,
+                    loc: file.filename
+                }, function (err, created_file) {
                     if (err) throw err
-                    Room.findOneAndUpdate({
-                        name: req.params.room_name
-                    }, {
+                    submission.update({
                         $push: {
-                            submissions: submission._id
+                            files: created_file._id
                         }
-                    }, (err) => {if (err) throw err})
-                    if (prob != 'None') {
-                        Problem.findOneAndUpdate({
-                            name: prob
-                        }, {
-                            $push: {submissions: submission._id}
-                        }, (err) => {if (err) throw err})
-                    }
-                    for (var i in req.files) {
-                        var file = req.files[i]
-                        File.create({
-                            name: file.originalname,
-                            type: file.mimetype,
-                            loc: file.filename
-                        }, function (err, created_file) {
-                            if (err) throw err
-                            Submission.findByIdAndUpdate(submission._id, {
-                                $push: {
-                                    files: created_file._id
-                                }
-                            }, (err) => {
-                                if (err) throw err
-                            })
-                        })
-                    }
+                    }, (err) => {
+                        if (err) throw err
+                        submission.save()
+                    })
                 })
             }
-        })
+        }
     })
+}
 
 router.get('/_download/:room_name/:submission', validateRoom,
     function(req, res) {
@@ -148,34 +168,25 @@ router.get('/_download/:room_name/:submission', validateRoom,
 
 router.delete('/_remove_sub', validateRoom,
     function(req, res) {
-        console.log(req.body.sub_name)
-        Submission.findOneAndRemove({name: req.body.sub_name}, function(err, sub) {
+        Submission.findOne({name: req.body.sub_name}, function(err, sub) {
             if (err) throw err
             if (sub) {
-                Room.findOneAndUpdate({name: req.room},  {
-                    $pull: {
-                        submissions: sub._id
-                    }
-                }, function(err) {
-                    if (err) throw err
-                })
-                Problem
-                    .find({
-                        submissions: { $elemMatch: {_id: sub._id} }
-                    })
-                    .exec(function(prob) {
-                        if (prob) {
-                            console.log(prob)
-                        }
-                    })
-                sub.files.forEach(function(id) {
-                    File.findOneAndRemove({_id: id}, (err, file) => {
-                        if (err) throw err
-                        fs.unlink('uploads/'+file.loc, (err) => {
-                            if (err) throw err
+                sub.remove((err) => {
+                    if (err) {
+                        req.flash('error', err.message)
+                        res.status(400)
+                        res.redirect('back')
+                    } else {
+                        sub.files.forEach(function(id) {
+                            File.findOneAndRemove({_id: id}, (err, file) => {
+                                if (err) throw err
+                                fs.unlink('uploads/'+file.loc, (err) => {
+                                    if (err) throw err
+                                })
+                                res.sendStatus(200)
+                            })
                         })
-                        res.sendStatus(200)
-                    })
+                    }
                 })
             } else {
                 req.flash('error', 'Submission not found')

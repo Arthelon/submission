@@ -4,13 +4,36 @@ var findOrCreate = require('mongoose-findorcreate')
 
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    name: {type: String, required: true, unique: true},
+    name: String,
     desc: String,
     user: {type: String, required: true},
+    prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
+    room: {type: Schema.Types.ObjectId, ref: 'Room'},
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}
     ]
 })
+
+SubmissionSchema.pre('remove', function(next) {
+    models.Room.findOneAndUpdate({_id: this.room},  {
+        $pull: {
+            submissions: this._id
+        }
+    }, function(err, room) {
+        if (err) throw err
+        if (!room) throw new Error('Room not found')
+    })
+    models.Problem.findOneAndUpdate({_id: this.prob}, {
+        $pull: {
+            submissions: this._id
+        }
+    }, (err, prob) => {
+        if (err) throw err
+        if (!prob) throw new Error('Problem not found')
+    })
+    next()
+})
+
 
 var FileSchema = new Schema({
     name: String,
@@ -57,9 +80,6 @@ RoomSchema.methods.verifyID = function(id) {
     })
 }
 
-
-var models = {}
-
 UserSchema.methods.verifyPassword = function (password) {
     return this.password == password;
 
@@ -72,6 +92,8 @@ UserSchema.methods.validatePassword = function() {
 UserSchema.plugin(findOrCreate)
 RoomSchema.plugin(findOrCreate)
 ProblemSchema.plugin(findOrCreate)
+
+var models = {}
 
 models.File = mongoose.model('File', FileSchema)
 models.Submission = mongoose.model('Submission', SubmissionSchema)
