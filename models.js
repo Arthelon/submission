@@ -14,27 +14,6 @@ var SubmissionSchema = new Schema({
     ]
 })
 
-SubmissionSchema.pre('remove', function(next) {
-    models.Room.findOneAndUpdate({_id: this.room},  {
-        $pull: {
-            submissions: this._id
-        }
-    }, function(err, room) {
-        if (err) throw err
-        if (!room) throw new Error('Room not found')
-    })
-    models.Problem.findOneAndUpdate({_id: this.prob}, {
-        $pull: {
-            submissions: this._id
-        }
-    }, (err, prob) => {
-        if (err) throw err
-        if (!prob) throw new Error('Problem not found')
-    })
-    next()
-})
-
-
 var FileSchema = new Schema({
     name: String,
     type: String,
@@ -71,6 +50,37 @@ var ProblemSchema = new Schema({
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
+})
+SubmissionSchema.pre('remove', function(next) {
+    models.Room.findOneAndUpdate({_id: this.room},  {
+        $pull: {
+            submissions: this._id
+        }
+    }, function(err, room) {
+        if (err) throw err
+        if (!room) throw new Error('Room not found')
+    })
+    models.Problem.findOneAndUpdate({_id: this.prob}, {
+        $pull: {
+            submissions: this._id
+        }
+    }, (err, prob) => {
+        if (err) throw err
+        if (!prob) throw new Error('Problem not found')
+    })
+    next()
+})
+
+RoomSchema.pre('remove', function(next) {
+    models.User.findOneAndUpdate({_id: this.owner}, {
+        $pull: {
+            rooms: this._id
+        }
+    }, (err, user) => {
+        if (err) throw err
+        else if (!user) throw new Error('User not found')
+    })
+    next()
 })
 
 RoomSchema.methods.verifyID = function(id) {

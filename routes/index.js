@@ -120,13 +120,6 @@ router.delete('/_remove_room', function(req, res) {
                         res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
                     }
                 })
-                User.findOneAndUpdate({
-                    username: req.user.username
-                }, {
-                    $pull: {rooms: room._id}
-                }, (err, docs) => {
-                    if (err) throw err
-                })
                 res.sendStatus(200)
             }
         })
