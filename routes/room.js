@@ -137,8 +137,9 @@ function createSubCb(sub, req, res) {
     })
 }
 
-router.get('/_download/:room_name/:submission', validateRoom,
-    function(req, res) {
+
+router.route('/:room_name/:submission')
+    .get(validateRoom, function(req, res) {
         Submission
             .findOne({
                 name: req.params.submission
@@ -161,12 +162,9 @@ router.get('/_download/:room_name/:submission', validateRoom,
                     file_bundle.finalize()
                 }
             })
-    }
-)
-
-router.delete('/_remove_sub', validateRoom,
-    function(req, res) {
-        Submission.findOne({name: req.body.sub_name}, function(err, sub) {
+    })
+    .delete(validateRoom, function(req, res) {
+        Submission.findOne({name: req.params.submission}, function(err, sub) {
             if (err) throw err
             if (sub) {
                 sub.remove((err) => {
@@ -191,8 +189,7 @@ router.delete('/_remove_sub', validateRoom,
                 res.status(404)
                 res.redirect('back')
             }
-         })
+        })
     })
-
 
 module.exports = router

@@ -85,7 +85,6 @@ SubmissionSchema.pre('remove', function(next) {
             }
         }, (err, prob) => {
             if (err) throw err
-            else if (!prob) throw new Error('Problem not found')
             else next()
         })
     })

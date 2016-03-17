@@ -86,12 +86,7 @@ $(function() {
 
             $.ajax({
                 type: "DELETE",
-                url: '/room/_remove_sub/',
-                dataType: 'json',
-                data: {
-                    room_name: room_name,
-                    sub_name: sub_name
-                }
+                url: '/room/'+room_name+'/'+sub_name
             });
             $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
         })
