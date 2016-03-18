@@ -57,7 +57,3 @@ label {
 .dropdown:hover .dropdown-menu {
     display: block;
 }
-
-.dropdown-menu > * {
-    cursor: pointer;
-}

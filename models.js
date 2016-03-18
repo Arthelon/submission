@@ -11,18 +11,9 @@ var SubmissionSchema = new Schema({
     room: {type: Schema.Types.ObjectId, ref: 'Room'},
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}
-    ],
-    test: {type: Schema.Types.ObjectId, ref: 'Test'}
+    ]
 })
 
-var TestSchema = new Schema({
-    sub: {type: Schema.Types.ObjectId, ref: 'Submission'},
-    cases: [{
-        in: {type: String, required: true},
-        out: {type: String, required: true}
-    }],
-    check: [String]
-})
 
 var FileSchema = new Schema({
     name: String,
@@ -58,6 +49,13 @@ var ProblemSchema = new Schema({
     name: {type: String, required: true, unique: true},
     desc: {type: String, required: true},
     room: {type: Schema.Types.ObjectId, ref: 'Room'},
+    test: {
+        cases: [{
+            in: {type: String, required: true},
+            out: {type: String, required: true}
+        }],
+        matches: [String]
+    },
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
@@ -135,7 +133,6 @@ ProblemSchema.plugin(findOrCreate)
 
 var models = {}
 
-models.Test = mongoose.model('Test', TestSchema)
 models.File = mongoose.model('File', FileSchema)
 models.Submission = mongoose.model('Submission', SubmissionSchema)
 models.Room = mongoose.model('Room', RoomSchema)

@@ -166,13 +166,13 @@ app.use(function (err, req, res, next) {
 //Mongoose
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function(err) {
     if (err) throw err
-    //User.findOrCreate({
+    // User.findOrCreate({
     //    username: 'Arthelon',
     //    password: '123456789',
     //    email: 'hsing.daniel@gmail.com',
     //    first_name: 'Daniel',
     //    last_name: 'Hsing',
-    //}, (err, doc, created) => {
+    // }, (err, doc, created) => {
     //    if (err) throw err
     //    Room.findOrCreate({
     //        path: 'hello',
@@ -190,7 +190,7 @@ mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', f
     //            if (err) throw err
     //        })
     //    })
-    //})
+    // })
 })
 
 module.exports = app;

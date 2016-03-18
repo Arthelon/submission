@@ -1,6 +1,8 @@
 var router = require('express').Router()
 var models = require('../models')
 var validateRoom = require('../mid').validateRoom
+var fs = require('fs')
+var PythonShell = require('python-shell')
 
 //Models
 var Room = models.Room
@@ -76,6 +78,7 @@ router.route('/:room_name/:problem')
                             prob_desc: prob.desc,
                             prob_subs: prob.submissions,
                             room_name: req.room.name,
+                            test: prob.test,
                             errors: req.flash('error'),
                             title: 'submission | ' + prob.name
                         })
@@ -90,7 +93,6 @@ router.route('/:room_name/:problem')
     })
     .delete(validateRoom, function(req, res) {
         var prob_name = req.params.problem
-        console.log(prob_name)
         Problem.findOne({name: prob_name},
             function(err, prob) {
             if (err) {
@@ -128,6 +130,10 @@ router.route('/:room_name/:problem')
                 res.redirect('back')
             }
         })
+    })
+    .post(validateRoom, function(req, res) {
+        var problem = req.params.problem
+
     })
 
 module.exports = router

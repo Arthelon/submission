@@ -55,3 +55,7 @@ a:hover, a:active {
     margin-top: 10px;
     margin-bottom: 15px;
 }
+
+.nav > * {
+    cursor: pointer;
+}

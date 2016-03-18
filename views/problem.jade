@@ -1,5 +1,6 @@
 extends ./layout
-
+block head
+    link(rel='stylesheet' href='/stylesheets/problem.css')
 block content
     .header.btns
         .float-left
@@ -12,31 +13,92 @@ block content
             p #{prob_desc}
     .container
         .row
-            if prob_subs && prob_subs.length > 0
-                    table.table.table-striped.table-hover
-                        thead
-                            tr
-                                th Submission Title
-                                th Submitted by
-                                th Description
-                                th Timestamp
-                                th Files
-                        tbody
-                            each sub in prob_subs
+            .col-md-3
+                ul.nav.nav-pills.nav-stacked
+                    li.active
+                        a Submissions
+                    li
+                        a Tests
+            .col-md-9#subContent
+                if prob_subs && prob_subs.length > 0
+                        table.table.table-striped.table-hover
+                            thead
                                 tr
-                                    td
-                                        a#downloadFile(href='/room/#{room_name}/#{sub.name}') #{sub.name}
-                                    td #{sub.user}
-                                    td #{sub.desc}
-                                    td #{sub.timestamp}
-                                    td #{sub.files.length}
-                                        i.fa.fa-times.cross
-            else
-                .row
-                    .col-md-4.col-md-offset-4
+                                    th Submission Title
+                                    th Submitted by
+                                    th Description
+                                    th Timestamp
+                                    th Files
+                            tbody
+                                each sub in prob_subs
+                                    tr
+                                        td
+                                            a#downloadFile(href='/room/#{room_name}/#{sub.name}') #{sub.name}
+                                        td #{sub.user}
+                                        td #{sub.desc}
+                                        td #{sub.timestamp}
+                                        td #{sub.files.length}
+                                            i.fa.fa-times.cross
+                else
+                    .text-center
                         .alert.alert-dismissible.alert-warning
                             button.fa.fa-close.close(type='button', data-dismiss='alert')
+
                             p No submissions found
+            #testContent
+                .col-md-6
+                    if test.cases.length > 0
+                        table.table.table-striped.table-hover
+                            thead
+                                tr
+                                    th Input
+                                    th Output
+                            tbody
+                                each item in test.cases
+                                    tr
+                                        td #{item.in}
+                                        td #{item.out}
+                                            i.fa.fa-times.cross
+                    else
+                        .text-center
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No I/O cases found
+                .col-md-3
+                    if test.matches.length > 0
+                        table.table.table-striped.table-hover
+                            thead
+                                tr
+                                    th Match
+                            tbody
+                                each item in test.matches
+                                    tr
+                                        td #{item}
+                    else
+                        .text-center
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No matches found
+                .btns.text-center.col-md-9
+                    a#createTest New Tests
+            #createContent
+                .col-md-6
+                    form#cases(method='POST' action='/problem/#{room_name}/#{prob_name}')
+                        .form-group
+                            label.col-lg-4.control-label(for='caseInput') Input
+                            input#caseInput.form-control(name='in' type='text', placeholder='Required')
+                        .form-group
+                            label.col-lg-4.control-label(for='caseOutput') Expected Output
+                            input#caseOutput.form-control(name='out' type='text', placeholder='Required')
+                        button.btn.btn-success(type='submit') Submit
+                .col-md-3
+                    form#matches(method='POST')
+                        .form-group
+                            label.col-lg-4.control-label(for='matchString') Match
+                            input#matchString.form-control(name='match' type='text', placeholder='String to Capture')
+                        button.btn.btn-success(type='submit') Submit
+
+
         .errors.text-center
             if errors
                 each error in errors
