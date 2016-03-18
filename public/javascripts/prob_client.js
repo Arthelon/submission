@@ -16,18 +16,19 @@ $(function() {
 
     $('.nav > li').click(function() {
         $(this).attr('class', 'active')
-        $createContent.fadeOut(500)
-        if ($(this).index() != 0) {
-            $('.nav > li:nth-child(1)').attr('class', '')
-            $subContent.fadeOut(500, function() {
-                $testContent.fadeIn(300)
-            })
-        } else {
-            $('.nav > li:nth-child(2)').attr('class', '')
-            $testContent.fadeOut(500, function() {
-                $subContent.fadeIn(300)
-            })
-        }
+        $createContent.fadeOut(500, () => {
+            if ($(this).index() != 0) {
+                $('.nav > li:nth-child(1)').attr('class', '')
+                $subContent.fadeOut(500, function() {
+                    $testContent.fadeIn(300)
+                })
+            } else {
+                $('.nav > li:nth-child(2)').attr('class', '')
+                $testContent.fadeOut(500, function() {
+                    $subContent.fadeIn(300)
+                })
+            }
+        })
     })
 
     $('#createTest').click(function() {

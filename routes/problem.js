@@ -118,7 +118,7 @@ router.route('/:room_name/:problem')
                             if (err) throw err
                             else {
                                 req.flash('success', 'Sucess')
-                                res.sendStatus(200)
+                                res.status(200)
                                 res.redirect('back')
                             }
                         })
@@ -132,8 +132,45 @@ router.route('/:room_name/:problem')
         })
     })
     .post(validateRoom, function(req, res) {
-        var problem = req.params.problem
+        var prob_name = req.params.problem
+        Problem.findOne({name: prob_name}, function(err, prob) {
+            if (err) {
+                req.flash('error', err.message)
+                res.status(400)
+                res.redirect('back')
+            } else if (!prob) {
+                req.flash('error', 'Problem not found')
+                res.status(404)
+                res.redirect('back')
+            } else if (prob.room.toString() == req.room._id.toString()) {
+                var inp = req.body.in
+                var out = req.body.out
+                if (inp && out) {
+                    prob.test.cases.push({
+                        in: inp,
+                        out: out
+                    })
 
+                } else if (req.body.match) {
+                    prob.test.matches.push(req.body.match)
+                }
+                prob.save((err) => {
+                    if (err) {
+                        req.flash('error', err.message)
+                        res.status(400)
+                        res.redirect('back')
+                    } else {
+                        req.flash('success', 'Sucess')
+                        res.status(200)
+                        res.redirect('back')
+                    }
+                })
+            } else {
+                req.flash('error', 'Room doesn\'t belong to user')
+                res.status(401)
+                res.redirect('back')
+            }
+        })
     })
 
 module.exports = router
