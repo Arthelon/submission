@@ -5,6 +5,7 @@ var multer = require('multer')
 var fs = require('fs')
 var archiver = require('archiver')
 var validateRoom = require('../mid').validateRoom
+var PythonShell = require('python-shell')
 
 var upload = multer({
     dest: 'uploads/',
@@ -72,7 +73,7 @@ router.route('/:room_name')
             user: req.body.user
         })
         if (prob_name == 'None') {
-            createSubCb(submissions, req, res)
+            createSubCb(req, res, submissions)
         } else {
             Problem.findOne({name: prob_name}, (err, prob) => {
                 if (err) {
@@ -84,19 +85,67 @@ router.route('/:room_name')
                     res.status(404)
                     res.redirect('back')
                 } else {
-                    prob.update({
-                        $push: {submissions: submissions._id}
-                    }, (err) => {
-                        if (err) throw err
+                    req.files.forEach(function(file, findex) {
+                        prob.test.matches.forEach(function(match) {
+                            fs.readFile(file.path, 'utf8', function(err, data) {
+                                if (err) {
+                                    handleTestFail(req, res, err.message)
+                                    return
+                                } else {
+                                    if (data.search(new RegExp(match)) == -1) {
+                                        handleTestFail(req, res, 'Failed match. '+match+' not found.')
+                                        return
+                                    }
+                                }
+                            })
+                        })
+                        prob.test.cases.forEach(function(c, index) {
+                            var pyshell = new PythonShell(file.path, {mode:'text'})
+                            pyshell.send(c.in)
+                            pyshell.on('message', function(data) {
+                                if (data != c.out) {
+                                    handleTestFail(req, res, 'Failed Test. '+data+' != '+c.out)
+                                    return
+                                }
+                            })
+                            pyshell.on('error', function(err) {
+                                handleTestFail(req, res, err.msg)
+                                return
+                            })
+                            pyshell.end(function(err) {
+                                if (err) {
+                                    handleTestFail(req, res, err.msg)
+                                    return
+                                }
+                                if (findex+1 == req.files.length && index+1==prob.test.cases.length) {
+                                    submissions.prob = prob._id
+                                    prob.update({
+                                        $push: {submissions: submissions._id}
+                                    }, (err) => {
+                                        if (err) throw err
+                                    })
+                                    createSubCb(req, res, submissions)
+                                }
+                            })
+                        })
                     })
-                    submissions.prob = prob._id
-                    createSubCb(submissions, req, res)
                 }
             })
         }
     })
 
-function createSubCb(sub, req, res) {
+function handleTestFail(req, res, msg) {
+    req.files.forEach(function(file) {
+        fs.unlink(file.path, (err) => {
+            if (err) throw err
+        })
+    })
+    console.log(msg)
+    req.flash('error', msg)
+    res.redirect('back')
+}
+
+function createSubCb(req, res, sub) {
     sub.save((err, submission) => {
         if (err) {
             req.flash('error', err.message)

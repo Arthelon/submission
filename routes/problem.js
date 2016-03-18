@@ -2,7 +2,6 @@ var router = require('express').Router()
 var models = require('../models')
 var validateRoom = require('../mid').validateRoom
 var fs = require('fs')
-var PythonShell = require('python-shell')
 
 //Models
 var Room = models.Room

@@ -22,7 +22,7 @@ var mongoose = require('mongoose')
 var models = require('./models')
 
 //Misc
-var flash = require('connect-flash')
+var flash = require('express-flash')
 
 var app = express();
 
@@ -45,6 +45,7 @@ var User = models.User
 var Room = models.Room
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 passport.serializeUser(function(user, done) {
     done(null, user._id);
@@ -125,12 +126,6 @@ app.use('/', root);
 app.use('/room', room)
 app.use('/dashboard', dashboard)
 app.use('/problem', problem)
-
-app.use(function(req, res, next) {
-    "use strict";
-    res.locals.err_msg = req.flash('err_msg')
-    next()
-})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

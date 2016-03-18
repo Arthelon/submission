@@ -46,11 +46,14 @@ $(function() {
                 .on( 'focus', function(){ $fileInp.addClass( 'has-focus' ); })
                 .on( 'blur', function(){ $fileInp.removeClass( 'has-focus' ); });
         });
-
+        var $nameInput = $('input[name=name]')
         $('button[type=submit]').on('click', function(e) {
-            if (!$('input[name=name]').val()) {
+            console.log('clicked')
+            if (!$nameInput.val()) {
                 show_err('Please enter submission title', e)
-            } else if ($fileInp.val() && editor.getValue() == fillerCode) {
+            } else if (!$('input[name=user]').val()) {
+                show_err('Please enter your name', e)
+            }  else if ($fileInp.val() && editor.getValue() == fillerCode) {
                 show_err('Can\'t accept submissions from both file(s) and text editor', e)
             } else if (!$fileInp.val() && editor.getValue() == fillerCode) {
                 show_err('Please submit data', e)
@@ -58,7 +61,7 @@ $(function() {
                 e.preventDefault()
                 var fd = new FormData(document.forms[0])
                 var editor_file = new Blob([editor.getValue()], {type: 'text/x-script.python'})
-                fd.append('file', editor_file, $('input[name=name]').val()+'.py')
+                fd.append('file', editor_file, $nameInput.val()+'.py')
                 $.ajax({
                     url: '/room/'+form.attr('room'),
                     method: 'post',
@@ -71,8 +74,9 @@ $(function() {
         })
 
         function show_err(msg, e) {
-            form.find('.errors').empty()
-            form.find('.errors').append('<p>'+msg+'</p>')
+            var $errors = $('.errors')
+            $errors.empty()
+            $errors.append('<p>'+msg+'</p>')
             e.preventDefault()
         }
     } else {
