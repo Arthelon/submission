@@ -1,6 +1,7 @@
 var router = require('express').Router()
 var models = require('../models')
 var validateRoom = require('../util').validateRoom
+var handleResp = require('../util').handleResp
 var fs = require('fs')
 
 //Models
@@ -19,7 +20,7 @@ router.route('/:room_name')
             res.redirect('/')
         }
     })
-    .post(validateRoom, function(req, res) {
+    .post(validateRoom, function(req, res, next) {
         if (req.user) {
             if (req.body.name && req.body.desc) {
                 Problem.findOrCreate({
@@ -28,29 +29,23 @@ router.route('/:room_name')
                     room: req.room._id
                 }, (err, prob, created) => {
                     if (err) {
-                        req.flash('error', err.message)
-                        res.redirect('back')
+                        return next(err)
                     } else if (!created) {
-                        req.flash('error', 'Problem already exists')
-                        res.redirect('back')
+                        return handleResp(res, 404, 'Problem already exists')
                     } else {
                         Room.findOneAndUpdate({
                             _id: req.room._id
                         }, {$push: {problems: prob._id}}, (err) => {
                             if (err) throw err
                         })
-                        res.redirect('/dashboard')
+                        return handleResp(res, 401, null, 'Problem Created')
                     }
                 })
             } else {
-                req.flash('error', 'Fields not filled')
-                res.redirect('back')
+                return handleResp(res, 400, 'Fields not filled')
             }
         } else {
-            res.status(401)
-            res.end(JSON.stringify({
-                msg: 'User not authenticated'
-            }))
+            return handleResp(res, 401, 'User not authenticated')
         }
     })
 
@@ -90,57 +85,44 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateRoom, function(req, res, next) {
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name},
             function(err, prob) {
             if (err) {
-                req.flash('error', err.message)
-                res.status(400)
-                res.redirect('back')
+                return next(err)
             } else if (!prob) {
-                req.flash('error', 'Problem not found')
-                res.status(404)
-                res.redirect('back')
+                return handleResp(res, 404, 'Problem not found')
             } else if (prob.room.toString() == req.room._id.toString()) {
                 prob.remove(function(err) {
                     if (err) {
-                        req.flash('error', err.message)
-                        res.status(400)
-                        res.redirect('back')
+                        return next(err)
                     } else {
                         req.room.update({
                             $pull: {
                                 problems: prob._id
                             }
                         }, (err) => {
-                            if (err) throw err
-                            else {
-                                req.flash('success', 'Sucess')
-                                res.status(200)
-                                res.redirect('back')
+                            if (err) {
+                                return next(err)
+                            } else {
+                                return handleResp(res, 200, null, 'Success')
                             }
                         })
                     }
                 })
             } else {
-                req.flash('error', 'Room doesn\'t belong to user')
-                res.status(401)
-                res.redirect('back')
+                return handleResp(res, 401, 'Room doesn\'t belong to user')
             }
         })
     })
-    .post(validateRoom, function(req, res) {
+    .post(validateRoom, function(req, res, next) {
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name}, function(err, prob) {
             if (err) {
-                req.flash('error', err.message)
-                res.status(400)
-                res.redirect('back')
+                return next(err)
             } else if (!prob) {
-                req.flash('error', 'Problem not found')
-                res.status(404)
-                res.redirect('back')
+                return handleResp(res, 404, 'Problem not found')
             } else if (prob.room.toString() == req.room._id.toString()) {
                 var inp = req.body.in
                 var out = req.body.out
@@ -155,19 +137,13 @@ router.route('/:room_name/:problem')
                 }
                 prob.save((err) => {
                     if (err) {
-                        req.flash('error', err.message)
-                        res.status(400)
-                        res.redirect('back')
+                        return next(err)
                     } else {
-                        req.flash('success', 'Sucess')
-                        res.status(200)
-                        res.redirect('back')
+                        return handleResp(res, 200, null, 'Success')
                     }
                 })
             } else {
-                req.flash('error', 'Room doesn\'t belong to user')
-                res.status(401)
-                res.redirect('back')
+                return handleResp(res, 401, 'Room doesn\'t belong to user')
             }
         })
     })

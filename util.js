@@ -1,35 +1,32 @@
-var router = require('express').Router()
+var util = {}
 var Room = require('./models').Room
 
-router.validateRoom = function(req, res, next) {
+
+function handleResp(res, status, err, succ) {
+    if (status) {
+        res.status(status)
+    }
+    payload = {}
+    if (err) payload.error = err
+    if (succ) payload.success = succ
+    res.json(payload)
+    res.end()
+}
+
+util.handleResp = handleResp
+
+util.validateRoom = function(req, res, next) {
     var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
     if (!req.user) {
-        res.status(401)
-        res.end(JSON.stringify({
-            status: 'FAILED',
-            msg: 'Unvalidated user'
-        }))
+        return handleResp(res, 401, 'User not logged in')
     } else {
         Room.findOne({name:room_name}, function(err, room) {
             if (err) {
-                res.status(400)
-                res.send(JSON.stringify({
-                    status: 'FAILED',
-                    msg: err.message
-                }))
-            }
-            else if (!room) {
-                res.status(404)
-                res.end(JSON.stringify({
-                    status: 'FAILED',
-                    msg: 'Room not found'
-                }))
+                return next(err)
+            } else if (!room) {
+                return handleResp(res, 404, 'Room not found')
             } else if (req.user._id.toString() != room.owner.toString()) {
-                res.status(406)
-                res.end(JSON.stringify({
-                    status: 'FAILED',
-                    msg: 'User does not own room'
-                }))
+                return handleResp(res, 406, 'User does not own room')
             } else {
                 req.room = room
                 next()
@@ -38,14 +35,4 @@ router.validateRoom = function(req, res, next) {
     }
 }
 
-router.handleResp = function(res, status, msg) {
-    if (status) {
-        res.status(status)
-    }
-    res.json({
-        msg: msg
-    })
-    res.end()
-}
-
-module.exports = router
+module.exports = util

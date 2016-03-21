@@ -6,7 +6,8 @@ var models = require('../models')
 var User = models.User
 var Room = models.Room
 
-var handleResp = require('../util')
+var handleResp = require('../util').handleResp
+var validateRoom = require('../util').validateRoom
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -72,7 +73,7 @@ router.route('/create_room')
             res.redirect('/')
         }
     })
-    .post(function(req, res) {
+    .post(function(req, res, next) {
         if (req.user) {
             Room.findOrCreate({
                 path: req.body.path,
@@ -81,52 +82,25 @@ router.route('/create_room')
                 owner: req.user._id
             }, function (err, room, created) {
                 if (err) {
-                    handleResp(res, 400, 'Error Occurred')
+                    return next(err)
                 } else if (!created) {
-                    handleResp(res, 409, 'Room already exists')
+                    return handleResp(res, 409, 'Room already exists')
                 } else {
                     User.findOneAndUpdate({username: req.user.username}, {
                         $push: {rooms: room._id}
                     }, (err) => {
                         if (err) {
-                            handleResp(res, 400, err.message)
+                            return next(err)
                         }
                     })
-                    handleResp(res, 201, 'Room created')
+                    return handleResp(res, 201, null,'Room created')
                 }
             })
         } else {
-            handleResp(res, 401, 'Unvalidated user')
+            return handleResp(res, 401, 'Unvalidated user')
         }
     })
 
-router.delete('/_remove_room', function(req, res) {
-    if (req.user) {
-        Room.findOne({
-            name: req.query.room_name
-        }, (err, room) => {
-            if (err) {
-                handleResp(res, 400, err.message)
-            } else if (!room) {
-                handleResp(res, 404, 'Room not found')
-            } else if (!req.user._id == room.owner) {
-                handleResp(res, 406, 'Room does not belong to you')
-            } else {
-                Room.findOneAndRemove({
-                    name: req.query.room_name
-                }, (err, room) => {
-                    if (err) throw err
-                    if (!room) {
-                        handleResp(res, 404, 'Room not found')
-                    }
-                })
-                handleResp(res, 200, 'Success')
-            }
-        })
-    } else {
-        handleResp(res, 401, 'Unvalidated user')
-    }
-})
 
 
 module.exports = router;

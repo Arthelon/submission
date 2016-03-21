@@ -17,6 +17,7 @@ router.route('/')
                         title: 'submission | Dashboard',
                         rooms: user.rooms
                     })
+                    res.end()
                 })
         } else {
             res.redirect('/')

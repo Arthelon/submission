@@ -35,7 +35,7 @@ var Submission = models.Submission
 var Problem = models.Problem
 
 router.route('/:room_name')
-    .get(function(req, res) {
+    .get(function(req, res, next) {
         var room_name = req.params.room_name
         var payload = {}
         Room
@@ -45,8 +45,9 @@ router.route('/:room_name')
         .populate('submissions problems')
         .sort({'submissions.timestamp': -1})
         .exec(function(err, room) {
-            if (err) throw err
-            if (!room) {
+            if (err) {
+                return next(err)
+            } else if (!room) {
                 res.status(404)
                 res.render('error', {
                     message: 'Room does not exist, did you enter in the room path correctly?',
@@ -67,7 +68,7 @@ router.route('/:room_name')
             }
         })
     })
-    .post(upload.array('file'), function(req, res) {
+    .post(upload.array('file'), function(req, res, next) {
         var prob_name = req.body.prob
         var submissions = new Submission({
             name: req.body.name,
@@ -79,20 +80,18 @@ router.route('/:room_name')
         } else {
             Problem.findOne({name: prob_name}, (err, prob) => {
                 if (err) {
-                    handleResp(res, 400, err.message)
+                    return next(err)
                 } else if (!prob) {
-                    handleResp(res, 404, 'Problem not found')
+                    return handleResp(res, 404, 'Problem not found')
                 } else {
                     req.files.forEach(function(file, findex) {
                         prob.test.matches.forEach(function(match) {
                             fs.readFile(file.path, 'utf8', function(err, data) {
                                 if (err) {
-                                    handleTestFail(req, res, err.message)
-                                    return
+                                    return next(err)
                                 } else {
                                     if (data.search(new RegExp(match)) == -1) {
-                                        handleTestFail(req, res, 'Failed match. '+match+' not found.')
-                                        return
+                                        return handleTestFail(req, res, 'Failed match. '+match+' not found.')
                                     }
                                 }
                             })
@@ -102,33 +101,59 @@ router.route('/:room_name')
                             pyshell.send(c.in)
                             pyshell.on('message', function(data) {
                                 if (data != c.out) {
-                                    handleTestFail(req, res, 'Failed Test. '+data+' != '+c.out)
-                                    return
+                                    return handleTestFail(req, res, 'Failed Test. '+data+' != '+c.out)
                                 }
                             })
                             pyshell.on('error', function(err) {
-                                handleTestFail(req, res, err.msg)
-                                return
+                                return handleTestFail(req, res, err.msg)
                             })
                             pyshell.end(function(err) {
                                 if (err) {
-                                    handleTestFail(req, res, err.msg)
-                                    return
+                                    return handleTestFail(req, res, err.msg)
                                 }
                                 if (findex+1 == req.files.length && index+1==prob.test.cases.length) {
                                     submissions.prob = prob._id
                                     prob.update({
                                         $push: {submissions: submissions._id}
                                     }, (err) => {
-                                        if (err) throw err
+                                        return next(err)
                                     })
-                                    createSubCb(req, res, submissions)
+                                    createSubCb(req, res, submissions, next)
                                 }
                             })
                         })
                     })
                 }
             })
+        }
+    })
+    .delete(validateRoom, function(req, res, next) {
+        if (req.user) {
+            Room.findOne({
+                name: req.room.name
+            }, (err, room) => {
+                if (err) {
+                    return next(err)
+                } else if (!room) {
+                    return handleResp(res, 404, 'Room not found')
+                } else if (!req.user._id == room.owner) {
+                    return handleResp(res, 406, 'Room does not belong to you')
+                } else {
+                    Room.findOneAndRemove({
+                        name: req.room.name
+                    }, (err, room) => {
+                        if (err) {
+                            return next(err)
+                        } else if (!room) {
+                            return handleResp(res, 404, 'Room not found')
+                        } else {
+                            return handleResp(res, 200, null, 'Success')
+                        }
+                    })
+                }
+            })
+        } else {
+            return handleResp(res, 401, 'Unvalidated user')
         }
     })
 
@@ -138,19 +163,20 @@ function handleTestFail(req, res, msg) {
             if (err) throw err
         })
     })
-    handleResp(res, 400, msg)
+    return handleResp(res, 400, msg)
 }
 
-function createSubCb(req, res, sub) {
+function createSubCb(req, res, sub, next) {
     sub.save((err, submission) => {
         if (err) {
-            handleResp(res, 400, err.message)
+            return next(err)
         } else {
             Room.findOneAndUpdate({
                 name: req.params.room_name
             }, {$push: {submissions: submission._id}}, (err, room) => {
-                if (err) throw err
-                if (!room) {
+                if (err) {
+                    return next(err)
+                } else if (!room) {
                     handleResp(res, 404, 'Room not found')
                 } else {
                     submission.room = room._id
@@ -170,7 +196,7 @@ function createSubCb(req, res, sub) {
                             files: created_file._id
                         }
                     }, (err) => {
-                        if (err) throw err
+                        return next(err)
                     })
                 })
             }
@@ -180,7 +206,7 @@ function createSubCb(req, res, sub) {
 
 
 router.route('/:room_name/:submission')
-    .get(validateRoom, function(req, res) {
+    .get(validateRoom, function(req, res, next) {
         Submission
             .findOne({
                 name: req.params.submission
@@ -188,10 +214,12 @@ router.route('/:room_name/:submission')
             .populate('files')
             .exec(function(err, sub) {
                 if (err) {
-                    handleResp(res, 400, err.message)
+                    return next(err)
+                } else if (!sub) {
+                    return handleResp(res, 404, 'Submission not found')
                 } else if (sub.files.length == 1) {
                     res.download('uploads/'+sub.files[0].loc, sub.files[0].name, (err) => {
-                        if (err) throw err
+                        return next(err)
                     })
                 } else {
                     var file_bundle = archiver.create('zip', {})
@@ -205,29 +233,30 @@ router.route('/:room_name/:submission')
                 }
             })
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateRoom, function(req, res, next) {
         Submission.findOne({name: req.params.submission}, function(err, sub) {
-            if (err) throw err
-            if (sub) {
+            if (err) {
+                return next(err)
+            } else if (sub) {
                 sub.remove((err) => {
                     if (err) {
-                        handleResp(res, 400, err.message)
+                        return next(err)
                     } else {
                         sub.files.forEach(function(id) {
                             File.findOneAndRemove({_id: id}, (err, file) => {
                                 if (err) throw err
                                 fs.unlink('uploads/'+file.loc, (err) => {
                                     if (err) {
-
+                                        return next(err)
                                     }
                                 })
-                                handleResp(res, 200, 'Success')
                             })
                         })
+                        return handleResp(res, 200, null, 'Submission deleted')
                     }
                 })
             } else {
-                handleResp(res, 404, 'Submission not found')
+                return handleResp(res, 404, 'Submission not found')
             }
         })
     })

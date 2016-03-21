@@ -35,12 +35,13 @@ block content
         .row
             .btns.text-center
                 a(href='/create_room') Create Room
-            .errors.text-center
-                if errors
-                    each error in errors
-                        p #{error}
+        .msg.text-center.row
+            if errors
+                each error in errors
+                    p #{error}
 
 block script
+    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
     script(type='text/javascript' src='javascripts/dash_client.js')
 
 

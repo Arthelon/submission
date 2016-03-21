@@ -3,6 +3,7 @@ $(function() {
     var form = $('#uploadForm')
     var $fileInp = $('input[name=file]')
     var fillerCode = '# Enter code here'
+    var axios = require('axios')
 
     //AceJS Code
     if (form.length) {
@@ -102,6 +103,8 @@ $(function() {
             $.ajax({
                 type: "DELETE",
                 url: '/problem/'+room_name+'/'+prob_name
+            }).done(function(data) {
+
             });
             $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
 

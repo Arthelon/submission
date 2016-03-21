@@ -24,7 +24,6 @@
     "passport-custom": "^1.0.5",
     "passport-local": "^1.0.0",
     "python-shell": "^0.4.0",
-    "react": "^0.14.7",
     "serve-favicon": "~2.3.0"
   },
   "description": "Online judge and submission platform for students and teachers",
