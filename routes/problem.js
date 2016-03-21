@@ -1,6 +1,6 @@
 var router = require('express').Router()
 var models = require('../models')
-var validateRoom = require('../mid').validateRoom
+var validateRoom = require('../util').validateRoom
 var fs = require('fs')
 
 //Models

@@ -6,6 +6,8 @@ var models = require('../models')
 var User = models.User
 var Room = models.Room
 
+var handleResp = require('../util')
+
 /* GET home page. */
 router.get('/', function(req, res) {
     if (req.user) {
@@ -79,23 +81,22 @@ router.route('/create_room')
                 owner: req.user._id
             }, function (err, room, created) {
                 if (err) {
-                    req.flash('error', 'Error Occured')
-                    res.redirect('/create_room')
+                    handleResp(res, 400, 'Error Occurred')
                 } else if (!created) {
-                    req.flash('error', 'Room already exists')
-                    res.redirect('/create_room')
+                    handleResp(res, 409, 'Room already exists')
                 } else {
                     User.findOneAndUpdate({username: req.user.username}, {
                         $push: {rooms: room._id}
-                    }, (err, doc) => {
-                        if(err) throw err
+                    }, (err) => {
+                        if (err) {
+                            handleResp(res, 400, err.message)
+                        }
                     })
-                    req.flash('msg', 'Room created')
-                    res.redirect('/dashboard')
+                    handleResp(res, 201, 'Room created')
                 }
             })
         } else {
-            res.redirect('/')
+            handleResp(res, 401, 'Unvalidated user')
         }
     })
 
@@ -104,28 +105,26 @@ router.delete('/_remove_room', function(req, res) {
         Room.findOne({
             name: req.query.room_name
         }, (err, room) => {
-            if (err) throw err
-            if (!room) {
-                res.status(404)
-                res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
+            if (err) {
+                handleResp(res, 400, err.message)
+            } else if (!room) {
+                handleResp(res, 404, 'Room not found')
             } else if (!req.user._id == room.owner) {
-                res.status(406)
-                res.end(JSON.stringify({status: 'FAILED', msg: 'Room does not belong to you'}))
+                handleResp(res, 406, 'Room does not belong to you')
             } else {
                 Room.findOneAndRemove({
                     name: req.query.room_name
                 }, (err, room) => {
                     if (err) throw err
                     if (!room) {
-                        res.status(404)
-                        res.end(JSON.stringify({status: 'FAILED', msg: 'Room not found'}))
+                        handleResp(res, 404, 'Room not found')
                     }
                 })
-                res.sendStatus(200)
+                handleResp(res, 200, 'Success')
             }
         })
     } else {
-        res.sendStatus(401)
+        handleResp(res, 401, 'Unvalidated user')
     }
 })
 

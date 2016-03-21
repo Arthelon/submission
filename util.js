@@ -38,4 +38,14 @@ router.validateRoom = function(req, res, next) {
     }
 }
 
+router.handleResp = function(res, status, msg) {
+    if (status) {
+        res.status(status)
+    }
+    res.json({
+        msg: msg
+    })
+    res.end()
+}
+
 module.exports = router

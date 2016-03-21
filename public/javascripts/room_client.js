@@ -69,7 +69,6 @@ $(function() {
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
                 })
-                location.reload()
             }
         })
 

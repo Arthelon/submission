@@ -4,8 +4,10 @@ var models = require('../models')
 var multer = require('multer')
 var fs = require('fs')
 var archiver = require('archiver')
-var validateRoom = require('../mid').validateRoom
 var PythonShell = require('python-shell')
+
+var handleResp = require('../util').handleResp
+var validateRoom = require('../util').validateRoom
 
 var upload = multer({
     dest: 'uploads/',
@@ -35,6 +37,7 @@ var Problem = models.Problem
 router.route('/:room_name')
     .get(function(req, res) {
         var room_name = req.params.room_name
+        var payload = {}
         Room
         .findOne({
             path: room_name
@@ -50,18 +53,17 @@ router.route('/:room_name')
                     error: {}
                 })
             } else {
-                var payload = {
+                payload = {
                     room_name: room.name,
                     room_desc: room.desc,
                     problems: room.problems,
                     errors: req.flash('error')
                 }
+                console.log(payload.errors)
                 if (req.user && req.user._id.toString() == room.owner.toString()) {
                     payload.submissions = room.submissions
-                    res.render('room', payload)
-                } else {
-                    res.render('room', payload)
                 }
+                res.render('room', payload)
             }
         })
     })
@@ -77,13 +79,9 @@ router.route('/:room_name')
         } else {
             Problem.findOne({name: prob_name}, (err, prob) => {
                 if (err) {
-                    req.flash('error', err.message)
-                    res.status(400)
-                    res.redirect('back')
+                    handleResp(res, 400, err.message)
                 } else if (!prob) {
-                    req.flash('error', 'Problem not found')
-                    res.status(404)
-                    res.redirect('back')
+                    handleResp(res, 404, 'Problem not found')
                 } else {
                     req.files.forEach(function(file, findex) {
                         prob.test.matches.forEach(function(match) {
@@ -140,26 +138,20 @@ function handleTestFail(req, res, msg) {
             if (err) throw err
         })
     })
-    console.log(msg)
-    req.flash('error', msg)
-    res.redirect('back')
+    handleResp(res, 400, msg)
 }
 
 function createSubCb(req, res, sub) {
     sub.save((err, submission) => {
         if (err) {
-            req.flash('error', err.message)
-            res.status(400)
-            res.redirect('back')
+            handleResp(res, 400, err.message)
         } else {
             Room.findOneAndUpdate({
                 name: req.params.room_name
             }, {$push: {submissions: submission._id}}, (err, room) => {
                 if (err) throw err
                 if (!room) {
-                    req.flash('error', 'Room not found')
-                    res.status(404)
-                    res.redirect('back')
+                    handleResp(res, 404, 'Room not found')
                 } else {
                     submission.room = room._id
                     submission.save()
@@ -195,8 +187,9 @@ router.route('/:room_name/:submission')
             })
             .populate('files')
             .exec(function(err, sub) {
-                if (err) throw err
-                if (sub.files.length == 1) {
+                if (err) {
+                    handleResp(res, 400, err.message)
+                } else if (sub.files.length == 1) {
                     res.download('uploads/'+sub.files[0].loc, sub.files[0].name, (err) => {
                         if (err) throw err
                     })
@@ -218,25 +211,23 @@ router.route('/:room_name/:submission')
             if (sub) {
                 sub.remove((err) => {
                     if (err) {
-                        req.flash('error', err.message)
-                        res.status(400)
-                        res.redirect('back')
+                        handleResp(res, 400, err.message)
                     } else {
                         sub.files.forEach(function(id) {
                             File.findOneAndRemove({_id: id}, (err, file) => {
                                 if (err) throw err
                                 fs.unlink('uploads/'+file.loc, (err) => {
-                                    if (err) throw err
+                                    if (err) {
+
+                                    }
                                 })
-                                res.sendStatus(200)
+                                handleResp(res, 200, 'Success')
                             })
                         })
                     }
                 })
             } else {
-                req.flash('error', 'Submission not found')
-                res.status(404)
-                res.redirect('back')
+                handleResp(res, 404, 'Submission not found')
             }
         })
     })
