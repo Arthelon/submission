@@ -47,5 +47,6 @@ block script
                     if (!data.responseJSON.error) data.responseJSON.error = 'Error'
                     $msg.append('<p style="color:red;">' + data.responseJSON.error + '</p>')
                 })
+                $(this).trigger('reset')
             })
         })

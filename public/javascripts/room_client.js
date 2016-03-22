@@ -78,6 +78,7 @@ $(function() {
                     if (!data.responseText) data.responseJSON.error = 'Error'
                     $msg.append('<p style="color:red;">'+data.error+'</p>')
                 })
+                $(this).trigger('reset')
             }
         })
 

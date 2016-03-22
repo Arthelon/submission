@@ -49,5 +49,6 @@ block script
                     if (!data.error) data.error = 'Error'
                     $msg.append('<p style="color:red;">' + data.error + '</p>')
                 })
+                $(this).trigger('reset')
             })
         })
