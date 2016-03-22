@@ -73,7 +73,7 @@ router.route('/create_room')
             res.redirect('/')
         }
     })
-    .post(function(req, res, next) {
+    .post(function(req, res) {
         if (req.user) {
             Room.findOrCreate({
                 path: req.body.path,
@@ -82,7 +82,7 @@ router.route('/create_room')
                 owner: req.user._id
             }, function (err, room, created) {
                 if (err) {
-                    return next(err)
+                    return handleResp(res, 500, err.message)
                 } else if (!created) {
                     return handleResp(res, 409, 'Room already exists')
                 } else {
@@ -90,10 +90,10 @@ router.route('/create_room')
                         $push: {rooms: room._id}
                     }, (err) => {
                         if (err) {
-                            return next(err)
+                            return handleResp(res, 500, err)
                         }
                     })
-                    return handleResp(res, 201, null,'Room created')
+                    return handleResp(res, 200, null, 'Room Created')
                 }
             })
         } else {

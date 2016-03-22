@@ -130,6 +130,7 @@ UserSchema.methods.validatePassword = function() {
 UserSchema.plugin(findOrCreate)
 RoomSchema.plugin(findOrCreate)
 ProblemSchema.plugin(findOrCreate)
+SubmissionSchema.plugin(findOrCreate)
 
 var models = {}
 

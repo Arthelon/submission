@@ -1,7 +1,6 @@
 var util = {}
 var Room = require('./models').Room
 
-
 function handleResp(res, status, err, succ) {
     if (status) {
         res.status(status)
@@ -12,8 +11,6 @@ function handleResp(res, status, err, succ) {
     res.json(payload)
     res.end()
 }
-
-util.handleResp = handleResp
 
 util.validateRoom = function(req, res, next) {
     var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
@@ -34,5 +31,7 @@ util.validateRoom = function(req, res, next) {
         })
     }
 }
+
+util.handleResp = handleResp
 
 module.exports = util

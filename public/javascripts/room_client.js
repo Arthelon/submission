@@ -3,7 +3,7 @@ $(function() {
     var form = $('#uploadForm')
     var $fileInp = $('input[name=file]')
     var fillerCode = '# Enter code here'
-    var axios = require('axios')
+    var $msg = $('.msg')
 
     //AceJS Code
     if (form.length) {
@@ -15,7 +15,7 @@ $(function() {
 
         //Event Handlers
         $fileInp.each(function() {
-            var $label	 = $fileInp.next('label'),
+            var $label = $fileInp.next('label'),
                 labelVal = $label.html();
 
             $fileInp.on('change', function(e) {
@@ -49,7 +49,6 @@ $(function() {
         });
         var $nameInput = $('input[name=name]')
         $('button[type=submit]').on('click', function(e) {
-            console.log('clicked')
             if (!$nameInput.val()) {
                 show_err('Please enter submission title', e)
             } else if (!$('input[name=user]').val()) {
@@ -60,54 +59,69 @@ $(function() {
                 show_err('Please submit data', e)
             } else if (editor.getValue() != fillerCode) {
                 e.preventDefault()
+                var form = $("#uploadForm")
                 var fd = new FormData(document.forms[0])
                 var editor_file = new Blob([editor.getValue()], {type: 'text/x-script.python'})
                 fd.append('file', editor_file, $nameInput.val()+'.py')
+                // window.location.reload()
                 $.ajax({
                     url: '/room/'+form.attr('room'),
                     method: 'post',
                     data: fd,
+                    dataType: 'json',
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
+                }).then(function(data) {
+                    if (!data.success) data.success = 'Success'
+                    $msg.append('<p style="color:green;">'+data.success+'</p>')
+                }, function(data) {
+                    if (!data.responseText) data.responseJSON.error = 'Error'
+                    $msg.append('<p style="color:red;">'+data.error+'</p>')
                 })
             }
         })
 
         function show_err(msg, e) {
-            var $errors = $('.errors')
-            $errors.empty()
-            $errors.append('<p>'+msg+'</p>')
+            $msg.empty()
+            $msg.append('<p>'+msg+'</p>')
             e.preventDefault()
         }
     } else {
         var $subContent = $('#subContent')
         var $probContent = $('#probContent')
+
         $subContent.find('.cross').click(function () {
+            $msg.empty()
             var $parentElem = $(this).parents('tbody')
             var $index = $parentElem.find('i').index(this) + 1
             var $tableLink =$parentElem.find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var sub_name = $tableLink.text()
 
-            $.ajax({
-                type: "DELETE",
-                url: '/room/'+room_name+'/'+sub_name
-            });
-            $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+            axios.delete('/room/'+room_name+'/'+sub_name).then(function(res) {
+                if (!res.data.success) res.data.success = 'Success'
+                $msg.append('<p style="color:green;">'+res.data.success+'</p>')
+                $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+            }, function(res) {
+                if (!res.data.error) res.data.error = 'Error Occurred'
+                $msg.append('<p style="color:green;">'+res.data.error+'</p>')
+            })
         })
 
         $probContent.find('.cross').click(function() {
+            $msg.empty()
             var $parentElem = $(this).parents('tbody')
             var $index = $parentElem.find('i').index(this) + 1
             var $tableLink = $parentElem.find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var prob_name = $tableLink.text()
-            $.ajax({
-                type: "DELETE",
-                url: '/problem/'+room_name+'/'+prob_name
-            }).done(function(data) {
 
-            });
-            $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
-
+            axios.delete('/problem/'+room_name+'/'+prob_name).then(function(res) {
+                if (!res.data.success) res.data.success = 'Success'
+                $msg.append('<p style="color:green;">'+res.data.success+'</p>')
+                $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
+            }, function(res) {
+                if (!res.data.error) res.data.error = 'Error Occurred'
+                $msg.append('<p style="color:green;">'+res.data.error+'</p>')
+            })
         })
 
         $('.nav > li').click(function() {

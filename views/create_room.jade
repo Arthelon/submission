@@ -16,7 +16,7 @@ block content
                     .panel-heading.clearfix
                         h3.panel-title Create Room
                     .panel-body
-                        form(method='POST' action='/create_room')
+                        form
                             .form-group
                                 label.col-lg-4.control-label(for='roomName') Room Name
                                 input#roomName.form-control(name='name' type='text', placeholder='Room Name')
@@ -29,3 +29,25 @@ block content
                             if errors
                                 p #{errors}
                             button.btn.btn-success(type='submit') Submit
+        .row.msg.text-center
+block script
+    script(type='text/javascript').
+        $(function() {
+            var $msg = $('.msg')
+            $("form").submit(function (e) {
+                e.preventDefault()
+                $msg.empty()
+                $.ajax({
+                    method: "POST",
+                    url: "/problem/",
+                    data: $(this).serialize(),
+                    dataType: 'json'
+                }).then(function (data) {
+                    if (!data.success) data.success = 'Success'
+                    $msg.append('<p style="color:green;">' + data.success + '</p>')
+                }, function (data) {
+                    if (!data.error) data.error = 'Error'
+                    $msg.append('<p style="color:red;">' + data.error + '</p>')
+                })
+            })
+        })

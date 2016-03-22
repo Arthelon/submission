@@ -20,7 +20,7 @@ router.route('/:room_name')
             res.redirect('/')
         }
     })
-    .post(validateRoom, function(req, res, next) {
+    .post(validateRoom, function(req, res) {
         if (req.user) {
             if (req.body.name && req.body.desc) {
                 Problem.findOrCreate({
@@ -29,16 +29,16 @@ router.route('/:room_name')
                     room: req.room._id
                 }, (err, prob, created) => {
                     if (err) {
-                        return next(err)
+                        return handleResp(res, 500, err.message)
                     } else if (!created) {
                         return handleResp(res, 404, 'Problem already exists')
                     } else {
                         Room.findOneAndUpdate({
                             _id: req.room._id
                         }, {$push: {problems: prob._id}}, (err) => {
-                            if (err) throw err
+                            if (err) return handleResp(res, 400, err.message)
                         })
-                        return handleResp(res, 401, null, 'Problem Created')
+                        return handleResp(res, 200, null, 'Problem Created')
                     }
                 })
             } else {
@@ -78,9 +78,7 @@ router.route('/:room_name/:problem')
                         })
                     }
                 }, function() {
-                    res.status(404)
-                    req.flash('error', 'Room not found')
-                    res.redirect('back')
+                    handleResp(res, 404, 'Room not found')
                 })
             }
         })
@@ -90,13 +88,13 @@ router.route('/:room_name/:problem')
         Problem.findOne({name: prob_name},
             function(err, prob) {
             if (err) {
-                return next(err)
+                return handleResp(res, 500, err.message)
             } else if (!prob) {
                 return handleResp(res, 404, 'Problem not found')
             } else if (prob.room.toString() == req.room._id.toString()) {
                 prob.remove(function(err) {
                     if (err) {
-                        return next(err)
+                        return handleResp(res, 500, err.message)
                     } else {
                         req.room.update({
                             $pull: {
@@ -104,7 +102,7 @@ router.route('/:room_name/:problem')
                             }
                         }, (err) => {
                             if (err) {
-                                return next(err)
+                                return handleResp(res, 500, err.message)
                             } else {
                                 return handleResp(res, 200, null, 'Success')
                             }
@@ -120,7 +118,7 @@ router.route('/:room_name/:problem')
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name}, function(err, prob) {
             if (err) {
-                return next(err)
+                return handleResp(res, 500, err.message)
             } else if (!prob) {
                 return handleResp(res, 404, 'Problem not found')
             } else if (prob.room.toString() == req.room._id.toString()) {
@@ -137,7 +135,7 @@ router.route('/:room_name/:problem')
                 }
                 prob.save((err) => {
                     if (err) {
-                        return next(err)
+                        return handleResp(res, 500, err.message)
                     } else {
                         return handleResp(res, 200, null, 'Success')
                     }
