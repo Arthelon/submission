@@ -8,6 +8,7 @@ function handleResp(res, status, err, succ) {
     payload = {}
     if (err) payload.error = err
     if (succ) payload.success = succ
+    console.log(payload)
     res.json(payload)
     res.end()
 }

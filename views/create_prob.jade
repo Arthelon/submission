@@ -44,8 +44,8 @@ block script
                     if (!data.success) data.success = 'Success'
                     $msg.append('<p style="color:green;">' + data.success + '</p>')
                 }, function (data) {
-                    if (!data.error) data.error = 'Error'
-                    $msg.append('<p style="color:red;">' + data.error + '</p>')
+                    if (!data.responseJSON.error) data.responseJSON.error = 'Error'
+                    $msg.append('<p style="color:red;">' + data.responseJSON.error + '</p>')
                 })
             })
         })

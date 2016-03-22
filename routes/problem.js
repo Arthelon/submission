@@ -23,20 +23,25 @@ router.route('/:room_name')
     .post(validateRoom, function(req, res) {
         if (req.user) {
             if (req.body.name && req.body.desc) {
+                if (!req.body.name.match(/^[\d\w]+$/)) {
+                    return handleResp(res, 400, 'Name can only consist of alphanumeric characters')
+                }
                 Problem.findOrCreate({
                     name: req.body.name,
                     desc: req.body.desc,
                     room: req.room._id
                 }, (err, prob, created) => {
                     if (err) {
+                        console.log('hi')
                         return handleResp(res, 500, err.message)
-                    } else if (!created) {
+                    }
+                    else if (!created) {
                         return handleResp(res, 404, 'Problem already exists')
                     } else {
                         Room.findOneAndUpdate({
                             _id: req.room._id
                         }, {$push: {problems: prob._id}}, (err) => {
-                            if (err) return handleResp(res, 400, err.message)
+                            if (err) return handleResp(res, 500, err.message)
                         })
                         return handleResp(res, 200, null, 'Problem Created')
                     }
@@ -83,7 +88,7 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    .delete(validateRoom, function(req, res, next) {
+    .delete(validateRoom, function(req, res) {
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name},
             function(err, prob) {
@@ -114,7 +119,7 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    .post(validateRoom, function(req, res, next) {
+    .post(validateRoom, function(req, res) {
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name}, function(err, prob) {
             if (err) {
