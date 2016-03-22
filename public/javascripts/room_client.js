@@ -59,7 +59,6 @@ $(function() {
                 show_err('Please submit data', e)
             } else if (editor.getValue() != fillerCode) {
                 e.preventDefault()
-                var form = $("#uploadForm")
                 var fd = new FormData(document.forms[0])
                 var editor_file = new Blob([editor.getValue()], {type: 'text/x-script.python'})
                 fd.append('file', editor_file, $nameInput.val()+'.py')
@@ -78,7 +77,7 @@ $(function() {
                     if (!data.responseText) data.responseJSON.error = 'Error'
                     $msg.append('<p style="color:red;">'+data.error+'</p>')
                 })
-                $(this).trigger('reset')
+                $(form).trigger('reset')
             }
         })
 
