@@ -8,17 +8,12 @@ var fs = require('fs')
 var Room = models.Room
 var Problem = models.Problem
 
-
 router.route('/:room_name')
     .get(validateRoom, function(req, res) {
-        if (req.user) {
-            res.render('create_prob', {
-                room_name: req.room.name,
-                errors: req.flash('error')
-            })
-        } else {
-            res.redirect('/')
-        }
+        res.render('create_prob', {
+            room_name: req.room.name,
+            errors: req.flash('error')
+        })
     })
     .post(validateRoom, function(req, res) {
         if (req.user) {
@@ -52,6 +47,40 @@ router.route('/:room_name')
         } else {
             return handleResp(res, 401, 'User not authenticated')
         }
+    })
+    .delete(validateRoom, function(req, res) {
+        var prob_name = req.body.problem
+        if (!prob_name) {
+            return handleResp(res, 400, 'Invalid Request. Please enter problem name')
+        }
+        Problem.findOne({name: prob_name},
+            function(err, prob) {
+                if (err) {
+                    return handleResp(res, 500, err.message)
+                } else if (!prob) {
+                    return handleResp(res, 404, 'Problem not found')
+                } else if (prob.room.toString() == req.room._id.toString()) {
+                    prob.remove(function(err) {
+                        if (err) {
+                            return handleResp(res, 500, err.message)
+                        } else {
+                            req.room.update({
+                                $pull: {
+                                    problems: prob._id
+                                }
+                            }, (err) => {
+                                if (err) {
+                                    return handleResp(res, 500, err.message)
+                                } else {
+                                    return handleResp(res, 200, null, 'Success')
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    return handleResp(res, 401, 'Room doesn\'t belong to user')
+                }
+            })
     })
 
 router.route('/:room_name/:problem')
@@ -88,37 +117,6 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    .delete(validateRoom, function(req, res) {
-        var prob_name = req.params.problem
-        Problem.findOne({name: prob_name},
-            function(err, prob) {
-            if (err) {
-                return handleResp(res, 500, err.message)
-            } else if (!prob) {
-                return handleResp(res, 404, 'Problem not found')
-            } else if (prob.room.toString() == req.room._id.toString()) {
-                prob.remove(function(err) {
-                    if (err) {
-                        return handleResp(res, 500, err.message)
-                    } else {
-                        req.room.update({
-                            $pull: {
-                                problems: prob._id
-                            }
-                        }, (err) => {
-                            if (err) {
-                                return handleResp(res, 500, err.message)
-                            } else {
-                                return handleResp(res, 200, null, 'Success')
-                            }
-                        })
-                    }
-                })
-            } else {
-                return handleResp(res, 401, 'Room doesn\'t belong to user')
-            }
-        })
-    })
     .post(validateRoom, function(req, res) {
         var prob_name = req.params.problem
         Problem.findOne({name: prob_name}, function(err, prob) {
@@ -150,5 +148,8 @@ router.route('/:room_name/:problem')
             }
         })
     })
+    // .delete(function(req, res) {
+        //Test deletion code
+    // })
 
 module.exports = router

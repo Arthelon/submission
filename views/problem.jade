@@ -43,7 +43,6 @@ block content
                     .text-center
                         .alert.alert-dismissible.alert-warning
                             button.fa.fa-close.close(type='button', data-dismiss='alert')
-
                             p No submissions found
             #testContent
                 .col-md-6
@@ -83,7 +82,7 @@ block content
                     a#createTest New Tests
             #createContent
                 .col-md-6
-                    form#cases(method='POST' action='/problem/#{room_name}/#{prob_name}')
+                    form
                         .form-group
                             label.col-lg-4.control-label(for='caseInput') Input
                             input#caseInput.form-control(name='in' type='text', placeholder='Required')
@@ -92,19 +91,19 @@ block content
                             input#caseOutput.form-control(name='out' type='text', placeholder='Required')
                         button.btn.btn-success(type='submit') Submit
                 .col-md-3
-                    form#matches(method='POST')
+                    form
                         .form-group
                             label.col-lg-4.control-label(for='matchString') Match
                             input#matchString.form-control(name='match' type='text', placeholder='String to Capture')
                         button.btn.btn-success(type='submit') Submit
-
-
-        .errors.text-center
+        .msg.text-center
             if errors
                 each error in errors
                     p #{error}
 
 block script
+    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
     script(type='text/javascript').
         var room_name = !{JSON.stringify(room_name)}
+        var prob_name = !{JSON.stringify(prob_name)}
     script(type='text/javascript' src='/javascripts/prob_client.js')

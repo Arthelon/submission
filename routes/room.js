@@ -83,77 +83,80 @@ router.route('/:room_name')
                 } else if (!prob) {
                     return handleResp(res, 404, 'Problem not found')
                 } else {
-                    req.files.forEach(function(file, findex) {
-                        prob.test.matches.forEach(function(match) {
-                            fs.readFile(file.path, 'utf8', function(err, data) {
-                                if (err) {
-                                    return handleResp(res, 500, err.message)
-                                } else {
-                                    if (data.search(new RegExp(match)) == -1) {
-                                        return handleTestFail(req, res, 'Failed match. '+match+' not found.')
-                                    }
-                                }
-                            })
-                        })
-                        prob.test.cases.forEach(function(c, index) {
-                            var pyshell = new PythonShell(file.path, {mode:'text'})
-                            pyshell.send(c.in)
-                            pyshell.on('message', function(data) {
-                                if (data != c.out) {
-                                    return handleTestFail(req, res, 'Failed Test. '+data+' != '+c.out)
-                                }
-                            })
-                            pyshell.on('error', function(err) {
-                                return handleTestFail(req, res, err.msg)
-                            })
-                            pyshell.end(function(err) {
-                                if (err) {
-                                    return handleTestFail(req, res, err.msg)
-                                }
-                                if (findex+1 == req.files.length && index+1==prob.test.cases.length) {
-                                    submissions.prob = prob._id
-                                    prob.update({
-                                        $push: {submissions: submissions._id}
-                                    }, (err) => {
-                                        return handleResp(res, 500, err.message)
-                                    })
-                                    createSubCb(req, res, submissions)
-                                }
-                            })
-                        })
+                    submissions.prob = prob._id
+                    prob.update({
+                        $push: {submissions: submissions._id}
+                    }, (err) => {
+                        if (err) return handleResp(res, 500, err.message)
+                        else createSubCb(req, res, submissions)
                     })
+                    // req.files.forEach(function(file, findex) {
+                        // prob.test.matches.forEach(function(match) {
+                        //     fs.readFile(file.path, 'utf8', function(err, data) {
+                        //         if (err) {
+                        //             return handleResp(res, 500, err.message)
+                        //         } else {
+                        //             if (data.search(new RegExp(match)) == -1) {
+                        //                 return handleTestFail(req, res, 'Failed match. '+match+' not found.')
+                        //             }
+                        //         }
+                        //     })
+                        // })
+                        // prob.test.cases.forEach(function(c, index) {
+                        //     var pyshell = new PythonShell(file.path, {mode:'text'})
+                        //     pyshell.send(c.in)
+                        //     pyshell.on('message', function(data) {
+                        //         if (data != c.out) {
+                        //             return handleTestFail(req, res, 'Failed Test. '+data+' != '+c.out)
+                        //         }
+                        //     })
+                        //     pyshell.on('error', function(err) {
+                        //         return handleTestFail(req, res, err.msg)
+                        //     })
+                        //     pyshell.end(function(err) {
+                        //         if (err) {
+                        //             return handleTestFail(req, res, err.msg)
+                        //         }
+                        //         if (findex+1 == req.files.length && index+1==prob.test.cases.length) {
+                        //             submissions.prob = prob._id
+                        //             prob.update({
+                        //                 $push: {submissions: submissions._id}
+                        //             }, (err) => {
+                        //                 return handleResp(res, 500, err.message)
+                        //             })
+                        //             createSubCb(req, res, submissions)
+                        //         }
+                        //     })
+                        // })
+                    // })
                 }
             })
         }
     })
     .delete(validateRoom, function(req, res) {
-        if (req.user) {
-            Room.findOne({
-                name: req.room.name
-            }, (err, room) => {
-                if (err) {
-                    return handleResp(res, 500, err.message)
-                } else if (!room) {
-                    return handleResp(res, 404, 'Room not found')
-                } else if (!req.user._id == room.owner) {
-                    return handleResp(res, 406, 'Room does not belong to you')
-                } else {
-                    Room.findOneAndRemove({
-                        name: req.room.name
-                    }, (err, room) => {
-                        if (err) {
-                            return handleResp(res, 500, err.message)
-                        } else if (!room) {
-                            return handleResp(res, 404, 'Room not found')
-                        } else {
-                            return handleResp(res, 200, null, 'Success')
-                        }
-                    })
-                }
+        Room.findOne({
+            name: req.room.name
+        }, (err, room) => {
+            if (err) {
+                return handleResp(res, 500, err.message)
+            } else if (!room) {
+                return handleResp(res, 404, 'Room not found')
+            } else if (!req.user._id == room.owner) {
+                return handleResp(res, 406, 'Room does not belong to you')
+            } else {
+                Room.findOneAndRemove({
+                    name: req.room.name
+                }, (err, room) => {
+                    if (err) {
+                        return handleResp(res, 500, err.message)
+                    } else if (!room) {
+                        return handleResp(res, 404, 'Room not found')
+                    } else {
+                        return handleResp(res, 200, null, 'Success')
+                    }
+                })
+            }
             })
-        } else {
-            return handleResp(res, 401, 'Unvalidated user')
-        }
     })
 
 function handleTestFail(req, res, msg) {

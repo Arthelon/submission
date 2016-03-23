@@ -34,12 +34,12 @@ block script
     script(type='text/javascript').
         $(function() {
             var $msg = $('.msg')
-            $("form").submit(function (e) {
+            $("form").submit(function(e) {
                 e.preventDefault()
                 $msg.empty()
                 $.ajax({
                     method: "POST",
-                    url: "/problem/",
+                    url: "/create_room",
                     data: $(this).serialize(),
                     dataType: 'json'
                 }).then(function (data) {

@@ -114,7 +114,11 @@ $(function() {
             var $tableLink = $parentElem.find('tr:nth-child(' + $index + ') td:nth-child(1) a')
             var prob_name = $tableLink.text()
 
-            axios.delete('/problem/'+room_name+'/'+prob_name).then(function(res) {
+            axios.delete('/problem/'+room_name, {
+                data: {
+                    problem: prob_name
+                }
+            }).then(function(res) {
                 if (!res.data.success) res.data.success = 'Success'
                 $msg.append('<p style="color:green;">'+res.data.success+'</p>')
                 $parentElem.find('tr:nth-child(' + $index + ')').fadeOut(400, () => $(this).remove())
