@@ -54,7 +54,7 @@ block content
                                     th Output
                             tbody
                                 each item in test.cases
-                                    tr
+                                    tr(id=item._id)
                                         td #{item.in}
                                         td #{item.out}
                                             i.fa.fa-times.cross
@@ -71,7 +71,7 @@ block content
                                     th Match
                             tbody
                                 each item in test.matches
-                                    tr
+                                    tr(id=item._id)
                                         td #{item}
                     else
                         .text-center

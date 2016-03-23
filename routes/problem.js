@@ -132,7 +132,6 @@ router.route('/:room_name/:problem')
                         in: inp,
                         out: out
                     })
-
                 } else if (req.body.match) {
                     prob.test.matches.push(req.body.match)
                 }
@@ -148,8 +147,18 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    // .delete(function(req, res) {
-        //Test deletion code
-    // })
+    .delete(validateRoom, function(req, res) {
+        var prob_name = req.params.problem
+        Problem.findOne({name: prob_name}, function(err, prob) {
+            if (err) {
+                return handleResp(res, 500, err.message)
+            } else if (!prob) {
+                return handleResp(res, 404, 'Problem not found')
+            } else if (prob.room.toString() == req.room._id.toString()) {
+
+            }
+        })
+        // Test deletion code
+    })
 
 module.exports = router
