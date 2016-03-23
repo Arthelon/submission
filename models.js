@@ -106,7 +106,19 @@ RoomSchema.pre('remove', function(next) {
     }, (err, user) => {
         if (err) throw err
         else if (!user) throw new Error('User not found')
-        else next()
+        else {
+            this.problems.forEach(function(prob) {
+                prob.remove((err) => {
+                    if (err) throw err
+                })
+            })
+            this.submissions.forEach(function(sub) {
+                sub.remove((err) => {
+                    if (err) throw err
+                })
+            })
+            next()
+        }
     })
 })
 

@@ -134,34 +134,10 @@ router.route('/:room_name')
         }
     })
     .delete(validateRoom, function(req, res) {
-        Room
-            .populate('problems submissions')
-            .findOne({
-                name: req.room.name
-            }, (err, room) => {
-                if (err) {
-                    return handleResp(res, 500, err.message)
-                } else if (!room) {
-                    return handleResp(res, 404, 'Room not found')
-                } else if (!req.user._id == room.owner) {
-                    return handleResp(res, 406, 'Room does not belong to you')
-                } else {
-                    room.problems.forEach(function(prob) {
-                        prob.remove((err) => {
-                            if (err) return handleResp(res, 500, err.message)
-                        })
-                    })
-                    room.submissions.forEach(function(wub) {
-                        sub.remove((err) => {
-                            if (err) return handleResp(res, 500, err.message)
-                        })
-                    })
-                    room.remove((err) => {
-                        if (err) return handleResp(res, 500, err.message)
-                        else return handleResp(res, 200, 'Room deleted')
-                    })
-                }
-            })
+        room.remove((err) => {
+            if (err) return handleResp(res, 500, err.message)
+            else return handleResp(res, 200, 'Room deleted')
+        })
     })
 
 function handleTestFail(req, res, msg) {
