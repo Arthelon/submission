@@ -134,9 +134,9 @@ router.route('/:room_name')
         }
     })
     .delete(validateRoom, function(req, res) {
-        room.remove((err) => {
+        req.room.remove((err) => {
             if (err) return handleResp(res, 500, err.message)
-            else return handleResp(res, 200, 'Room deleted')
+            else return handleResp(res, 200, null, 'Room deleted')
         })
     })
 

@@ -20,13 +20,14 @@ $(function () {
     })
 
     $testContent.find('.cross').click(function () {
-        var $index = $('i').index(this) + 1
+        var $testType = $(this).parents('tbody').attr('id')
         var $row = $(this).parents('tr')
         var id = $row.attr('id')
 
         axios.delete('/problem/' + room_name + '/' + prob_name, {
             data: {
-                id: id
+                id: id,
+                type: $testType
             }
         }).then(function (res) {
             if (!res.data.success) res.data.success = 'Success'

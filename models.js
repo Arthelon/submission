@@ -54,7 +54,9 @@ var ProblemSchema = new Schema({
             in: {type: String, required: true},
             out: {type: String, required: true}
         }],
-        matches: [String]
+        matches: [{
+            text: String
+        }]
     },
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
@@ -108,12 +110,12 @@ RoomSchema.pre('remove', function(next) {
         else if (!user) throw new Error('User not found')
         else {
             this.problems.forEach(function(prob) {
-                prob.remove((err) => {
+                models.Problem.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
             })
             this.submissions.forEach(function(sub) {
-                sub.remove((err) => {
+                models.Submission.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
             })

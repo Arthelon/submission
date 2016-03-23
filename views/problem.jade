@@ -52,7 +52,7 @@ block content
                                 tr
                                     th Input
                                     th Output
-                            tbody
+                            tbody#cases
                                 each item in test.cases
                                     tr(id=item._id)
                                         td #{item.in}
@@ -69,10 +69,11 @@ block content
                             thead
                                 tr
                                     th Match
-                            tbody
+                            tbody#matches
                                 each item in test.matches
                                     tr(id=item._id)
-                                        td #{item}
+                                        td #{item.text}
+                                            i.fa.fa-times.cross
                     else
                         .text-center
                             .alert.alert-dismissible.alert-warning

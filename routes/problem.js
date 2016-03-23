@@ -133,7 +133,7 @@ router.route('/:room_name/:problem')
                         out: out
                     })
                 } else if (req.body.match) {
-                    prob.test.matches.push(req.body.match)
+                    prob.test.matches.push({text: req.body.match})
                 }
                 prob.save((err) => {
                     if (err) {
@@ -149,16 +149,29 @@ router.route('/:room_name/:problem')
     })
     .delete(validateRoom, function(req, res) {
         var prob_name = req.params.problem
+        var test_id = req.body.id
+        var test_type = req.body.type
+        if (test_type != 'matches' && test_type != 'cases') {
+            return handleResp(res, 400, 'Invalid test type')
+        }
         Problem.findOne({name: prob_name}, function(err, prob) {
             if (err) {
                 return handleResp(res, 500, err.message)
             } else if (!prob) {
                 return handleResp(res, 404, 'Problem not found')
             } else if (prob.room.toString() == req.room._id.toString()) {
-
+                prob.update({
+                    $pull: {
+                        ['test.'+test_type]: {
+                            _id: test_id
+                        }
+                    }
+                }, (err) => {
+                    if (err) return handleResp(res, 500, err.message)
+                    else return handleResp(res, 200, null, 'Test deleted')
+                })
             }
         })
-        // Test deletion code
     })
 
 module.exports = router
