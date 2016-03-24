@@ -18,7 +18,8 @@ var SubmissionSchema = new Schema({
 var FileSchema = new Schema({
     name: String,
     type: String,
-    loc: String
+    loc: String,
+    sub: {type:Schema.Types.ObjectId, ref: 'Submission'}
 })
 
 var UserSchema = new Schema({

@@ -53,7 +53,7 @@ $(function() {
                 show_err('Please enter submission title', e)
             } else if (!$('input[name=user]').val()) {
                 show_err('Please enter your name', e)
-            }  else if ($fileInp.val() && editor.getValue() == fillerCode) {
+            }  else if ($fileInp.val() && editor.getValue() != fillerCode) {
                 show_err('Can\'t accept submissions from both file(s) and text editor', e)
             } else if (!$fileInp.val() && editor.getValue() == fillerCode) {
                 show_err('Please submit data', e)
@@ -74,9 +74,11 @@ $(function() {
                     if (!data.success) data.success = 'Success'
                     $msg.append('<p style="color:green;">'+data.success+'</p>')
                 }, function(data) {
-                    if (!data.responseText) data.responseJSON.error = 'Error'
-                    $msg.append('<p style="color:red;">'+data.error+'</p>')
+                    console.log(data)
+                    if (!data.responseJSON.error) data.responseJSON.error = 'Error'
+                    $msg.append('<p style="color:red;">'+data.responseJSON.error+'</p>')
                 })
+                editor.setValue('')
                 $(form).trigger('reset')
             }
         })

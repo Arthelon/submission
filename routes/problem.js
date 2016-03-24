@@ -162,7 +162,7 @@ router.route('/:room_name/:problem')
             } else if (prob.room.toString() == req.room._id.toString()) {
                 prob.update({
                     $pull: {
-                        ['test.'+test_type]: {
+                        ['test.'+test_type]: { //Dynamic object key
                             _id: test_id
                         }
                     }
