@@ -189,7 +189,7 @@ function createSubCb(req, res, sub) {
                         })
                     }, function(err) {
                         if (err) return handleResp(res, 500, err.message)
-                        else return handleResp(res, 200, 'Success')
+                        else return handleResp(res, 200, null, 'Success')
                     })
                 }
             })

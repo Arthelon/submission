@@ -34,9 +34,9 @@ $(function() {
                     $label.html(labelVal);
                 if (this.files) {
                     var files = this.files
-                    for (var i in files) {
-                        if (files[i] && !files[i].name.endsWith('.py')) {
-                            form.find('.errors').append('<p>Please upload valid filetypes</p>')
+                    for (var i = 0; i < files.length; i++) {
+                        if (!files[i].name.endsWith('.py')) {
+                            $msg.append('<p style="color:red;">Please upload valid filetypes</p>')
                             $fileInp.val('')
                         }
                     }
@@ -53,9 +53,9 @@ $(function() {
                 show_err('Please enter submission title', e)
             } else if (!$('input[name=user]').val()) {
                 show_err('Please enter your name', e)
-            }  else if ($fileInp.val() && editor.getValue() != fillerCode) {
+            }  else if ($fileInp.val() && (editor.getValue() != fillerCode || !editor.getValue())) {
                 show_err('Can\'t accept submissions from both file(s) and text editor', e)
-            } else if (!$fileInp.val() && editor.getValue() == fillerCode) {
+            } else if (!$fileInp.val() && (editor.getValue() == fillerCode || !editor.getValue())) {
                 show_err('Please submit data', e)
             } else if (editor.getValue() != fillerCode) {
                 e.preventDefault()
@@ -71,6 +71,7 @@ $(function() {
                     processData: false,  // tell jQuery not to process the data
                     contentType: false   // tell jQuery not to set contentType
                 }).then(function(data) {
+                    console.log(data)
                     if (!data.success) data.success = 'Success'
                     $msg.append('<p style="color:green;">'+data.success+'</p>')
                 }, function(data) {
