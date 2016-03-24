@@ -13,13 +13,13 @@ function handleResp(res, status, err, succ) {
     res.end()
 }
 
-util.validateRoom = function(req, res, next) {
+util.validateRoom = function (req, res, next) {
     var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
     if (!req.user) {
         if (req.method == 'GET') res.redirect('/')
         else return handleResp(res, 401, 'User not authenticated')
     } else {
-        Room.findOne({name:room_name}, function(err, room) {
+        Room.findOne({name: room_name}, function (err, room) {
             if (err) {
                 return next(err)
             } else if (!room) {

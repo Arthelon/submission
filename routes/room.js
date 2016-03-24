@@ -36,39 +36,39 @@ var Submission = models.Submission
 var Problem = models.Problem
 
 router.route('/:room_name')
-    .get(function(req, res) {
+    .get(function (req, res) {
         var room_name = req.params.room_name
         var payload = {}
         Room
-        .findOne({
-            path: room_name
-        })
-        .populate('submissions problems')
-        .sort({'submissions.timestamp': -1})
-        .exec(function(err, room) {
-            if (err) {
-                return handleResp(res, 500, err.message)
-            } else if (!room) {
-                res.status(404)
-                res.render('error', {
-                    message: 'Room does not exist, did you enter in the room path correctly?',
-                    error: {}
-                })
-            } else {
-                payload = {
-                    room_name: room.name,
-                    room_desc: room.desc,
-                    problems: room.problems,
-                    errors: req.flash('error')
+            .findOne({
+                path: room_name
+            })
+            .populate('submissions problems')
+            .sort({'submissions.timestamp': -1})
+            .exec(function (err, room) {
+                if (err) {
+                    return handleResp(res, 500, err.message)
+                } else if (!room) {
+                    res.status(404)
+                    res.render('error', {
+                        message: 'Room does not exist, did you enter in the room path correctly?',
+                        error: {}
+                    })
+                } else {
+                    payload = {
+                        room_name: room.name,
+                        room_desc: room.desc,
+                        problems: room.problems,
+                        errors: req.flash('error')
+                    }
+                    if (req.user && req.user._id.toString() == room.owner.toString()) {
+                        payload.submissions = room.submissions
+                    }
+                    res.render('room', payload)
                 }
-                if (req.user && req.user._id.toString() == room.owner.toString()) {
-                    payload.submissions = room.submissions
-                }
-                res.render('room', payload)
-            }
-        })
+            })
     })
-    .post(upload.array('file'), function(req, res) {
+    .post(upload.array('file'), function (req, res) {
         var prob_name = req.body.prob
         var submissions = new Submission({
             name: req.body.name,
@@ -84,44 +84,38 @@ router.route('/:room_name')
                 } else if (!prob) {
                     return handleTestFail(req, res, 'Problem not found', 404)
                 } else {
-                    req.files.forEach(function(file, findex) {
-                        fs.readFile(file.path, 'utf8', function(err, data) {
+                    req.files.forEach(function (file, findex) {
+                        fs.readFile(file.path, 'utf8', function (err, data) {
                             if (err) return handleTestFail(req, res, err.message)
-                            else async.each(prob.test.matches, function(match, cb) {
-                                if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"'+match.text+'\" not found.')
+                            else async.each(prob.test.matches, function (match, cb) {
+                                if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"' + match.text + '\" not found.')
                                 else cb()
-                            }, function(err) {
+                            }, function (err) {
                                 if (err) return handleTestFail(req, res, err)
                                 else if (!prob.test.cases) {
-                                    console.log('2')
-                                    PythonShell.run(file.path, function(err) {
+                                    PythonShell.run(file.path, function (err) {
                                         if (err) {
                                             if (!err.stacktrace) err.stacktrace = 'Error Occured'
                                             return handleTestFail(req, res, err.stacktrace)
                                         } else {
-                                            console.log('2')
                                             createSubCb(req, res, submissions)
                                         }
                                     })
                                 } else {
-                                    console.log('3')
-                                    prob.test.cases.forEach(function(c, index) {
-                                        var pyshell = new PythonShell(file.path, {mode:'text'})
-                                        pyshell.send("\'"+c.in+"\'")
-                                        pyshell.on('message', function(data) {
+                                    prob.test.cases.forEach(function (c, index) {
+                                        var pyshell = new PythonShell(file.path, {mode: 'text'})
+                                        pyshell.send("\'" + c.in + "\'")
+                                        pyshell.on('message', function (data) {
                                             if (data != c.out) {
-                                                return handleTestFail(req, res, 'Failed Test. \"'+data+'\" != '+c.out)
+                                                return handleTestFail(req, res, 'Failed Test. \"' + data + '\" != ' + c.out)
                                             }
                                         })
-                                        pyshell.on('error', function(err) {
-                                            if (!err.stacktrace) err.stacktrace = 'Error Occured'
-                                            return handleTestFail(req, res, err.stacktrace)
-                                        })
-                                        pyshell.end(function(err) {
+                                        pyshell.end(function (err) {
                                             if (err) {
-                                                if (!err.stacktrace) err.stacktrace = 'Error Occured'
-                                                return handleTestFail(req, res, err.stacktrace)
-                                            } else if (findex+1 == req.files.length && index+1==prob.test.cases.length) {
+                                                console.log(err.stack)
+                                                if (!err.stack) err.stack = 'Error Occured'
+                                                return handleTestFail(req, res, err.stack)
+                                            } else if (findex + 1 == req.files.length && index + 1 == prob.test.cases.length) {
                                                 submissions.prob = prob._id
                                                 prob.update({
                                                     $push: {submissions: submissions._id}
@@ -140,7 +134,7 @@ router.route('/:room_name')
             })
         }
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateRoom, function (req, res) {
         req.room.remove((err) => {
             if (err) return handleResp(res, 500, err.message)
             else return handleResp(res, 200, null, 'Room deleted')
@@ -148,7 +142,7 @@ router.route('/:room_name')
     })
 
 function handleTestFail(req, res, msg, status) {
-    req.files.forEach(function(file) {
+    req.files.forEach(function (file) {
         fs.unlink(file.path, (err) => {
             if (err) return handleResp(res, 500, err.message)
         })
@@ -171,7 +165,7 @@ function createSubCb(req, res, sub) {
                 } else {
                     submission.room = room._id
                     submission.save()
-                    async.each(req.files, function(file, cb) {
+                    async.each(req.files, function (file, cb) {
                         File.create({
                             name: file.originalname,
                             type: file.mimetype,
@@ -187,7 +181,7 @@ function createSubCb(req, res, sub) {
                                 else cb()
                             })
                         })
-                    }, function(err) {
+                    }, function (err) {
                         if (err) return handleResp(res, 500, err.message)
                         else return handleResp(res, 200, null, 'Success')
                     })
@@ -199,25 +193,25 @@ function createSubCb(req, res, sub) {
 
 
 router.route('/:room_name/:submission')
-    .get(validateRoom, function(req, res) {
+    .get(validateRoom, function (req, res) {
         Submission
             .findOne({
                 name: req.params.submission
             })
             .populate('files')
-            .exec(function(err, sub) {
+            .exec(function (err, sub) {
                 if (err) return handleResp(res, 500, err.message)
                 else if (!sub) {
                     return handleResp(res, 404, 'Submission not found')
                 } else if (sub.files.length == 1) {
-                    res.download('uploads/'+sub.files[0].loc, sub.files[0].name, (err) => {
-                        if(err) return handleResp(res, 500, err.message)
+                    res.download('uploads/' + sub.files[0].loc, sub.files[0].name, (err) => {
+                        if (err) return handleResp(res, 500, err.message)
                     })
                 } else {
                     var file_bundle = archiver.create('zip', {})
                     file_bundle.pipe(res)
                     sub.files.forEach(function (file) {
-                        file_bundle.append(fs.createReadStream('uploads/'+file.loc), {
+                        file_bundle.append(fs.createReadStream('uploads/' + file.loc), {
                             name: file.name
                         })
                     })
@@ -225,8 +219,8 @@ router.route('/:room_name/:submission')
                 }
             })
     })
-    .delete(validateRoom, function(req, res) {
-        Submission.findOne({name: req.params.submission}, function(err, sub) {
+    .delete(validateRoom, function (req, res) {
+        Submission.findOne({name: req.params.submission}, function (err, sub) {
             if (err) {
                 return handleResp(res, 500, err.message)
             } else if (sub) {
@@ -234,15 +228,15 @@ router.route('/:room_name/:submission')
                     if (err) {
                         return handleResp(res, 500, err.message)
                     } else {
-                        async.each(sub.files, function(id, cb) {
+                        async.each(sub.files, function (id, cb) {
                             File.findOneAndRemove({_id: id}, (err, file) => {
                                 if (err) cb(err)
-                                fs.unlink('uploads/'+file.loc, (err) => {
+                                fs.unlink('uploads/' + file.loc, (err) => {
                                     if (err) cb(err)
                                     else cb()
                                 })
                             })
-                        }, function(err) {
+                        }, function (err) {
                             if (err) return handleResp(res, 500, err.message)
                             return handleResp(res, 200, null, 'Submission deleted')
                         })

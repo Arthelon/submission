@@ -3,7 +3,7 @@ var router = express.Router()
 var models = require('../models')
 
 router.route('/')
-    .get(function(req, res) {
+    .get(function (req, res) {
         if (req.user) {
             models.User
                 .findOne({
@@ -11,7 +11,7 @@ router.route('/')
                 })
                 .populate('rooms')
                 .sort('username')
-                .exec(function(err, user) {
+                .exec(function (err, user) {
                     res.render('dashboard', {
                         name: user.username,
                         title: 'submission | Dashboard',

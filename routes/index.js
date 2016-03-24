@@ -10,7 +10,7 @@ var handleResp = require('../util').handleResp
 var validateRoom = require('../util').validateRoom
 
 /* GET home page. */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     if (req.user) {
         res.redirect('/dashboard')
     } else {
@@ -20,7 +20,7 @@ router.get('/', function(req, res) {
     }
 });
 
-router.get('/logout', function(req, res) {
+router.get('/logout', function (req, res) {
     if (req.user) {
         req.logout()
     }
@@ -28,7 +28,7 @@ router.get('/logout', function(req, res) {
 })
 
 router.route('/register')
-    .get(function(req, res) {
+    .get(function (req, res) {
         payload = {
             errors: req.flash('error'),
             title: 'submission | Register',
@@ -46,7 +46,7 @@ router.route('/register')
     }))
 
 router.route('/login')
-    .get(function(req, res) {
+    .get(function (req, res) {
         if (req.user) {
             res.redirect('/dashboard')
         } else {
@@ -63,7 +63,7 @@ router.route('/login')
     }))
 
 router.route('/create_room')
-    .get(function(req, res) {
+    .get(function (req, res) {
         if (req.user) {
             res.render('create_room', {
                 title: 'submission | Create Room',
@@ -73,7 +73,7 @@ router.route('/create_room')
             res.redirect('/')
         }
     })
-    .post(function(req, res) {
+    .post(function (req, res) {
         if (req.user) {
             Room.findOrCreate({
                 path: req.body.path,
@@ -100,7 +100,6 @@ router.route('/create_room')
             return handleResp(res, 401, 'Unvalidated user')
         }
     })
-
 
 
 module.exports = router;

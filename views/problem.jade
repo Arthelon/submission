@@ -21,24 +21,24 @@ block content
                         a Tests
             .col-md-9#subContent
                 if prob_subs && prob_subs.length > 0
-                        table.table.table-striped.table-hover
-                            thead
+                    table.table.table-striped.table-hover
+                        thead
+                            tr
+                                th Submission Title
+                                th Submitted by
+                                th Description
+                                th Timestamp
+                                th Files
+                        tbody
+                            each sub in prob_subs
                                 tr
-                                    th Submission Title
-                                    th Submitted by
-                                    th Description
-                                    th Timestamp
-                                    th Files
-                            tbody
-                                each sub in prob_subs
-                                    tr
-                                        td
-                                            a#downloadFile(href='/room/#{room_name}/#{sub.name}') #{sub.name}
-                                        td #{sub.user}
-                                        td #{sub.desc}
-                                        td #{sub.timestamp}
-                                        td #{sub.files.length}
-                                            i.fa.fa-times.cross
+                                    td
+                                        a#downloadFile(href='/room/#{room_name}/#{sub.name}') #{sub.name}
+                                    td #{sub.user}
+                                    td #{sub.desc}
+                                    td #{sub.timestamp}
+                                    td #{sub.files.length}
+                                        i.fa.fa-times.cross
                 else
                     .text-center
                         .alert.alert-dismissible.alert-warning

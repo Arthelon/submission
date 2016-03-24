@@ -9,13 +9,13 @@ var Room = models.Room
 var Problem = models.Problem
 
 router.route('/:room_name')
-    .get(validateRoom, function(req, res) {
+    .get(validateRoom, function (req, res) {
         res.render('create_prob', {
             room_name: req.room.name,
             errors: req.flash('error')
         })
     })
-    .post(validateRoom, function(req, res) {
+    .post(validateRoom, function (req, res) {
         if (req.user) {
             if (req.body.name && req.body.desc) {
                 if (!req.body.name.match(/^[\d\w]+$/)) {
@@ -48,19 +48,19 @@ router.route('/:room_name')
             return handleResp(res, 401, 'User not authenticated')
         }
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateRoom, function (req, res) {
         var prob_name = req.body.problem
         if (!prob_name) {
             return handleResp(res, 400, 'Invalid Request. Please enter problem name')
         }
         Problem.findOne({name: prob_name},
-            function(err, prob) {
+            function (err, prob) {
                 if (err) {
                     return handleResp(res, 500, err.message)
                 } else if (!prob) {
                     return handleResp(res, 404, 'Problem not found')
                 } else if (prob.room.toString() == req.room._id.toString()) {
-                    prob.remove(function(err) {
+                    prob.remove(function (err) {
                         if (err) {
                             return handleResp(res, 500, err.message)
                         } else {
@@ -84,42 +84,42 @@ router.route('/:room_name')
     })
 
 router.route('/:room_name/:problem')
-    .get(validateRoom, function(req, res) {
+    .get(validateRoom, function (req, res) {
         Room.findOne({_id: req.room._id})
-        .populate({
-            path: 'problems',
-            populate: {
-                path: 'submissions',
-                model: 'Submission'
-            }
-        })
-        .exec(function(err, room) {
-            if (err) {
-                res.status(400)
-                req.flash('error', err.message)
-                res.redirect('back')
-            } else {
-                room.problems.forEach(function(prob) {
-                    if (prob.name == req.params.problem) {
-                        res.render('problem', {
-                            prob_name: prob.name,
-                            prob_desc: prob.desc,
-                            prob_subs: prob.submissions,
-                            room_name: req.room.name,
-                            test: prob.test,
-                            errors: req.flash('error'),
-                            title: 'submission | ' + prob.name
-                        })
-                    }
-                }, function() {
-                    handleResp(res, 404, 'Room not found')
-                })
-            }
-        })
+            .populate({
+                path: 'problems',
+                populate: {
+                    path: 'submissions',
+                    model: 'Submission'
+                }
+            })
+            .exec(function (err, room) {
+                if (err) {
+                    res.status(400)
+                    req.flash('error', err.message)
+                    res.redirect('back')
+                } else {
+                    room.problems.forEach(function (prob) {
+                        if (prob.name == req.params.problem) {
+                            res.render('problem', {
+                                prob_name: prob.name,
+                                prob_desc: prob.desc,
+                                prob_subs: prob.submissions,
+                                room_name: req.room.name,
+                                test: prob.test,
+                                errors: req.flash('error'),
+                                title: 'submission | ' + prob.name
+                            })
+                        }
+                    }, function () {
+                        handleResp(res, 404, 'Room not found')
+                    })
+                }
+            })
     })
-    .post(validateRoom, function(req, res) {
+    .post(validateRoom, function (req, res) {
         var prob_name = req.params.problem
-        Problem.findOne({name: prob_name}, function(err, prob) {
+        Problem.findOne({name: prob_name}, function (err, prob) {
             if (err) {
                 return handleResp(res, 500, err.message)
             } else if (!prob) {
@@ -147,14 +147,14 @@ router.route('/:room_name/:problem')
             }
         })
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateRoom, function (req, res) {
         var prob_name = req.params.problem
         var test_id = req.body.id
         var test_type = req.body.type
         if (test_type != 'matches' && test_type != 'cases') {
             return handleResp(res, 400, 'Invalid test type')
         }
-        Problem.findOne({name: prob_name}, function(err, prob) {
+        Problem.findOne({name: prob_name}, function (err, prob) {
             if (err) {
                 return handleResp(res, 500, err.message)
             } else if (!prob) {
@@ -162,7 +162,7 @@ router.route('/:room_name/:problem')
             } else if (prob.room.toString() == req.room._id.toString()) {
                 prob.update({
                     $pull: {
-                        ['test.'+test_type]: { //Dynamic object key
+                        ['test.' + test_type]: { //Dynamic object key
                             _id: test_id
                         }
                     }

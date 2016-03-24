@@ -19,15 +19,15 @@ var FileSchema = new Schema({
     name: String,
     type: String,
     loc: String,
-    sub: {type:Schema.Types.ObjectId, ref: 'Submission'}
+    sub: {type: Schema.Types.ObjectId, ref: 'Submission'}
 })
 
 var UserSchema = new Schema({
-    username: {type:String, unique: true, required: true},
-    password: {type:String, required: true},
-    first_name: {type:String, required: true},
-    last_name: {type:String, required: true},
-    email: {type:String, unique: true, required: true},
+    username: {type: String, unique: true, required: true},
+    password: {type: String, required: true},
+    first_name: {type: String, required: true},
+    last_name: {type: String, required: true},
+    email: {type: String, unique: true, required: true},
     rooms: [
         {type: Schema.Types.ObjectId, ref: 'Room'}
     ]
@@ -63,13 +63,13 @@ var ProblemSchema = new Schema({
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
 })
-ProblemSchema.pre('remove', function(next) {
+ProblemSchema.pre('remove', function (next) {
     models.Submission.find({
         prob: this._id
-    }, function(err, subs) {
+    }, function (err, subs) {
         if (err) throw err
         else {
-            subs.forEach(function(sub) {
+            subs.forEach(function (sub) {
                 sub.update({
                     prob: null
                 }, (err) => {
@@ -81,13 +81,13 @@ ProblemSchema.pre('remove', function(next) {
     })
 })
 
-SubmissionSchema.pre('remove', function(next) {
+SubmissionSchema.pre('remove', function (next) {
     sub = this
-    models.Room.findOneAndUpdate({_id: sub.room},  {
+    models.Room.findOneAndUpdate({_id: sub.room}, {
         $pull: {
             submissions: sub._id
         }
-    }, function(err, room) {
+    }, function (err, room) {
         if (err) throw err
         if (!room) throw new Error('Room not found')
         models.Problem.findOneAndUpdate({_id: sub.prob}, {
@@ -101,7 +101,7 @@ SubmissionSchema.pre('remove', function(next) {
     })
 })
 
-RoomSchema.pre('remove', function(next) {
+RoomSchema.pre('remove', function (next) {
     models.User.findOneAndUpdate({_id: this.owner}, {
         $pull: {
             rooms: this._id
@@ -110,12 +110,12 @@ RoomSchema.pre('remove', function(next) {
         if (err) throw err
         else if (!user) throw new Error('User not found')
         else {
-            this.problems.forEach(function(prob) {
+            this.problems.forEach(function (prob) {
                 models.Problem.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
             })
-            this.submissions.forEach(function(sub) {
+            this.submissions.forEach(function (sub) {
                 models.Submission.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
@@ -126,8 +126,8 @@ RoomSchema.pre('remove', function(next) {
 })
 
 
-RoomSchema.methods.verifyID = function(id) {
-    this.findById(id, function(err, found) {
+RoomSchema.methods.verifyID = function (id) {
+    this.findById(id, function (err, found) {
         if (err) throw err
         return !found
     })
@@ -137,7 +137,7 @@ UserSchema.methods.verifyPassword = function (password) {
     return this.password == password;
 
 }
-UserSchema.methods.validatePassword = function() {
+UserSchema.methods.validatePassword = function () {
     return !!this.password.match(/^[\d\w]{8,}$/);
 }
 
