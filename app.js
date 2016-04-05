@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 //routes
 var root = require('./routes/index');
+var api = require('./routes/api');
 var room = require('./routes/room');
 var dashboard = require('./routes/dashboard')
 var problem = require('./routes/problem')
@@ -126,6 +127,7 @@ app.use('/', root);
 app.use('/room', room)
 app.use('/dashboard', dashboard)
 app.use('/problem', problem)
+app.use('/api', api)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
