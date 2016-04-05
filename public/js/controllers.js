@@ -1,3 +1,4 @@
-/**
- * Created by Daniel on 5/4/16.
- */
+angular.module('rootApp.controllers', [])
+    .controller('dashboard', ['$scope', function($scope) {
+
+    }])

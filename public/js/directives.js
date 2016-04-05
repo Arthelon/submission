@@ -1,3 +1,1 @@
-/**
- * Created by Daniel on 5/4/16.
- */
+angular.module('rootApp.directives', [])

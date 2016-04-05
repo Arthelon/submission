@@ -1,3 +1,6 @@
-/**
- * Created by Daniel on 5/4/16.
- */
+angular.module('rootApp', [
+    'rootApp.controllers',
+    'rootApp.services',
+    'rootApp.filters',
+    'rootApp.directives'
+])

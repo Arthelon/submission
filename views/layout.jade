@@ -1,5 +1,5 @@
 doctype html
-html
+html(ng-app='rootApp')
     head
         meta(http-equiv="content-type" content="text/html; charset=UTF-8")
         meta(charset="utf-8")
@@ -8,14 +8,15 @@ html
         link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css')
         link(rel='stylesheet' href='/stylesheets/style.css')
         block head
-    body
-        if (!{flash}.length > 0)
-            #alert
-                p !{flash}
-
+    body(ng-cloak)
         block content
         include footer
         script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js')
         script(type='text/javascript', src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-        script(type='text/javascript', src='/javascripts/bootswatch.js')
+        script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.3/angular.min.js')
+        script(type='text/javascript', src='/js/root.js')
+        script(type='text/javascript', src='/js/controllers.js')
+        script(type='text/javascript', src='/js/directives.js')
+        script(type='text/javascript', src='/js/filters.js')
+        script(type='text/javascript', src='/js/services.js')
         block script
