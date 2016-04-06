@@ -34,6 +34,14 @@ util.validateRoom = function (req, res, next) {
     }
 }
 
+util.validateUser = function(req, res, next) {
+    if (!req.user) {
+        return handleResp(res, 401, 'User not authenticated')
+    } else {
+        next()
+    }
+}
+
 util.handleResp = handleResp
 
 module.exports = util

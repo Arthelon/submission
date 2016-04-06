@@ -8,41 +8,33 @@ block content
     .container(ng-controller='dashboard' ng-init='loadRooms()')
         .row
             h1.text-center Welcome !{name}
-        if rooms && rooms.length > 0
-            .row
-                table.table.table-striped.table-hover
-                    thead
-                        tr
-                            th URL
-                            th Room Name
-                            th Room Description
-                            th Number of Submissions
-                    tbody
-                        each room in rooms
-                            tr
-                                td
-                                    a(href='/room/#{room.path}') /#{room.path}
-                                td #{room.name}
-                                td #{room.desc}
-                                td #{room.submissions.length}
-                                    i.fa.fa-times.cross(ng-click='removeItem()')
-        else
-            .row
-                .col-md-4.col-md-offset-4
-                    .alert.alert-dismissible.alert-warning
-                        button.fa.fa-close.close(type='button', data-dismiss='alert')
-                        p No rooms found
+        .row(ng-if='rooms')
+            table.table.table-striped.table-hover
+                thead
+                    tr
+                        th URL
+                        th Room Name
+                        th Room Description
+                        th Number of Submissions
+                tbody
+                        tr.tableItem(ng-repeat='room in rooms')
+                            td
+                                a(href='/room/{{room.path}}') {{room.path}}
+                            td {{room.name}}
+                            td {{room.desc}}
+                            td {{room.submissions.length}}
+                                i.fa.fa-times.cross(ng-click='removeRoom($index)')
+        .row(ng-if='!rooms')
+            .col-md-4.col-md-offset-4
+                .alert.alert-dismissible.alert-warning
+                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                    p No rooms found
         .row
             .btns.text-center
                 a(href='/create_room') Create Room
         .msg.text-center.row
-            if errors
-                each error in errors
-                    p #{error}
-
-block script
-    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
-    script(type='text/javascript' src='js/dash_client.js')
+            p(style='color:red;' ng-if='error') {{error}}
+            p(style='color:green;' ng-if='success') {{success}}
 
 
 

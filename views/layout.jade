@@ -5,16 +5,20 @@ html(ng-app='rootApp')
         meta(charset="utf-8")
         title #{title}
         link(rel='stylesheet' href='/stylesheets/darkly.min.css')
-        link(rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css')
         link(rel='stylesheet' href='/stylesheets/style.css')
+        link(rel='stylesheet' href='/font-awesome/css/font-awesome.min.css')
         block head
     body(ng-cloak)
         block content
         include footer
-        script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js')
-        script(type='text/javascript', src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
-        script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.3/angular.min.js')
+        //Bower Components
+        script(type='text/javascript', src='/jQuery/dist/jquery.min.js')
+        script(type='text/javascript', src='/bootstrap/dist/js/bootstrap.min.js')
+        script(type='text/javascript', src='/angular/angular.min.js')
+        script(type='text/javascript', src='/angular-animate/angular-animate.min.js')
+        //Other Imports
         script(type='text/javascript', src='/js/root.js')
+        script(type='text/javascript', src='/js/animations.js')
         script(type='text/javascript', src='/js/controllers.js')
         script(type='text/javascript', src='/js/directives.js')
         script(type='text/javascript', src='/js/filters.js')

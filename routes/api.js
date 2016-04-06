@@ -1,12 +1,11 @@
 var express = require('express')
-var router = express.Router
+var router = express.Router()
 var util = require('../util')
 var models = require('../models')
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
-
 
 
 router.route('/rooms')
@@ -27,5 +26,13 @@ router.route('/rooms')
                 res.end()
             })
     })
+    .delete(validateRoom, function(req, res) {
+        req.room.remove((err) => {
+            if (err) return handleResp(res, 500, err.message)
+            else return handleResp(res, 200, null, 'Room deleted')
+        })
+    })
+
+
 
 module.exports = router

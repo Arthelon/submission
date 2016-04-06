@@ -114,10 +114,10 @@ RoomSchema.pre('remove', function (next) {
                 models.Problem.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
-            })
-            this.submissions.forEach(function (sub) {
-                models.Submission.findOneAndRemove({_id: prob}, (err) => {
-                    if (err) throw err
+                this.submissions.forEach(function (sub) {
+                    models.Submission.findOneAndRemove({_id: prob}, (err) => {
+                        if (err) throw err
+                    })
                 })
             })
             next()

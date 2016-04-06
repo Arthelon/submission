@@ -90,7 +90,7 @@ router.route('/create_room')
                         $push: {rooms: room._id}
                     }, (err) => {
                         if (err) {
-                            return handleResp(res, 500, err)
+                            return handleResp(res, 500, err.message)
                         }
                     })
                     return handleResp(res, 200, null, 'Room Created')
