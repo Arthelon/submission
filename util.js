@@ -2,10 +2,10 @@ var util = {}
 var Room = require('./models').Room
 
 function handleResp(res, status, data) {
+    console.log(data)
     if (!(typeof data == 'object')) {
         data = {error: data}
     }
-    console.log(data)
     res.status(status)
     res.json(data)
     res.end()
@@ -38,6 +38,12 @@ util.validateUser = function(req, res, next) {
     } else {
         next()
     }
+}
+
+util.handleErr = function(next, status, msg) {
+    var err = new Error(msg || '');
+    err.status = status;
+    next(err)
 }
 
 util.handleResp = handleResp

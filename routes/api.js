@@ -21,7 +21,8 @@ router.route('/rooms')
             .sort('username')
             .exec(function (err, user) {
                 if (err) return handleResp(res, 400, err.message)
-                return handleResp(res, 200, null, 'Rooms retrieved', {
+                return handleResp(res, 200, {
+                    success: 'Rooms retrieved',
                     rooms: user.rooms
                 })
             })
@@ -29,7 +30,9 @@ router.route('/rooms')
     .delete(validateRoom, function(req, res) {
         req.room.remove((err) => {
             if (err) return handleResp(res, 500, err.message)
-            else return handleResp(res, 200, null, 'Room deleted')
+            else return handleResp(res, 200, {
+                success: 'Room deleted'
+            })
         })
     })
 
@@ -41,7 +44,8 @@ router.route('submissions')
                 name: req.room.name
             }, function(err, room) {
                 if (err) return handleResp(res, 400, err.message)
-                return handleResp(res, 200, null, 'Submissions retrieved', {
+                return handleResp(res, 200, {
+                    success: 'Submissions retrieved',
                     submissions: room.submissions
                 })
             })
