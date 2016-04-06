@@ -1,0 +1,19 @@
+{
+  "name": "submission",
+  "description": "Online judge and submission platform for students and teachers",
+  "main": "bin/www",
+  "authors": [
+    "Daniel Hsing"
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
