@@ -8,7 +8,7 @@ var fs = require('fs')
 var Room = models.Room
 var Problem = models.Problem
 
-router.route('/:room_name')
+router.route('/:room_path')
     .get(validateRoom, function (req, res) {
         res.render('create_prob', {
             room_name: req.room.name,
@@ -82,7 +82,7 @@ router.route('/:room_name')
             })
     })
 
-router.route('/:room_name/:problem')
+router.route('/:room_path/:problem')
     .get(validateRoom, function (req, res) {
         Room.findOne({_id: req.room._id})
             .populate({

@@ -36,12 +36,13 @@ router.route('/rooms')
         })
     })
 
-router.route('submissions')
+router.route('/submissions')
     .get(validateRoom, function(req, res) {
         Room
             .populate('submissions')
+            .sort('timestamp')
             .findOne({
-                name: req.room.name
+                path: req.room.path
             }, function(err, room) {
                 if (err) return handleResp(res, 400, err.message)
                 return handleResp(res, 200, {
@@ -49,6 +50,34 @@ router.route('submissions')
                     submissions: room.submissions
                 })
             })
+    })
+    .delete(validateRoom, function(req, res) {
+        Submission.findOne({name: req.params.submission}, function (err, sub) {
+            if (err) {
+                return handleResp(res, 500, {error: err.message})
+            } else if (sub) {
+                sub.remove((err) => {
+                    if (err) {
+                        return handleResp(res, 500, {error: err.message})
+                    } else {
+                        async.each(sub.files, function (id, cb) {
+                            File.findOneAndRemove({_id: id}, (err, file) => {
+                                if (err) cb(err)
+                                fs.unlink('uploads/' + file.loc, (err) => {
+                                    if (err) cb(err)
+                                    else cb()
+                                })
+                            })
+                        }, function (err) {
+                            if (err) return handleResp(res, 500, {error:err.message})
+                            return handleResp(res, 200, {success:'Submission deleted'})
+                        })
+                    }
+                })
+            } else {
+                return handleResp(res, 404, {error: 'Submission not found'})
+            }
+        })
     })
 
 

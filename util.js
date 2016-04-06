@@ -12,24 +12,22 @@ function handleResp(res, status, data) {
 }
 
 util.validateRoom = function (req, res, next) {
-    var room_name = req.body.room_name ? req.body.room_name : req.params.room_name
-    if (!req.user) {
-        if (req.method == 'GET') res.redirect('/')
-        else return handleResp(res, 401, 'User not authenticated')
-    } else {
-        Room.findOne({name: room_name}, function (err, room) {
-            if (err) {
-                return next(err)
-            } else if (!room) {
-                return handleResp(res, 404, 'Room not found')
-            } else if (req.user._id.toString() != room.owner.toString()) {
-                return handleResp(res, 406, 'User does not own room')
-            } else {
-                req.room = room
-                next()
-            }
-        })
-    }
+    var room_path = req.body.room_path ? req.body.room_path : req.params.room_path
+    console.log(room_path)
+    console.log(req.body)
+    console.log(req)
+    Room.findOne({path: room_path}, function (err, room) {
+        if (err) {
+            return next(err)
+        } else if (!room) {
+            return handleResp(res, 404, 'Room not found')
+        } else if (req.user && req.user._id.toString() != room.owner.toString()) {
+            return handleResp(res, 406, 'User does not own room')
+        } else {
+            req.room = room
+            next()
+        }
+    })
 }
 
 util.validateUser = function(req, res, next) {

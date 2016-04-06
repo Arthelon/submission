@@ -35,40 +35,14 @@ var File = models.File
 var Submission = models.Submission
 var Problem = models.Problem
 
-router.route('/:room_name')
-    .get(function (req, res) {
-        var room_name = req.params.room_name
-        var payload = {}
-        Room
-            .findOne({
-                path: room_name
-            })
-            .populate('submissions problems')
-            .sort({'submissions.timestamp': -1})
-            .exec(function (err, room) {
-                if (err) {
-                    return handleResp(res, 500, {
-                        error: err.message
-                    })
-                } else if (!room) {
-                    res.status(404)
-                    res.render('error', {
-                        message: 'Room does not exist, did you enter in the room path correctly?',
-                        error: {}
-                    })
-                } else {
-                    payload = {
-                        room_name: room.name,
-                        room_desc: room.desc,
-                        problems: room.problems,
-                        errors: req.flash('error')
-                    }
-                    if (req.user && req.user._id.toString() == room.owner.toString()) {
-                        payload.submissions = room.submissions
-                    }
-                    res.render('room', payload)
-                }
-            })
+router.route('/:room_path')
+    .get(validateRoom, function (req, res) {
+        payload = {
+            room_name: req.room.name,
+            room_desc: req.room.desc,
+        }
+        payload.user_authenticated = req.user ? true : false
+        res.render('room', payload)
     })
     .post(upload.array('file'), function (req, res) {
         var prob_name = req.body.prob
@@ -152,7 +126,7 @@ function createSubCb(req, res, sub) {
             return handleResp(res, 500, {error: err.message})
         } else {
             Room.findOneAndUpdate({
-                name: req.params.room_name
+                path: req.params.room_path
             }, {$push: {submissions: submission._id}}, (err, room) => {
                 if (err) {
                     return handleResp(res, 500, {error: err.message})
@@ -188,7 +162,7 @@ function createSubCb(req, res, sub) {
 }
 
 
-router.route('/:room_name/:submission')
+router.route('/:room_path/:submission')
     .get(validateRoom, function (req, res) {
         Submission
             .findOne({
@@ -214,34 +188,6 @@ router.route('/:room_name/:submission')
                     file_bundle.finalize()
                 }
             })
-    })
-    .delete(validateRoom, function (req, res) {
-        Submission.findOne({name: req.params.submission}, function (err, sub) {
-            if (err) {
-                return handleResp(res, 500, {error: err.message})
-            } else if (sub) {
-                sub.remove((err) => {
-                    if (err) {
-                        return handleResp(res, 500, {error: err.message})
-                    } else {
-                        async.each(sub.files, function (id, cb) {
-                            File.findOneAndRemove({_id: id}, (err, file) => {
-                                if (err) cb(err)
-                                fs.unlink('uploads/' + file.loc, (err) => {
-                                    if (err) cb(err)
-                                    else cb()
-                                })
-                            })
-                        }, function (err) {
-                            if (err) return handleResp(res, 500, {error:err.message})
-                            return handleResp(res, 200, {success:'Submission deleted'})
-                        })
-                    }
-                })
-            } else {
-                return handleResp(res, 404, {error: 'Submission not found'})
-            }
-        })
     })
 
 module.exports = router

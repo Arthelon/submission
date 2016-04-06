@@ -4,128 +4,122 @@ block head
     link(rel='stylesheet' href='/stylesheets/room.css')
 
 block content
-    if submissions
+    if user_authenticated
         .header.btns
             .float-left
                 a(href='/dashboard') Main
             .float-right
                 a(href='/logout') Logout
-    .container
-        .row.text-center
-            h1 #{room_name}
-            p #{room_desc}
-    .container(ng-controller='room' ng-init)
-        if submissions
+        .container
+            .row.text-center
+                h1 #{room_path}
+                p #{room_desc}
+        .container(ng-controller='room' ng-init="loadSubmissions()")
             .row
                 .col-md-3
                     ul.nav.nav-pills.nav-stacked
                         li.active
-                            a(href='#') Submissions
+                            a(href='') Submissions
                         li.dropdown
-                            a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
+                            a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false' ng-click='loadProblems()')
                                 | Problems
                                 span.caret
                             ul.dropdown-menu
                                 if problems
                                     each problem in problems
                                         li
-                                            a(href='/problem/#{room_name}/#{problem.name}') #{problem.name}
+                                            a(href='/problem/#{room_path}/#{problem.name}') #{problem.name}
                                 else
                                     li
                                         a No Problems Found!
                                 li.divider
                                 li
-                                    a#createProb(href='/problem/#{room_name}') Create Problem
-                #subContent
-                    .col-md-9#subContent
-                        if submissions.length > 0
-                            table.table.table-striped.table-hover
-                                thead
-                                    tr
-                                        th Submission Title
-                                        th Submitted by
-                                        th Description
-                                        th Timestamp
-                                        th Files
-                                tbody
-                                    each submission in submissions
-                                        tr
-                                            td
-                                                a#downloadFile(href='/room/#{room_name}/#{submission.name}') #{submission.name}
-                                            td #{submission.user}
-                                            td #{submission.desc}
-                                            td #{submission.timestamp}
-                                            td #{submission.files.length}
-                                                i.fa.fa-times.cross
-                        else
-                            .text-center
-                                .alert.alert-dismissible.alert-warning
-                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                    p No submissions found
-                #probContent
-                    .col-md-9
-                        if problems && problems.length > 0
-                            table.table.table-striped.table-hover
-                                thead
-                                    tr
-                                        th Problem Name
-                                        th Problem Description
-                                        th Number of Submissions
-                                tbody
-                                    each problem in problems
-                                        tr
-                                            td
-                                                a(href='/problem/#{room_name}/#{problem.name}') #{problem.name}
-                                            td #{problem.desc}
-                                            td #{problem.submissions.length}
-                                                i.fa.fa-times.cross
-                        else
-                            .text-center
-                                .alert.alert-dismissible.alert-warning
-                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                    p No problems found
-                    .row
-                        .col-md-9.col-md-offset-3
-                            .btns.text-center
-                                a(href='/problem/#{room_name}') Create Problem
-        else
-            .panel.panel-default
-                .panel-body
-                    form#uploadForm(room=room_name action='/room/'+room_name method='POST' encType='multipart/form-data')
-                        .form-group.row
-                            label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
-                            .col-lg-4
-                                input.form-control#nameInput(type='text' name='name' placeholder='Title')
-                        .form-group.row
-                            label.col-lg-2.col-lg-offset-4.control-label(for='userInput') Name
-                            .col-lg-4
-                                input.form-control#userInput(type='text' name='user' placeholder='Enter your name')
-                        .form-group.row
-                            label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
-                            .col-lg-4
-                                input.form-control#descInput(type='text' name='desc' placeholder='Optional')
-                        .form-group.row
-                            label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
-                            .col-lg-4
-                                select#select.form-control(name='prob')
-                                    option None
-                                    each prob in problems
-                                        option #{prob.name}
-                        .fileInput.form-group
-                            input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
-                            label(for="file")
-                                i.fa.fa-upload
-                                span Choose a file...
-                        #editor
-                        button.btn.btn-default(type='submit') Upload
-        .msg.text-center
-            if errors
-                each error in errors
-                    p #{error}
+                                    a#createProb(href='/problem/#{room_path}') Create Problem
+                .col-md-9#subContent(ng-if='subToggle')
+                    table.table.table-striped.table-hover(ng-if='submissions')
+                        thead
+                            tr
+                                th Submission Title
+                                th Submitted by
+                                th Description
+                                th Timestamp
+                                th Files
+                        tbody
+                            tr(ng-repeat='submission in submissions')
+                                td
+                                    a#downloadFile(href='/room/#{room_path}/{{submission.name}}') {{submission.name}}
+                                td {{submission.user}}
+                                td {{submission.desc}}
+                                td {{submission.timestamp}}
+                                td {{submission.files.length}}
+                                    i.fa.fa-times.cross
+                    .text-center(ng-if='!submissions')
+                        .alert.alert-dismissible.alert-warning
+                            button.fa.fa-close.close(type='button', data-dismiss='alert')
+                            p No submissions found
+                .col-md-9#probContent(ng-if='!subToggle')
+                    table.table.table-striped.table-hover(ng-if='problems')
+                        thead
+                            tr
+                                th Problem Name
+                                th Problem Description
+                                th Number of Submissions
+                        tbody
+                            tr(ng-repeat='problem in problems')
+                                td
+                                    a(href='/problem/#{room_path}/{{problem.name}}') {{problem.name}}
+                                td {{problem.desc}}
+                                td {{problem.submissions.length}}
+                                    i.fa.fa-times.cross
+                    div(ng-if='!problems')
+                        .text-center
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No problems found
+                        .row
+                            .col-md-9.col-md-offset-3
+                                .btns.text-center
+                                    a(href='/problem/#{room_path}') Create Problem
+    else
+        .container
+            .row.text-center
+                h1 #{room_path}
+                p #{room_desc}
+        .panel.panel-default
+            .panel-body
+                form#uploadForm(room=room_path action='/room/'+room_path method='POST' encType='multipart/form-data')
+                    .form-group.row
+                        label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
+                        .col-lg-4
+                            input.form-control#nameInput(type='text' name='name' placeholder='Title')
+                    .form-group.row
+                        label.col-lg-2.col-lg-offset-4.control-label(for='userInput') Name
+                        .col-lg-4
+                            input.form-control#userInput(type='text' name='user' placeholder='Enter your name')
+                    .form-group.row
+                        label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
+                        .col-lg-4
+                            input.form-control#descInput(type='text' name='desc' placeholder='Optional')
+                    .form-group.row
+                        label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
+                        .col-lg-4
+                            select#select.form-control(name='prob')
+                                option None
+                                each(ng-repeat='problem in problems')
+                                    option {{problem}}
+                    .fileInput.form-group
+                        input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
+                        label(for="file")
+                            i.fa.fa-upload
+                            span Choose a file...
+                    #editor
+                    button.btn.btn-default(type='submit') Upload
+    .msg.text-center.row
+        p(style='color:red;' ng-if='error') {{error}}
+        p(style='color:green;' ng-if='success') {{success}}
+
 block script
     script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
-    script(type='text/javascript').
-        var room_name = '#{room_name}'
-    if !submissions
+    if !user_authenticated
         script(type='text/javascript' src='https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js')
     script(type='text/javascript' src='/js/room_client.js')
