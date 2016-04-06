@@ -1,15 +1,13 @@
 var util = {}
 var Room = require('./models').Room
 
-function handleResp(res, status, err, succ) {
-    if (status) {
-        res.status(status)
+function handleResp(res, status, data) {
+    if (!(typeof data == 'object')) {
+        data = {error: data}
     }
-    payload = {}
-    if (err) payload.error = err
-    if (succ) payload.success = succ
-    console.log(payload)
-    res.json(payload)
+    console.log(data)
+    res.status(status)
+    res.json(data)
     res.end()
 }
 

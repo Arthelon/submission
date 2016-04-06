@@ -27,7 +27,6 @@ router.route('/:room_name')
                     room: req.room._id
                 }, (err, prob, created) => {
                     if (err) {
-                        console.log('hi')
                         return handleResp(res, 500, err.message)
                     }
                     else if (!created) {
@@ -38,7 +37,7 @@ router.route('/:room_name')
                         }, {$push: {problems: prob._id}}, (err) => {
                             if (err) return handleResp(res, 500, err.message)
                         })
-                        return handleResp(res, 200, null, 'Problem Created')
+                        return handleResp(res, 200, {success: 'Problem Created'})
                     }
                 })
             } else {
@@ -72,7 +71,7 @@ router.route('/:room_name')
                                 if (err) {
                                     return handleResp(res, 500, err.message)
                                 } else {
-                                    return handleResp(res, 200, null, 'Success')
+                                    return handleResp(res, 200, {success: 'Success'})
                                 }
                             })
                         }
@@ -139,7 +138,7 @@ router.route('/:room_name/:problem')
                     if (err) {
                         return handleResp(res, 500, err.message)
                     } else {
-                        return handleResp(res, 200, null, 'Success')
+                        return handleResp(res, 200,{success: 'Success'})
                     }
                 })
             } else {
@@ -168,7 +167,7 @@ router.route('/:room_name/:problem')
                     }
                 }, (err) => {
                     if (err) return handleResp(res, 500, err.message)
-                    else return handleResp(res, 200, null, 'Test deleted')
+                    else return handleResp(res, 200, {success: 'Test deleted'})
                 })
             }
         })

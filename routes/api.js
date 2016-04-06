@@ -7,6 +7,9 @@ var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
 
+var Submission = models.Submission
+var Room = models.Submission
+
 
 router.route('/rooms')
     .get(validateUser, function(req, res) {
@@ -17,13 +20,10 @@ router.route('/rooms')
             .populate('rooms')
             .sort('username')
             .exec(function (err, user) {
-                if (err) handleResp(res, 400, err.message)
-                res.status(200)
-                res.json({
-                    rooms: user.rooms,
-                    success: 'Rooms retrieved'
+                if (err) return handleResp(res, 400, err.message)
+                return handleResp(res, 200, null, 'Rooms retrieved', {
+                    rooms: user.rooms
                 })
-                res.end()
             })
     })
     .delete(validateRoom, function(req, res) {
@@ -31,6 +31,20 @@ router.route('/rooms')
             if (err) return handleResp(res, 500, err.message)
             else return handleResp(res, 200, null, 'Room deleted')
         })
+    })
+
+router.route('submissions')
+    .get(validateRoom, function(req, res) {
+        Room
+            .populate('submissions')
+            .findOne({
+                name: req.room.name
+            }, function(err, room) {
+                if (err) return handleResp(res, 400, err.message)
+                return handleResp(res, 200, null, 'Submissions retrieved', {
+                    submissions: room.submissions
+                })
+            })
     })
 
 

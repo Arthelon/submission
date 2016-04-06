@@ -14,7 +14,7 @@ block content
         .row.text-center
             h1 #{room_name}
             p #{room_desc}
-    .container
+    .container(ng-controller='room' ng-init)
         if submissions
             .row
                 .col-md-3

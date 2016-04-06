@@ -93,7 +93,7 @@ router.route('/create_room')
                             return handleResp(res, 500, err.message)
                         }
                     })
-                    return handleResp(res, 200, null, 'Room Created')
+                    return handleResp(res, 200, {success: 'Room Created'})
                 }
             })
         } else {
