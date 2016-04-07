@@ -26,19 +26,17 @@ angular.module('rootApp.controllers', ['rootApp.animations'])
     }])
     .controller('room', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.subToggle = true
-        $scope.room_path
+        $scope.room_path = null
         $scope.loadSubmissions = function() {
             var loc = $location.absUrl().split('/')
             $scope.room_path = loc[loc.length-1]
             $http.get('/api/submissions', {
-                data: {
+                params: {
                     room_path: $scope.room_path
-                },
-                headers: {
-                    'Content-Type': 'application/json'
                 }
             }).then(function(res) {
                 $scope.success = res.data.success
+                $scope.submissions = res.data.submissions
             }, function(err) {
                 $scope.error = err.data.error
                 console.log(err)
@@ -46,21 +44,31 @@ angular.module('rootApp.controllers', ['rootApp.animations'])
         }
         $scope.loadProblems = function() {
             $http.get('/api/problems', {
-                data: {
+                params: {
                     room_path: $scope.room_path
-                },
-                headers: {
-                    'Content-Type': 'application/json'
                 }
             }).then(function(res) {
                 $scope.success = res.data.success
-                $scope.rooms.splice(index, 1)
+                $scope.problems = res.data.problems
             }, function(err) {
                 $scope.error = err.data.error
                 console.log(err)
             })
         }
         $scope.deleteSubmission = function(index) {
+            $http.delete('/api/problems', {
+                data: {
+                    submission: $scope.submissions[index].name
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(res) {
+                $scope.success = res.data.success
+                $scope.submissions.splice(index, 1)
+            }, function(err) {
+                $scope.error = err.data.error
+            })
 
         }
     }])

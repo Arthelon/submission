@@ -8,7 +8,7 @@ var handleResp = util.handleResp
 var validateUser = util.validateUser
 
 var Submission = models.Submission
-var Room = models.Submission
+var Room = models.Room
 
 
 router.route('/rooms')
@@ -39,16 +39,22 @@ router.route('/rooms')
 router.route('/submissions')
     .get(validateRoom, function(req, res) {
         Room
-            .populate('submissions')
-            .sort('timestamp')
             .findOne({
                 path: req.room.path
-            }, function(err, room) {
+            })
+            .populate('submissions')
+            .sort('timestamp')
+            .exec(function(err, room) {
+                console.log(room)
+                console.log(err)
                 if (err) return handleResp(res, 400, err.message)
-                return handleResp(res, 200, {
-                    success: 'Submissions retrieved',
-                    submissions: room.submissions
-                })
+                if (!room) {
+                    return handleResp(res, 404, 'Room not found')
+                } else
+                    return handleResp(res, 200, {
+                        success: 'Submissions retrieved',
+                        submissions: room.submissions
+                    })
             })
     })
     .delete(validateRoom, function(req, res) {
@@ -80,6 +86,24 @@ router.route('/submissions')
         })
     })
 
+router.route('/problems')
+    .get(validateRoom, function(req, res) {
+        Room
+            .findOne({path: req.room.path})
+            .populate('problems')
+            .exec(function(err, room) {
+                if(err) return handleResp(res, 500, {error: err.message})
+                else if (!room) return handleResp(res, 400, {error: 'Room not found'})
+                else
+                    return handleResp(res, 200, {
+                        success: 'Problems retrieved',
+                        problems: room.problems
+                    })
+            })
+    })
+
+
+router.route('/tests')
 
 
 module.exports = router

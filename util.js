@@ -12,10 +12,14 @@ function handleResp(res, status, data) {
 }
 
 util.validateRoom = function (req, res, next) {
-    var room_path = req.body.room_path ? req.body.room_path : req.params.room_path
-    console.log(room_path)
-    console.log(req.body)
-    console.log(req)
+    var room_path = null
+    if (req.body.room_path) {
+        room_path = req.body.room_path
+    } else if (req.params.room_path) {
+        room_path = req.params.room_path
+    } else {
+        room_path = req.query.room_path
+    }
     Room.findOne({path: room_path}, function (err, room) {
         if (err) {
             return next(err)
