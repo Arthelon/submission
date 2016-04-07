@@ -16,7 +16,7 @@ block content
                         th Room Name
                         th Room Description
                         th Number of Submissions
-                tbody
+                tbody(ng-cloak)
                         tr.tableItem(ng-repeat='room in rooms')
                             td
                                 a(href='/room/{{room.path}}') {{room.path}}

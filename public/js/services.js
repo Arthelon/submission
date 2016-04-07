@@ -1,3 +1,7 @@
-angular.module('rootApp.services', [])/**
- * Created by Daniel on 5/4/16.
- */
+angular.module('rootApp.services', [])
+    .service('loadName', function() {
+        this.getBase = function($location) {
+            var loc = $location.absUrl().split('/')
+            return loc[loc.length-1]
+        }
+    })

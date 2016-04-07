@@ -1,4 +1,4 @@
-angular.module('rootApp.controllers', ['ngAnimate'])
+angular.module('rootApp.controllers', ['ngAnimate', 'rootApp.services', 'ui.ace'])
     .controller('dashboard', ['$scope', '$http', function($scope, $http) {
         $scope.loadRooms = function() {
             $http.get('/api/rooms').then(function(res) {
@@ -24,10 +24,9 @@ angular.module('rootApp.controllers', ['ngAnimate'])
             })
         }
     }])
-    .controller('room', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    .controller('room', ['$scope', '$http', '$location', 'loadName', function($scope, $http, $location, loadName) {
         $scope.loadPath = function() {
-            var loc = $location.absUrl().split('/')
-            $scope.room_path = loc[loc.length-1]
+            $scope.room_path = loadName.getBase($location)
         }
         $scope.subToggle = true
         $scope.room_path = null
@@ -92,15 +91,60 @@ angular.module('rootApp.controllers', ['ngAnimate'])
     .animation('.tableItem', [function() {
         return {
             enter: function(element, done) {
-                element = jQuery(element)
-                element.css({
+                var $element = $(element)
+                $element.css({
                     opacity: 0
                 })
-                element.fadeIn(400, done)
+                $element.fadeIn(400, done)
             },
             leave: function(element, done) {
-                element = jQuery(element)
-                element.fadeOut(300, done)
+                var $element = $(element)
+                $element.fadeOut(300, done)
             }
         }
     }])
+    .controller('FormControl', ['$scope', '$http', function($scope, $http) {
+        var fillerText = '# Enter code here'
+        $scope.form = {
+            name: '',
+            user: '',
+            prob: '',
+            desc: ''
+        }
+        $scope.editor = fillerText
+        $scope.submit = function() {
+            var fd = new FormData();
+            for (var key in $scope.form) {
+                if (!$scope.form.hasOwnProperty(key))
+                    continue
+                else {
+                    fd.append(key, $scope.form[key])
+                }
+            }
+            console.log($scope.editor)
+            // if ($scope.file )
+            // fd.append('file', $scope.file);
+            // $http.post('/room/'+$scope.room_path, fd, {
+            //         transformRequest: angular.identity,
+            //         headers: {'Content-Type': undefined}
+            //     })
+            //     .success(function(){
+            //     })
+            //     .error(function(){
+            //     });
+        }
+    }])
+    .directive('fileModel', ['$parse', function ($parse) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                var model = $parse(attrs.fileModel);
+                var modelSetter = model.assign;
+                element.bind('change', function(){
+                    scope.$apply(function(){
+                        modelSetter(scope, element[0].files[0]);
+                    });
+                });
+            }
+        };
+    }]);
