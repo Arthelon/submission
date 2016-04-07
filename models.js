@@ -102,6 +102,7 @@ SubmissionSchema.pre('remove', function (next) {
 })
 
 RoomSchema.pre('remove', function (next) {
+    var Room = this
     models.User.findOneAndUpdate({_id: this.owner}, {
         $pull: {
             rooms: this._id
@@ -110,12 +111,12 @@ RoomSchema.pre('remove', function (next) {
         if (err) throw err
         else if (!user) throw new Error('User not found')
         else {
-            this.problems.forEach(function (prob) {
+            Room.problems.forEach(function (prob) {
                 models.Problem.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
-                this.submissions.forEach(function (sub) {
-                    models.Submission.findOneAndRemove({_id: prob}, (err) => {
+                Room.submissions.forEach(function (sub) {
+                    models.Submission.findOneAndRemove({_id: sub}, (err) => {
                         if (err) throw err
                     })
                 })

@@ -1,4 +1,4 @@
-angular.module('rootApp.controllers', ['rootApp.animations'])
+angular.module('rootApp.controllers', ['ngAnimate'])
     .controller('dashboard', ['$scope', '$http', function($scope, $http) {
         $scope.loadRooms = function() {
             $http.get('/api/rooms').then(function(res) {
@@ -63,7 +63,8 @@ angular.module('rootApp.controllers', ['rootApp.animations'])
         $scope.removeSubmission = function(index) {
             $http.delete('/api/submissions', {
                 data: {
-                    submission: $scope.submissions[index].name
+                    submission: $scope.submissions[index].name,
+                    room_path: $scope.room_path
                 },
                 headers: {
                     'Content-Type': 'application/json'
@@ -77,6 +78,29 @@ angular.module('rootApp.controllers', ['rootApp.animations'])
 
         }
         $scope.removeProblem = function(index) {
-            $http.delete('/api/problems')
+            $http.delete('/api/problems', {
+                data: {
+                    room_path: $scope.room_path,
+                    submission: $scope.problems[index].name
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        }
+    }])
+    .animation('.tableItem', [function() {
+        return {
+            enter: function(element, done) {
+                element = jQuery(element)
+                element.css({
+                    opacity: 0
+                })
+                element.fadeIn(400, done)
+            },
+            leave: function(element, done) {
+                element = jQuery(element)
+                element.fadeOut(300, done)
+            }
         }
     }])
