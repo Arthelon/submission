@@ -28,6 +28,8 @@ angular.module('rootApp.controllers', ['ngAnimate', 'rootApp.services', 'ui.ace'
         $scope.loadPath = function() {
             $scope.room_path = loadName.getBase($location)
         }
+        $scope.error = null
+        $scope.success = null
         $scope.subToggle = true
         $scope.room_path = null
         $scope.loadSubmissions = function() {
@@ -87,6 +89,12 @@ angular.module('rootApp.controllers', ['ngAnimate', 'rootApp.services', 'ui.ace'
                 }
             })
         }
+        $scope.setSuccess = function(msg) {
+            $scope.success = msg
+        }
+        $scope.setError = function(msg) {
+            $scope.error = msg
+        }
     }])
     .animation('.tableItem', [function() {
         return {
@@ -105,33 +113,49 @@ angular.module('rootApp.controllers', ['ngAnimate', 'rootApp.services', 'ui.ace'
     }])
     .controller('FormControl', ['$scope', '$http', function($scope, $http) {
         var fillerText = '# Enter code here'
-        $scope.form = {
+        var defaultForm = {
             name: '',
             user: '',
-            prob: '',
+            prob: 'None',
             desc: ''
         }
+        $scope.form = jQuery.extend({}, defaultForm)
         $scope.editor = fillerText
         $scope.submit = function() {
-            var fd = new FormData();
-            for (var key in $scope.form) {
-                if (!$scope.form.hasOwnProperty(key))
-                    continue
-                else {
-                    fd.append(key, $scope.form[key])
+            if ($scope.editor != fillerText && $scope.file) {
+                $scope.error = 'Can\'t accept submissions from both file(s) and text editor'
+            } else if ($scope.editor == fillerText && !$scope.file) {
+                $scope.error = 'Please submit data'
+            } else {
+                var fd = new FormData();
+                for (var key in $scope.form) {
+                    if (!$scope.form.hasOwnProperty(key))
+                        continue
+                    else {
+                        fd.append(key, $scope.form[key])
+                    }
                 }
+                if ($scope.file)
+                    fd.append('file', $scope.file);
+                else {
+                    var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
+                    fd.append('file', editor_file, $scope.form.name+'.py')
+                }
+                $http.post('/room/'+$scope.room_path, fd, {
+                    transformRequest: angular.identity,
+                    headers: {'Content-Type': undefined}
+                })
+                .success(function(res){
+                    console.log(res)
+                    $scope.setSuccess(res.success)
+                    $scope.form = jQuery.extend({}, defaultForm)
+                    $scope.editor = fillerText
+                })
+                .error(function(err){
+                    console.log(err)
+                    $scope.setError(err.data.error)
+                });
             }
-            console.log($scope.editor)
-            // if ($scope.file )
-            // fd.append('file', $scope.file);
-            // $http.post('/room/'+$scope.room_path, fd, {
-            //         transformRequest: angular.identity,
-            //         headers: {'Content-Type': undefined}
-            //     })
-            //     .success(function(){
-            //     })
-            //     .error(function(){
-            //     });
         }
     }])
     .directive('fileModel', ['$parse', function ($parse) {

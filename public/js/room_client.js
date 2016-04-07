@@ -40,7 +40,7 @@ $(function () {
                 }
             }
         });
-        Firefox bug fix
+        // Firefox bug fix
         $fileInp
             .on('focus', function () {
                 $fileInp.addClass('has-focus');

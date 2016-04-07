@@ -4,112 +4,114 @@ block head
     link(rel='stylesheet' href='/stylesheets/room.css')
 
 block content
-    if user_authenticated
-        .header.btns
-            .float-left
-                a(href='/dashboard') Main
-            .float-right
-                a(href='/logout') Logout
-        .container
-            .row.text-center
-                h1 #{room_path}
-                p #{room_desc}
-        .container(ng-controller='room' ng-init="loadPath();loadSubmissions()")
-            .row
-                .col-md-3
-                    ul.nav.nav-pills.nav-stacked
-                        li(ng-click='subToggle=true' ng-class='{active: subToggle == true}')
-                            a(href='') Submissions
-                        li.dropdown(ng-mouseover='loadProblems()' ng-click='subToggle=false' ng-class='{active: subToggle == false}')
-                            a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
-                                | Problems
-                                span.caret
-                            ul.dropdown-menu(ng-cloak)
-                                li(ng-repeat='problem in problems')
-                                    a(ng-href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
-                                li(ng-if='problems.length == 0')
-                                    a No Problems Found!
-                                li.divider
-                                li
-                                    a#createProb(href='/problem/{{room_path}}') Create Problem
-                .col-md-9#subContent(ng-if='subToggle == true')
-                    table.table.table-striped.table-hover(ng-if='submissions.length > 0')
-                        thead
-                            tr
-                                th Submission Title
-                                th Submitted by
-                                th Description
-                                th Timestamp
-                                th Files
-                        tbody(ng-cloak)
-                            tr.tableItem(ng-repeat='submission in submissions')
-                                td
-                                    a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
-                                td {{submission.user}}
-                                td {{submission.desc}}
-                                td {{submission.timestamp}}
-                                td {{submission.files.length}}
-                                    i.fa.fa-times.cross(ng-click='removeSubmission($index)')
-                    .text-center(ng-if='submissions.length == 0')
-                        .alert.alert-dismissible.alert-warning
-                            button.fa.fa-close.close(type='button', data-dismiss='alert')
-                            p No submissions found
-                .col-md-9#probContent(ng-if='subToggle == false')
-                    table.table.table-striped.table-hover(ng-if='problems.length > 0')
-                        thead
-                            tr
-                                th Problem Name
-                                th Problem Description
-                                th Number of Submissions
-                        tbody(ng-cloak)
-                            tr.tableItem(ng-repeat='problem in problems')
-                                td
-                                    a(href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
-                                td {{problem.desc}}
-                                td {{problem.submissions.length}}
-                                    i.fa.fa-times.cross(ng-click='removeProblem($index)')
-                    .text-center(ng-if='problems.length == 0')
-                        .alert.alert-dismissible.alert-warning
-                            button.fa.fa-close.close(type='button', data-dismiss='alert')
-                            p No problems found
-                    .row
-                        .btns.text-center
-                            a(ng-href='/problem/{{room_path}}') Create Problem
-    else
-        .container
-            .row.text-center
-                h1 #{room_path}
-                p #{room_desc}
-        .panel.panel-default(ng-controller='room', ng-init='loadPath();loadProblems()')
-            .panel-body
-                form#uploadForm(ng-controller='FormControl' ng-submit='submit()')
-                    .form-group.row
-                        label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
-                        .col-lg-4
-                            input.form-control#nameInput(ng-model='form.name' type='text' placeholder='Title' ng-required)
-                    .form-group.row
-                        label.col-lg-2.col-lg-offset-4.control-label(for='userInput') Name
-                        .col-lg-4
-                            input.form-control#userInput(type='text' ng-model='form.user' placeholder='Enter your name' ng-required)
-                    .form-group.row
-                        label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
-                        .col-lg-4
-                            input.form-control#descInput(type='text' ng-model='form.desc'    placeholder='Optional')
-                    .form-group.row
-                        label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
-                        .col-lg-4
-                            select#select.form-control(ng-model='form.prob')
-                                option None
-                                each
-                                    option(ng-repeat='problem in problems')
-                                        | {{problem.name}}
-                    .fileInput.form-group
-                        input(type="file" name="file" id="file" file-model='file')
-                        label(for="file")
-                            i.fa.fa-upload
-                            span Choose a file...
-                    #editor(ui-ace="{theme: 'monokai', mode: 'python'}" ng-model='editor')
-                    button.btn.btn-default(type='submit') Upload
-    .msg.text-center.row
-        p(style='color:red;' ng-if='error') {{error}}
-        p(style='color:green;' ng-if='success') {{success}}
+    div(ng-controller='room')
+        if user_authenticated
+            .header.btns
+                .float-left
+                    a(href='/dashboard') Main
+                .float-right
+                    a(href='/logout') Logout
+            .container
+                .row.text-center
+                    h1 #{room_path}
+                    p #{room_desc}
+            .container(ng-init="loadPath();loadSubmissions()")
+                .row
+                    .col-md-3
+                        ul.nav.nav-pills.nav-stacked
+                            li(ng-click='subToggle=true' ng-class='{active: subToggle == true}')
+                                a(href='') Submissions
+                            li.dropdown(ng-mouseover='loadProblems()' ng-click='subToggle=false' ng-class='{active: subToggle == false}')
+                                a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
+                                    | Problems
+                                    span.caret
+                                ul.dropdown-menu(ng-cloak)
+                                    li(ng-repeat='problem in problems')
+                                        a(ng-href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
+                                    li(ng-if='problems.length == 0')
+                                        a No Problems Found!
+                                    li.divider
+                                    li
+                                        a#createProb(href='/problem/{{room_path}}') Create Problem
+                    .col-md-9#subContent(ng-if='subToggle == true')
+                        table.table.table-striped.table-hover(ng-if='submissions.length > 0')
+                            thead
+                                tr
+                                    th Submission Title
+                                    th Submitted by
+                                    th Description
+                                    th Timestamp
+                                    th Files
+                            tbody(ng-cloak)
+                                tr.tableItem(ng-repeat='submission in submissions')
+                                    td
+                                        a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
+                                    td {{submission.user}}
+                                    td {{submission.desc}}
+                                    td {{submission.timestamp}}
+                                    td {{submission.files.length}}
+                                        i.fa.fa-times.cross(ng-click='removeSubmission($index)')
+                        .text-center(ng-if='submissions.length == 0')
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No submissions found
+                    .col-md-9#probContent(ng-if='subToggle == false')
+                        table.table.table-striped.table-hover(ng-if='problems.length > 0')
+                            thead
+                                tr
+                                    th Problem Name
+                                    th Problem Description
+                                    th Number of Submissions
+                            tbody(ng-cloak)
+                                tr.tableItem(ng-repeat='problem in problems')
+                                    td
+                                        a(href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
+                                    td {{problem.desc}}
+                                    td {{problem.submissions.length}}
+                                        i.fa.fa-times.cross(ng-click='removeProblem($index)')
+                        .text-center(ng-if='problems.length == 0')
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No problems found
+                        .row
+                            .btns.text-center
+                                a(ng-href='/problem/{{room_path}}') Create Problem
+        else
+            div(ng-controller='FormControl')
+                .container
+                    .row.text-center
+                        h1 #{room_path}
+                        p #{room_desc}
+                .panel.panel-default(ng-init='loadPath();loadProblems()')
+                    .panel-body
+                        form#uploadForm
+                            .form-group.row
+                                label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
+                                .col-lg-4
+                                    input.form-control#nameInput(ng-model='form.name' type='text' placeholder='Title' ng-required)
+                            .form-group.row
+                                label.col-lg-2.col-lg-offset-4.control-label(for='userInput') Name
+                                .col-lg-4
+                                    input.form-control#userInput(type='text' ng-model='form.user' placeholder='Enter your name' ng-required)
+                            .form-group.row
+                                label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
+                                .col-lg-4
+                                    input.form-control#descInput(type='text' ng-model='form.desc' placeholder='Optional')
+                            .form-group.row
+                                label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
+                                .col-lg-4
+                                    select#select.form-control(ng-model='form.prob')
+                                        option None
+                                        each
+                                            option(ng-repeat='problem in problems')
+                                                | {{problem.name}}
+                            .fileInput.form-group
+                                input(type="file" name="file" id="file" file-model='file' multiple)
+                                label(for="file")
+                                    i.fa.fa-upload
+                                    span Choose a file...
+                            #editor(ui-ace="{theme: 'monokai', mode: 'python'}" ng-model='editor')
+                            button.btn.btn-default(ng-click='submit()') Upload
+        .msg.text-center.row
+            p(style='color:red;' ng-if='error' ng-bind='error')
+            p(style='color:green;' ng-if='success' ng-bind='success')

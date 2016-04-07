@@ -59,10 +59,14 @@ router.route('/:room_path')
                     return handleTestFail(req, res, err.message)
                 } else if (!prob) {
                     return handleTestFail(req, res, 'Problem not found', 404)
+                } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
+                    return createSubCb(req, res, submissions)
                 } else {
                     req.files.forEach(function (file, findex) {
                         fs.readFile(file.path, 'utf8', function (err, data) {
+                            console.log('1')
                             if (err) return handleTestFail(req, res, err.message)
+                            else if (!data) return handleTestFail(req, res, 'File not found')
                             else async.each(prob.test.matches, function (match, cb) {
                                 if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"' + match.text + '\" not found.')
                                 else cb()
