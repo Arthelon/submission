@@ -14,29 +14,26 @@ block content
             .row.text-center
                 h1 #{room_path}
                 p #{room_desc}
-        .container(ng-controller='room' ng-init="loadSubmissions()")
+        .container(ng-controller='room' ng-init="loadPath();loadSubmissions()")
             .row
                 .col-md-3
                     ul.nav.nav-pills.nav-stacked
-                        li.active
+                        li(ng-click='subToggle=true' ng-class='{active: subToggle == true}')
                             a(href='') Submissions
-                        li.dropdown
-                            a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false' ng-click='loadProblems()')
+                        li.dropdown(ng-mouseover='loadProblems()' ng-click='subToggle=false' ng-class='{active: subToggle == false}')
+                            a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
                                 | Problems
                                 span.caret
-                            ul.dropdown-menu
-                                if problems
-                                    each problem in problems
-                                        li
-                                            a(href='/problem/#{room_path}/#{problem.name}') #{problem.name}
-                                else
-                                    li
-                                        a No Problems Found!
+                            ul.dropdown-menu(ng-cloak)
+                                li(ng-repeat='problem in problems')
+                                    a(ng-href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
+                                li(ng-if='problems.length == 0')
+                                    a No Problems Found!
                                 li.divider
                                 li
-                                    a#createProb(href='/problem/#{room_path}') Create Problem
-                .col-md-9#subContent(ng-if='subToggle')
-                    table.table.table-striped.table-hover(ng-if='submissions')
+                                    a#createProb(href='/problem/{{room_path}}') Create Problem
+                .col-md-9#subContent(ng-if='subToggle == true')
+                    table.table.table-striped.table-hover(ng-if='submissions.length > 0')
                         thead
                             tr
                                 th Submission Title
@@ -47,18 +44,18 @@ block content
                         tbody
                             tr(ng-repeat='submission in submissions')
                                 td
-                                    a#downloadFile(href='/room/#{room_path}/{{submission.name}}') {{submission.name}}
+                                    a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
                                 td {{submission.user}}
                                 td {{submission.desc}}
                                 td {{submission.timestamp}}
                                 td {{submission.files.length}}
-                                    i.fa.fa-times.cross
-                    .text-center(ng-if='!submissions')
+                                    i.fa.fa-times.cross(ng-click='removeSubmission($index)')
+                    .text-center(ng-if='submissions.length == 0')
                         .alert.alert-dismissible.alert-warning
                             button.fa.fa-close.close(type='button', data-dismiss='alert')
                             p No submissions found
-                .col-md-9#probContent(ng-if='!subToggle')
-                    table.table.table-striped.table-hover(ng-if='problems')
+                .col-md-9#probContent(ng-if='subToggle == false')
+                    table.table.table-striped.table-hover(ng-if='problems.length > 0')
                         thead
                             tr
                                 th Problem Name
@@ -67,27 +64,25 @@ block content
                         tbody
                             tr(ng-repeat='problem in problems')
                                 td
-                                    a(href='/problem/#{room_path}/{{problem.name}}') {{problem.name}}
+                                    a(href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
                                 td {{problem.desc}}
                                 td {{problem.submissions.length}}
-                                    i.fa.fa-times.cross
-                    div(ng-if='!problems')
-                        .text-center
-                            .alert.alert-dismissible.alert-warning
-                                button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                p No problems found
-                        .row
-                            .col-md-9.col-md-offset-3
-                                .btns.text-center
-                                    a(href='/problem/#{room_path}') Create Problem
+                                    i.fa.fa-times.cross(ng-click='removeProblem($index)')
+                    .text-center(ng-if='problems.length == 0')
+                        .alert.alert-dismissible.alert-warning
+                            button.fa.fa-close.close(type='button', data-dismiss='alert')
+                            p No problems found
+                    .row
+                        .btns.text-center
+                            a(ng-href='/problem/{{room_path}}') Create Problem
     else
         .container
             .row.text-center
                 h1 #{room_path}
                 p #{room_desc}
-        .panel.panel-default
+        .panel.panel-default(ng-controller='room', ng-init='loadPath();loadProblems()')
             .panel-body
-                form#uploadForm(room=room_path action='/room/'+room_path method='POST' encType='multipart/form-data')
+                form#uploadForm(room=room_path method='POST' encType='multipart/form-data')
                     .form-group.row
                         label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
                         .col-lg-4
@@ -105,10 +100,11 @@ block content
                         .col-lg-4
                             select#select.form-control(name='prob')
                                 option None
-                                each(ng-repeat='problem in problems')
-                                    option {{problem}}
+                                each
+                                    option(ng-repeat='problem in problems')
+                                        | {{problem.name}}
                     .fileInput.form-group
-                        input(type='file' name='file' id='file' data-multiple-caption="{count} files selected" multiple)
+                        input(type="file" name="file" id="file" data-multiple-caption="{count} files selected" multiple)
                         label(for="file")
                             i.fa.fa-upload
                             span Choose a file...
@@ -122,4 +118,4 @@ block script
     script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
     if !user_authenticated
         script(type='text/javascript' src='https://cdn.jsdelivr.net/ace/1.2.3/min/ace.js')
-    script(type='text/javascript' src='/js/room_client.js')
+        script(type='text/javascript' src='/js/room_client.js')

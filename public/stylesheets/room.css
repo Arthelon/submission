@@ -50,10 +50,6 @@ label {
     margin-top:10px;
 }
 
-#probContent {
-    display: none;
-}
-
 .dropdown:hover .dropdown-menu {
     display: block;
 }

@@ -9,6 +9,7 @@ var validateUser = util.validateUser
 
 var Submission = models.Submission
 var Room = models.Room
+var Problem = models.Problem
 
 
 router.route('/rooms')
@@ -45,8 +46,6 @@ router.route('/submissions')
             .populate('submissions')
             .sort('timestamp')
             .exec(function(err, room) {
-                console.log(room)
-                console.log(err)
                 if (err) return handleResp(res, 400, err.message)
                 if (!room) {
                     return handleResp(res, 404, 'Room not found')
@@ -101,9 +100,43 @@ router.route('/problems')
                     })
             })
     })
+    .delete(validateRoom, function(req, res) {
+        var prob_name = req.body.problem
+        if (!prob_name) {
+            return handleResp(res, 400, 'Invalid Request. Please enter problem name')
+        }
+        Problem.findOne({name: prob_name},
+            function (err, prob) {
+                if (err) {
+                    return handleResp(res, 500, err.message)
+                } else if (!prob) {
+                    return handleResp(res, 404, 'Problem not found')
+                } else if (prob.room.toString() == req.room._id.toString()) {
+                    prob.remove(function (err) {
+                        if (err) {
+                            return handleResp(res, 500, err.message)
+                        } else {
+                            req.room.update({
+                                $pull: {
+                                    problems: prob._id
+                                }
+                            }, (err) => {
+                                if (err) {
+                                    return handleResp(res, 500, err.message)
+                                } else {
+                                    return handleResp(res, 200, {success: 'Success'})
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    return handleResp(res, 401, 'Room doesn\'t belong to user')
+                }
+            })
+    })
 
 
-router.route('/tests')
+// router.route('/tests')
 
 
 module.exports = router

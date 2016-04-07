@@ -37,7 +37,7 @@ block script
                 $msg.empty()
                 $.ajax({
                     method: "POST",
-                    url: "/problem/#{room_name}",
+                    url: location.pathname,
                     data: $(this).serialize(),
                     dataType: 'json'
                 }).then(function (data) {
