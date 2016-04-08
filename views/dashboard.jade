@@ -1,5 +1,4 @@
 extends ./layout
-block head
 block content
     .header
         //LOGO
@@ -36,7 +35,8 @@ block content
             p(style='color:red;' ng-if='error') {{error}}
             p(style='color:green;' ng-if='success') {{success}}
 block script
-    script(type='text/javascript' src='/js/dashboard.js')
+    script(type='text/javascript' src='/js/controllers/dashboard.js')
+
 
 
 

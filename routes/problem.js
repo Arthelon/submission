@@ -16,36 +16,36 @@ router.route('/:room_path')
         })
     })
     .post(validateRoom, function (req, res) {
-        if (req.user) {
-            if (req.body.name && req.body.desc) {
-                if (!req.body.name.match(/^[\d\w]+$/)) {
-                    return handleResp(res, 400, 'Name can only consist of alphanumeric characters')
-                }
-                Problem.findOrCreate({
-                    name: req.body.name,
-                    desc: req.body.desc,
-                    room: req.room._id
-                }, (err, prob, created) => {
-                    if (err) {
-                        return handleResp(res, 500, err.message)
-                    }
-                    else if (!created) {
-                        return handleResp(res, 404, 'Problem already exists')
-                    } else {
-                        Room.findOneAndUpdate({
-                            _id: req.room._id
-                        }, {$push: {problems: prob._id}}, (err) => {
-                            if (err) return handleResp(res, 500, err.message)
-                        })
-                        return handleResp(res, 200, {success: 'Problem Created'})
-                    }
-                })
-            } else {
-                return handleResp(res, 400, 'Fields not filled')
-            }
-        } else {
-            return handleResp(res, 401, 'User not authenticated')
-        }
+        // if (req.user) {
+        //     if (req.body.name && req.body.desc) {
+        //         if (!req.body.name.match(/^[\d\w]+$/)) {
+        //             return handleResp(res, 400, 'Name can only consist of alphanumeric characters')
+        //         }
+        //         Problem.findOrCreate({
+        //             name: req.body.name,
+        //             desc: req.body.desc,
+        //             room: req.room._id
+        //         }, (err, prob, created) => {
+        //             if (err) {
+        //                 return handleResp(res, 500, err.message)
+        //             }
+        //             else if (!created) {
+        //                 return handleResp(res, 404, 'Problem already exists')
+        //             } else {
+        //                 Room.findOneAndUpdate({
+        //                     _id: req.room._id
+        //                 }, {$push: {problems: prob._id}}, (err) => {
+        //                     if (err) return handleResp(res, 500, err.message)
+        //                 })
+        //                 return handleResp(res, 200, {success: 'Problem Created'})
+        //             }
+        //         })
+        //     } else {
+        //         return handleResp(res, 400, 'Fields not filled')
+        //     }
+        // } else {
+        //     return handleResp(res, 401, 'User not authenticated')
+        // }
     })
 
 router.route('/:room_path/:problem')

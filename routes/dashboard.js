@@ -7,7 +7,8 @@ router.route('/')
         if (req.user) {
             res.render('dashboard', {
                 name: req.user.username,
-                title: 'submission | Dashboard'
+                title: 'submission | Dashboard',
+                ngApp: 'app.dashboard'
             })
         } else {
             res.redirect('/')

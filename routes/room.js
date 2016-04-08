@@ -40,6 +40,7 @@ router.route('/:room_path')
         payload = {
             room_name: req.room.name,
             room_desc: req.room.desc,
+            ngApp: 'app.room'
         }
         payload.user_authenticated = req.user ? true : false
         res.render('room', payload)

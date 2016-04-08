@@ -29,24 +29,4 @@ block content
         .row.msg.text-center
 
 block script
-    script(type='text/javascript').
-        $(function () {
-            var $msg = $('.msg')
-            $("form").submit(function (e) {
-                e.preventDefault()
-                $msg.empty()
-                $.ajax({
-                    method: "POST",
-                    url: location.pathname,
-                    data: $(this).serialize(),
-                    dataType: 'json'
-                }).then(function (data) {
-                    if (!data.success) data.success = 'Success'
-                    $msg.append('<p style="color:green;">' + data.success + '</p>')
-                }, function (data) {
-                    if (!data.responseJSON.error) data.responseJSON.error = 'Error'
-                    $msg.append('<p style="color:red;">' + data.responseJSON.error + '</p>')
-                })
-                $(this).trigger('reset')
-            })
-        })
+    //script(type='text/javascript', src='/js/controllers/create_prob.js')

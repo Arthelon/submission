@@ -9,7 +9,11 @@ var validateUser = util.validateUser
 
 var Submission = models.Submission
 var Room = models.Room
+var File = models.File
 var Problem = models.Problem
+
+var async = require('async')
+var fs = require('fs')
 
 
 router.route('/rooms')
@@ -57,7 +61,7 @@ router.route('/submissions')
             })
     })
     .delete(validateRoom, function(req, res) {
-        Submission.findOne({name: req.params.submission}, function (err, sub) {
+        Submission.findOne({name: req.body.submission}, function (err, sub) {
             if (err) {
                 return handleResp(res, 500, {error: err.message})
             } else if (sub) {
@@ -102,6 +106,7 @@ router.route('/problems')
     })
     .delete(validateRoom, function(req, res) {
         var prob_name = req.body.problem
+        console.log(prob_name)
         if (!prob_name) {
             return handleResp(res, 400, 'Invalid Request. Please enter problem name')
         }

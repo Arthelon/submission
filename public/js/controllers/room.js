@@ -1,12 +1,14 @@
-angular.module('rootApp.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
-    .controller('room', ['$scope', '$http', '$location', 'loadName', function($scope, $http, $location, loadName) {
-        $scope.loadPath = function() {
-            $scope.room_path = loadName.getBase($location)
-        }
+angular.module('app.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
+    .controller('room', ['$scope', '$http', '$location', function($scope, $http, $location) {
+        $scope.room_path = null
         $scope.error = null
         $scope.success = null
         $scope.subToggle = true
         $scope.room_path = null
+        $scope.loadPath = function() {
+            var loc = $location.absUrl().split('/')
+            $scope.room_path = loc[loc.length-1]
+        }
         $scope.loadSubmissions = function() {
             $http.get('/api/submissions', {
                 params: {
@@ -49,7 +51,7 @@ angular.module('rootApp.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
                 $scope.success = res.data.success
                 $scope.submissions.splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error
+                $scope.error = err.data.error || err.error
             })
 
         }
@@ -57,7 +59,7 @@ angular.module('rootApp.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
             $http.delete('/api/problems', {
                 data: {
                     room_path: $scope.room_path,
-                    submission: $scope.problems[index].name
+                    problem: $scope.problems[index].name
                 },
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,25 +1,38 @@
 doctype html
-html(ng-app='rootApp')
-    head
-        meta(http-equiv="content-type" content="text/html; charset=UTF-8")
-        meta(charset="utf-8")
-        title #{title}
-        link(rel='stylesheet' href='/stylesheets/darkly.min.css')
-        link(rel='stylesheet' href='/stylesheets/style.css')
-        link(rel='stylesheet' href='/font-awesome/css/font-awesome.min.css')
-        block head
-    body(ng-cloak)
-        block content
-        include footer
-        //Bower Components
-        script(type='text/javascript', src='/jQuery/dist/jquery.min.js')
-        script(type='text/javascript', src='/bootstrap/dist/js/bootstrap.min.js')
-        script(type='text/javascript', src='/angular/angular.min.js')
-        script(type='text/javascript', src='/angular-animate/angular-animate.min.js')
-        script(type='text/javascript', src='/ace-builds/src-min-noconflict/ace.js')
-        script(type='text/javascript', src='/angular-ui-ace/ui-ace.js')
-        //Other Imports
-        script(type='text/javascript' src='/js/room.js')
-        script(type='text/javascript' src='/js/dashboard.js')
-        script(type='text/javascript', src='/js/services.js')
-        script(type='text/javascript', src='/js/root.js')
+if ngApp
+    html(ng-app='#{ngApp}')
+        head
+            meta(http-equiv="content-type" content="text/html; charset=UTF-8")
+            meta(charset="utf-8")
+            title #{title}
+            link(rel='stylesheet' href='/stylesheets/darkly.min.css')
+            link(rel='stylesheet' href='/stylesheets/style.css')
+            link(rel='stylesheet' href='/font-awesome/css/font-awesome.min.css')
+            block head
+        body(ng-cloak)
+            block content
+            include footer
+            //Bower Components
+            script(type='text/javascript', src='/jQuery/dist/jquery.min.js')
+            script(type='text/javascript', src='/bootstrap/dist/js/bootstrap.min.js')
+            script(type='text/javascript', src='/angular/angular.min.js')
+            script(type='text/javascript', src='/angular-animate/angular-animate.min.js')
+            //Other Imports
+            script(type='text/javascript', src='/js/services.js')
+            block script
+else
+    html
+        head
+            meta(http-equiv="content-type" content="text/html; charset=UTF-8")
+            meta(charset="utf-8")
+            title #{title}
+            link(rel='stylesheet' href='/stylesheets/darkly.min.css')
+            link(rel='stylesheet' href='/stylesheets/style.css')
+            link(rel='stylesheet' href='/font-awesome/css/font-awesome.min.css')
+            block head
+        body
+            block content
+            include footer
+            //Bower Components
+            script(type='text/javascript', src='/jQuery/dist/jquery.min.js')
+            script(type='text/javascript', src='/bootstrap/dist/js/bootstrap.min.js')

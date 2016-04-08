@@ -1,4 +1,4 @@
-angular.module('rootApp.dashboard', [])
+angular.module('app.dashboard', [])
     .controller('dashboard', ['$scope', '$http', function($scope, $http) {
         $scope.loadRooms = function() {
             $http.get('/api/rooms').then(function(res) {
