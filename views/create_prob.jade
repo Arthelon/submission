@@ -7,7 +7,7 @@ block content
                 a(href='/') Home
             .float-right
                 a(href='/logout') Logout
-    .container
+    .container(ng-controller='create_prob')
         h3 Create Problem
         hr
         .row
@@ -16,17 +16,17 @@ block content
                     .panel-heading.clearfix
                         h3.panel-title Create Problem
                     .panel-body
-                        form
+                        form(ng-submit='submit()')
                             .form-group
                                 label.col-lg-4.control-label(for='probName') Problem
-                                input#probName.form-control(name='name' type='text', placeholder='Name')
+                                input#probName.form-control(name='name' ng-model='form.name' type='text', placeholder='Name' ng-required)
                             .form-group
                                 label.col-lg-4.control-label(for='probDesc') Problem Description
-                                input#probDesc.form-control(name='desc' type='text', placeholder='Description')
-                            if errors
-                                p #{errors}
+                                input#probDesc.form-control(name='desc' ng-model='form.desc' type='text', placeholder='Description' ng-required)
                             button.btn.btn-success(type='submit') Submit
         .row.msg.text-center
+            p(style='color:red;' ng-if='error' ng-bind='error')
+            p(style='color:green;' ng-if='success' ng-bind='success')
 
 block script
-    //script(type='text/javascript', src='/js/controllers/create_prob.js')
+    script(type='text/javascript', src='/js/controllers/create_prob.js')
