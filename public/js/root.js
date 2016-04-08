@@ -1,3 +1,4 @@
 angular.module('rootApp', [
-    'rootApp.controllers'
+    'rootApp.room',
+    'rootApp.dashboard'
 ])
