@@ -1,27 +1,25 @@
 extends ./layout
-block head
-    link(rel='stylesheet' href='/stylesheets/problem.css')
 block content
-    .header.btns
-        .float-left
-            a(href='/') Main
-        .float-right
-            a(href='/logout') Logout
-    .container
-        .row.text-center
-            h1 #{prob_name}
-            p #{prob_desc}
-    .container
-        .row
-            .col-md-3
-                ul.nav.nav-pills.nav-stacked
-                    li.active
-                        a Submissions
-                    li
-                        a Tests
-            .col-md-9#subContent
-                if prob_subs && prob_subs.length > 0
-                    table.table.table-striped.table-hover
+    div(ng-controller='problem' ng-init='loadPath();loadData()' ng-cloak)
+        .header.btns
+            .float-left
+                a(href='/') Main
+            .float-right
+                a(href='/logout') Logout
+        .container
+            .row.text-center
+                h1 #{prob_name}
+                p(ng-bind='desc')
+        .container
+            .row
+                .col-md-3
+                    ul.nav.nav-pills.nav-stacked
+                        li(ng-click='toggle = true' ng-class='{active: toggle == true}')
+                            a Submissions
+                        li(ng-click='toggle = false' ng-class='{active: toggle == false}')
+                            a Tests
+                .col-md-9#subContent(ng-if='toggle')
+                    table.table.table-striped.table-hover(ng-if='submissions.length > 0')
                         thead
                             tr
                                 th Submission Title
@@ -30,81 +28,68 @@ block content
                                 th Timestamp
                                 th Files
                         tbody
-                            each sub in prob_subs
-                                tr
-                                    td
-                                        a#downloadFile(href='/room/#{room_name}/#{sub.name}') #{sub.name}
-                                    td #{sub.user}
-                                    td #{sub.desc}
-                                    td #{sub.timestamp}
-                                    td #{sub.files.length}
-                                        i.fa.fa-times.cross
-                else
-                    .text-center
+                            tr(ng-repeat='sub in submissions')
+                                td
+                                    a#downloadFile(href='/room/{{room_path}}/{{sub.name}}') {{sub.name}}
+                                td {{sub.user}}
+                                td {{sub.desc}}
+                                td {{sub.timestamp}}
+                                td {{sub.files.length}}
+                                    i.fa.fa-times.cross(ng-click='removeSubmission($index)')
+                    .text-center(ng-if='submissions.length == 0')
                         .alert.alert-dismissible.alert-warning
                             button.fa.fa-close.close(type='button', data-dismiss='alert')
                             p No submissions found
-            #testContent
-                .col-md-6
-                    if test.cases.length > 0
-                        table.table.table-striped.table-hover
+                #testContent(ng-if='!toggle')
+                    .col-md-6
+                        table.table.table-striped.table-hover(ng-if='tests.cases.length > 0')
                             thead
                                 tr
                                     th Input
                                     th Output
                             tbody#cases
-                                each item in test.cases
-                                    tr(id=item._id)
-                                        td #{item.in}
-                                        td #{item.out}
-                                            i.fa.fa-times.cross
-                    else
-                        .text-center
+                                tr(ng-repeat='item in tests.cases')
+                                    td {{item.in}}
+                                    td {{item.out}}
+                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}')")
+                        .text-center(ng-if='tests.cases.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No I/O cases found
-                .col-md-3
-                    if test.matches.length > 0
-                        table.table.table-striped.table-hover
+                    .col-md-3
+                        table.table.table-striped.table-hover(ng-if='test.matches.length > 0')
                             thead
                                 tr
                                     th Match
                             tbody#matches
-                                each item in test.matches
-                                    tr(id=item._id)
-                                        td #{item.text}
-                                            i.fa.fa-times.cross
-                    else
-                        .text-center
+                                tr(ng-repeat='item in tests.matches')
+                                    td {{item.text}}
+                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}')")
+                        .text-center(ng-if='tests.matches.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No matches found
-                .btns.text-center.col-md-9
-                    a#createTest New Tests
-            #createContent
-                .col-md-6
-                    form
-                        .form-group
-                            label.col-lg-4.control-label(for='caseInput') Input
-                            input#caseInput.form-control(name='in' type='text', placeholder='Required')
-                        .form-group
-                            label.col-lg-4.control-label(for='caseOutput') Expected Output
-                            input#caseOutput.form-control(name='out' type='text', placeholder='Required')
-                        button.btn.btn-success(type='submit') Submit
-                .col-md-3
-                    form
-                        .form-group
-                            label.col-lg-4.control-label(for='matchString') Match
-                            input#matchString.form-control(name='match' type='text', placeholder='String to Capture')
-                        button.btn.btn-success(type='submit') Submit
-        .msg.text-center
-            if errors
-                each error in errors
-                    p #{error}
+                    .btns.text-center.col-md-9
+                        a(ng-click='toggleForm = true') New Tests
+                #createContent(ng-if='toggleForm' ng-controller='FormControl')
+                    .col-md-6
+                        form
+                            .form-group
+                                label.col-lg-4.control-label(for='caseInput') Input
+                                input#caseInput.form-control(name='in' type='text', placeholder='Required')
+                            .form-group
+                                label.col-lg-4.control-label(for='caseOutput') Expected Output
+                                input#caseOutput.form-control(name='out' type='text', placeholder='Required')
+                            button.btn.btn-success(type='submit') Submit
+                    .col-md-3
+                        form
+                            .form-group
+                                label.col-lg-4.control-label(for='matchString') Match
+                                input#matchString.form-control(name='match' type='text', placeholder='String to Capture')
+                            button.btn.btn-success(type='submit') Submit
+            .msg.text-center
+                p(style='color:red;' ng-if='error' ng-bind='error')
+                p(style='color:green;' ng-if='success' ng-bind='success')
 
 block script
-    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.9.1/axios.min.js')
-    script(type='text/javascript').
-        var room_name = !{JSON.stringify(room_name)}
-        var prob_name = !{JSON.stringify(prob_name)}
-    script(type='text/javascript' src='/js/prob_client.js')
+    script(type='text/javascript' src='/js/controllers/problem.js')

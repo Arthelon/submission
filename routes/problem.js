@@ -55,37 +55,15 @@ router.route('/:room_path')
 
 router.route('/:room_path/:problem')
     .get(validateRoom, function (req, res) {
-        Room.findOne({_id: req.room._id})
-            .populate({
-                path: 'problems',
-                populate: {
-                    path: 'submissions',
-                    model: 'Submission'
-                }
+        if (req.user) {
+            res.render('problem', {
+                title: 'submission | '+req.params.problem,
+                prob_name: req.params.problem,
+                ngApp: 'app.problem'
             })
-            .exec(function (err, room) {
-                if (err) {
-                    res.status(400)
-                    req.flash('error', err.message)
-                    res.redirect('back')
-                } else {
-                    room.problems.forEach(function (prob) {
-                        if (prob.name == req.params.problem) {
-                            res.render('problem', {
-                                prob_name: prob.name,
-                                prob_desc: prob.desc,
-                                prob_subs: prob.submissions,
-                                room_name: req.room.name,
-                                test: prob.test,
-                                errors: req.flash('error'),
-                                title: 'submission | ' + prob.name
-                            })
-                        }
-                    }, function () {
-                        handleResp(res, 404, 'Room not found')
-                    })
-                }
-            })
+        } else {
+            res.redirect('/')
+        }
     })
     .post(validateRoom, function (req, res) {
         var prob_name = req.params.problem

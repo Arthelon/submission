@@ -32,7 +32,7 @@ router.route('/rooms')
                 })
             })
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateUser, validateRoom, function(req, res) {
         req.room.remove((err) => {
             if (err) return handleResp(res, 500, err.message)
             else return handleResp(res, 200, {
@@ -42,7 +42,7 @@ router.route('/rooms')
     })
 
 router.route('/submissions')
-    .get(validateRoom, function(req, res) {
+    .get(validateUser, validateRoom, function(req, res) {
         Room
             .findOne({
                 path: req.room.path
@@ -60,7 +60,7 @@ router.route('/submissions')
                     })
             })
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateUser, validateRoom, function(req, res) {
         Submission.findOne({name: req.body.submission}, function (err, sub) {
             if (err) {
                 return handleResp(res, 500, {error: err.message})
@@ -90,21 +90,50 @@ router.route('/submissions')
     })
 
 router.route('/problems')
-    .get(validateRoom, function(req, res) {
-        Room
-            .findOne({path: req.room.path})
-            .populate('problems')
-            .exec(function(err, room) {
-                if(err) return handleResp(res, 500, {error: err.message})
-                else if (!room) return handleResp(res, 400, {error: 'Room not found'})
-                else
-                    return handleResp(res, 200, {
-                        success: 'Problems retrieved',
-                        problems: room.problems
-                    })
-            })
+    .get(validateUser, validateRoom, function(req, res) {
+        if (req.query.problem) {
+            Room.findOne({path: req.room.path})
+                .populate({
+                    path: 'problems',
+                    populate: {
+                        path: 'submissions',
+                        model: 'Submission'
+                    }
+                })
+                .exec(function (err, room) {
+                    if (err) return handleResp(res, 400, err.message)
+                    else {
+                        room.problems.forEach(function (prob) {
+                            if (prob.name == req.query.problem) {
+                                return handleResp(res, 200, {
+                                    submissions: prob.submissions,
+                                    tests: prob.test,
+                                    prob_desc: prob.desc,
+                                    success: 'Problem data loaded'
+                                })
+                            }
+                        }, function () {
+                            return handleResp(res, 404, 'Problem not found')
+                        })
+                    }
+                })
+        }
+        else {
+            Room
+                .findOne({path: req.room.path})
+                .populate('problems')
+                .exec(function(err, room) {
+                    if(err) return handleResp(res, 500, {error: err.message})
+                    else if (!room) return handleResp(res, 400, {error: 'Room not found'})
+                    else
+                        return handleResp(res, 200, {
+                            success: 'Problems retrieved',
+                            problems: room.problems
+                        })
+                })
+        }
     })
-    .delete(validateRoom, function(req, res) {
+    .delete(validateUser, validateRoom, function(req, res) {
         var prob_name = req.body.problem
         console.log(prob_name)
         if (!prob_name) {
@@ -142,7 +171,7 @@ router.route('/problems')
 
 
 router.route('/tests')
-    .delete(validateRoom, function (req, res) {
+    .delete(validateUser, validateRoom, function (req, res) {
         var prob_name = req.body.problem
         var test_id = req.body.id
         var test_type = req.body.type
