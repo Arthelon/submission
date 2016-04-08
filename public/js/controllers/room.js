@@ -64,6 +64,11 @@ angular.module('app.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
                 headers: {
                     'Content-Type': 'application/json'
                 }
+            }).then(function(res) {
+                $scope.success = res.data.success
+                $scope.problems.splice(index, 1)
+            }, function(err) {
+                $scope.error = err.data.error || err.error
             })
         }
         $scope.setSuccess = function(msg) {
