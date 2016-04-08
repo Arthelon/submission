@@ -117,31 +117,5 @@ router.route('/:room_path/:problem')
             }
         })
     })
-    .delete(validateRoom, function (req, res) {
-        var prob_name = req.params.problem
-        var test_id = req.body.id
-        var test_type = req.body.type
-        if (test_type != 'matches' && test_type != 'cases') {
-            return handleResp(res, 400, 'Invalid test type')
-        }
-        Problem.findOne({name: prob_name}, function (err, prob) {
-            if (err) {
-                return handleResp(res, 500, err.message)
-            } else if (!prob) {
-                return handleResp(res, 404, 'Problem not found')
-            } else if (prob.room.toString() == req.room._id.toString()) {
-                prob.update({
-                    $pull: {
-                        ['test.' + test_type]: { //Dynamic object key
-                            _id: test_id
-                        }
-                    }
-                }, (err) => {
-                    if (err) return handleResp(res, 500, err.message)
-                    else return handleResp(res, 200, {success: 'Test deleted'})
-                })
-            }
-        })
-    })
 
 module.exports = router
