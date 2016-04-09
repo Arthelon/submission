@@ -56,7 +56,7 @@ angular.module('app.problem', [])
                 }
             }).then(function(res) {
                 $scope.success = res.data.success
-                $scope[type].splice(index, 1)
+                $scope.tests[type].splice(index, 1)
             }, function(err) {
                 $scope.error = err.data.error
                 console.log(err)
@@ -102,7 +102,6 @@ angular.module('app.problem', [])
                 match: $scope.match
             }).then(function(res) {
                 $scope.setSuccess(res.data.success)
-
                 $scope.match = ''
             }, function(err) {
                 $scope.setError(err.data.error)
