@@ -52,28 +52,28 @@ block content
                                 tr(ng-repeat='item in tests.cases')
                                     td {{item.in}}
                                     td {{item.out}}
-                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}', 'cases')")
+                                        i.fa.fa-times.cross(ng-click="removeTest(item._id, 'cases', $index)")
                         .text-center(ng-if='tests.cases.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No I/O cases found
                     .col-md-3
-                        table.table.table-striped.table-hover(ng-if='test.matches.length > 0')
+                        table.table.table-striped.table-hover(ng-if='tests.matches.length > 0')
                             thead
                                 tr
                                     th Match
                             tbody#matches
                                 tr(ng-repeat='item in tests.matches')
                                     td {{item.text}}
-                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}', 'matches')")
+                                        i.fa.fa-times.cross(ng-click="removeTest(item._id, 'matches', $index)")
                         .text-center(ng-if='tests.matches.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No matches found
                     //.btns.text-center
                     //    a(ng-click='toggle = true') New Test
-                #createContent(ng-if='!toggle' ng-controller='FormControl')
-                    .col-md-6
+                #createContent.row(ng-if='!toggle' ng-controller='FormControl')
+                    .col-md-6.col-md-offset-3
                         form(ng-submit='submitCase()')
                             .form-group
                                 label.col-lg-4.control-label(for='caseInput') Input

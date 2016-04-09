@@ -28,11 +28,25 @@ angular.module('app.problem', [])
             }
         }
         $scope.removeSubmission = function(index) {
-
+            $http.delete('/api/submissions', {
+                data: {
+                    room_path: $scope.room_path,
+                    submission: $scope.submissions[index].name
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(res) {
+                $scope.success = res.data.success
+                $scope.submissions.splice(index, 1)
+            }, function(err) {
+                $scope.error = err.data.error
+            })
         }
-        $scope.removeTest = function(id, type) {
+        $scope.removeTest = function(id, type, index) {
             $http.delete('/api/tests', {
                 data: {
+                    room_path: $scope.room_path,
                     id: id,
                     problem: $scope.prob_name,
                     type: type
@@ -42,6 +56,7 @@ angular.module('app.problem', [])
                 }
             }).then(function(res) {
                 $scope.success = res.data.success
+                $scope[type].splice(index, 1)
             }, function(err) {
                 $scope.error = err.data.error
                 console.log(err)
@@ -52,6 +67,12 @@ angular.module('app.problem', [])
         }
         $scope.setError = function(msg) {
             $scope.error = msg
+        }
+        $scope.addCase = function(inp, out) {
+            $scope.tests.cases.push({in: inp, out: out})
+        }
+        $scope.addMatch = function(match) {
+            $scope.tests.matches.push(match)
         }
     }])
     .controller('FormControl', ['$scope', '$http', function($scope, $http) {
@@ -81,6 +102,7 @@ angular.module('app.problem', [])
                 match: $scope.match
             }).then(function(res) {
                 $scope.setSuccess(res.data.success)
+
                 $scope.match = ''
             }, function(err) {
                 $scope.setError(err.data.error)
