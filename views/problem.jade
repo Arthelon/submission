@@ -1,4 +1,5 @@
 extends ./layout
+
 block content
     div(ng-controller='problem' ng-init='loadPath();loadData()' ng-cloak)
         .header.btns
@@ -51,7 +52,7 @@ block content
                                 tr(ng-repeat='item in tests.cases')
                                     td {{item.in}}
                                     td {{item.out}}
-                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}')")
+                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}', 'cases')")
                         .text-center(ng-if='tests.cases.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
@@ -64,28 +65,28 @@ block content
                             tbody#matches
                                 tr(ng-repeat='item in tests.matches')
                                     td {{item.text}}
-                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}')")
+                                        i.fa.fa-times.cross(ng-click="removeTest('{{item._id}}', 'matches')")
                         .text-center(ng-if='tests.matches.length == 0')
                             .alert.alert-dismissible.alert-warning
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No matches found
-                    .btns.text-center.col-md-9
-                        a(ng-click='toggleForm = true') New Tests
-                #createContent(ng-if='toggleForm' ng-controller='FormControl')
+                    //.btns.text-center
+                    //    a(ng-click='toggle = true') New Test
+                #createContent(ng-if='!toggle' ng-controller='FormControl')
                     .col-md-6
-                        form
+                        form(ng-submit='submitCase()')
                             .form-group
                                 label.col-lg-4.control-label(for='caseInput') Input
-                                input#caseInput.form-control(name='in' type='text', placeholder='Required')
+                                input#caseInput.form-control(ng-model='case.in' name='in' type='text', placeholder='Required' ng-required)
                             .form-group
                                 label.col-lg-4.control-label(for='caseOutput') Expected Output
-                                input#caseOutput.form-control(name='out' type='text', placeholder='Required')
+                                input#caseOutput.form-control(ng-model='case.out' name='out' type='text', placeholder='Required' ng-required)
                             button.btn.btn-success(type='submit') Submit
                     .col-md-3
-                        form
+                        form(ng-submit='submitMatch()')
                             .form-group
                                 label.col-lg-4.control-label(for='matchString') Match
-                                input#matchString.form-control(name='match' type='text', placeholder='String to Capture')
+                                input#matchString.form-control(ng-model='match' name='match' type='text', placeholder='String to Capture' ng-required)
                             button.btn.btn-success(type='submit') Submit
             .msg.text-center
                 p(style='color:red;' ng-if='error' ng-bind='error')
