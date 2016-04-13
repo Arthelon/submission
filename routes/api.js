@@ -12,9 +12,47 @@ var Submission = models.Submission
 var Room = models.Room
 var File = models.File
 var Problem = models.Problem
+var User = models.User
 
 var async = require('async')
 var fs = require('fs')
+
+router.route('/register')
+    /*
+     username
+     password
+     email
+     first_name
+     last_name
+    */
+    .post(function(req, res) {
+        User.findOne({username: req.body.username}, function (err, user) {
+            if (err) {
+                return handleResp(res, 400, {error: err.message})
+            } else if (user) {
+                return handleResp(res, 400, {error: 'User already exists'})
+            } else {
+                var new_user = new User({
+                    username: req.body.username,
+                    password: req.body.password,
+                    email: req.body.email,
+                    first_name: req.body.first_name,
+                    last_name: req.body.last_name
+                })
+                if (new_user.validatePassword()) {
+                    new_user.save(function (err) {
+                        if (err) {
+                            return handleResp(res, 400, {error: err.message})
+                        } else {
+                            return handleResp(res, 200, {success: 'User Created'})
+                        }
+                    })
+                } else {
+                    return handleResp(res, 400, {error: 'Invalid password'})
+                }
+            }
+        })
+    })
 
 router.route('/login')
     .post(passport.authenticate('login'), function(req, res) {

@@ -1,5 +1,5 @@
 angular.module('app.login', [])
-    .controller('LoginCtrl', function($scope, $http, $window, $log) {
+    .controller('LoginCtrl', function($scope, $http, $window) {
         $scope.user = {
             username: '',
             password: ''
@@ -14,7 +14,7 @@ angular.module('app.login', [])
                     $window.location = '/dashboard'
                 },
                 function(err) {
-                    $scope.error = err.data
+                    $scope.error = err.data.error
                 }
             )
         }

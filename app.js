@@ -66,55 +66,18 @@ passport.use('login', new BasicStrategy(
             function (err, user) {
                 if (err)
                     return done(err);
-                if (!user) {
-                    return done(null, false)
+                else if (!user) {
+                    return done(new Error('User not found'), false)
                 }
-                if (!user.verifyPassword(password)) {
-                    return done(null, false)
+                else if (!user.verifyPassword(password)) {
+                    return done(new Error('Incorrect password'), false)
                 }
-                return done(null, user);
+                else {
+                    return done(null, user);
+                }
             }
         );
     }));
-
-
-passport.use('register', new BasicStrategy(
-    function (username, password, done) {
-        User.findOne({username: username}, function (err, user) {
-            if (err) {
-                return done(err, false)
-            } else if (user) {
-                return done(null, false,
-                    req.flash('error', 'Username already exists'))
-            } else if (req.body.password2 != password) {
-                return done(null, false,
-                    req.flash('error', 'Passwords don\'t match'))
-            } else {
-                var new_user = new User({
-                    username: username,
-                    password: password,
-                    email: req.body.email,
-                    first_name: req.body.first_name,
-                    last_name: req.body.last_name
-                })
-                if (new_user.validatePassword()) {
-                    new_user.save(function (err) {
-                        if (err) {
-                            return done(err, false,
-                                req.flash('error', 'Error occurred'))
-                        }
-                        else {
-                            return done(null, user,
-                                req.flash('msg', 'Success'))
-                        }
-                    })
-                } else {
-                    return done(null, false,
-                        req.flash('error', 'Invalid password'))
-                }
-            }
-        })
-    }))
 
 //Routing
 app.use('/', root);
