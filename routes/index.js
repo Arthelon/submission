@@ -59,37 +59,10 @@ router.route('/create_room')
         if (req.user) {
             res.render('create_room', {
                 title: 'submission | Create Room',
-                errors: req.flash('error')
+                ngApp: 'app.createRoom'
             })
         } else {
             res.redirect('/')
-        }
-    })
-    .post(function (req, res) {
-        if (req.user) {
-            Room.findOrCreate({
-                path: req.body.path,
-                name: req.body.name,
-                desc: req.body.desc,
-                owner: req.user._id
-            }, function (err, room, created) {
-                if (err) {
-                    return handleResp(res, 500, err.message)
-                } else if (!created) {
-                    return handleResp(res, 409, 'Room already exists')
-                } else {
-                    User.findOneAndUpdate({username: req.user.username}, {
-                        $push: {rooms: room._id}
-                    }, (err) => {
-                        if (err) {
-                            return handleResp(res, 500, err.message)
-                        }
-                    })
-                    return handleResp(res, 200, {success: 'Room Created'})
-                }
-            })
-        } else {
-            return handleResp(res, 401, 'Unvalidated user')
         }
     })
 

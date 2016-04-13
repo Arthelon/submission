@@ -13,7 +13,6 @@ router.route('/')
         } else {
             res.redirect('/')
         }
-
     })
 
 module.exports = router

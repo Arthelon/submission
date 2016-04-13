@@ -94,6 +94,29 @@ router.route('/rooms')
             })
         })
     })
+    .post(validateUser, function(req, res) {
+        Room.findOrCreate({
+            path: req.body.path,
+            name: req.body.name,
+            desc: req.body.desc,
+            owner: req.user._id
+        }, function (err, room, created) {
+            if (err) {
+                return handleResp(res, 500, err.message)
+            } else if (!created) {
+                return handleResp(res, 409, 'Room already exists')
+            } else {
+                User.findOneAndUpdate({username: req.user.username}, {
+                    $push: {rooms: room._id}
+                }, (err) => {
+                    if (err) {
+                        return handleResp(res, 500, err.message)
+                    }
+                })
+                return handleResp(res, 200, {success: 'Room Created'})
+            }
+        })
+    })
 
 router.route('/submissions')
     .get(validateUser, validateRoom, function(req, res) {

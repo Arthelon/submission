@@ -24,7 +24,7 @@ block content
                                     input#passwordInput.form-control(ng-model='user.password', type='password', placeholder='password' required)
                                 button.btn.btn-success(type='submit') Submit
                     .msg.text-center
-                        p(style='color:red;' ng-if='true') {{error}}
+                        p(style='color:red;' ng-if='error') {{error}}
 block script
     script(src='/js/controllers/login.js')
 
