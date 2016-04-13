@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router()
 var util = require('../util')
 var models = require('../models')
+var passport = require('passport')
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
@@ -15,6 +16,13 @@ var Problem = models.Problem
 var async = require('async')
 var fs = require('fs')
 
+router.route('/login')
+    .post(passport.authenticate('login'), function(req, res) {
+        res.status(200)
+        res.json({
+            success: 'Logged In'
+        })
+    })
 
 router.route('/rooms')
     .get(validateUser, function(req, res) {

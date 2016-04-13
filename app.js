@@ -15,8 +15,7 @@ var problem = require('./routes/problem')
 //Authentication setup
 var passport = require('passport');
 var session = require('express-session');
-var LocalStrategy = require('passport-local').Strategy
-var CustomStrategy = require('passport-custom').Strategy
+var BasicStrategy = require('passport-http').BasicStrategy
 
 //Mongoose
 var mongoose = require('mongoose')
@@ -24,6 +23,7 @@ var models = require('./models')
 
 //Misc
 var flash = require('express-flash')
+var handleResp = require('./util').handleResp
 
 var app = express();
 
@@ -60,21 +60,17 @@ passport.deserializeUser(function (id, done) {
 });
 
 //Passport Strategies
-passport.use('login', new LocalStrategy({
-        passReqToCallback: true
-    },
-    function (req, username, password, done) {
+passport.use('login', new BasicStrategy(
+    function (username, password, done) {
         User.findOne({username: username},
             function (err, user) {
                 if (err)
                     return done(err);
                 if (!user) {
-                    return done(null, false,
-                        req.flash('error', 'User Not found.'));
+                    return done(null, false)
                 }
                 if (!user.verifyPassword(password)) {
-                    return done(null, false,
-                        req.flash('error', 'Invalid Password'));
+                    return done(null, false)
                 }
                 return done(null, user);
             }
@@ -82,14 +78,11 @@ passport.use('login', new LocalStrategy({
     }));
 
 
-passport.use('register', new LocalStrategy({
-        passReqToCallback: true
-    },
-    function (req, username, password, done) {
+passport.use('register', new BasicStrategy(
+    function (username, password, done) {
         User.findOne({username: username}, function (err, user) {
             if (err) {
-                return done(err, false,
-                    req.flash('error', 'Error occurred'))
+                return done(err, false)
             } else if (user) {
                 return done(null, false,
                     req.flash('error', 'Username already exists'))

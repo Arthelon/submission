@@ -52,15 +52,11 @@ router.route('/login')
         } else {
             res.render('login', {
                 errors: req.flash('error'),
-                title: 'submission | Login'
+                title: 'submission | Login',
+                ngApp: 'app.login'
             })
         }
     })
-    .post(passport.authenticate('login', {
-        successRedirect: '/',
-        failureRedirect: '/login',
-        failureFlash: true
-    }))
 
 router.route('/create_room')
     .get(function (req, res) {

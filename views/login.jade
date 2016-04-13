@@ -5,7 +5,7 @@ block content
         //LOGO
         .float-left.btns
             a(href='/') Main
-    .container
+    .container(ng-controller='LoginCtrl')
         .container-fluid
             h3 Login Here
             hr
@@ -15,14 +15,15 @@ block content
                         .panel-heading.clearfix
                             h3.panel-title Login
                         .panel-body
-                            form(method='POST', action='/login')
+                            form(ng-submit='login()')
                                 .form-group
                                     label(for='usernameInput') Username
-                                    input#usernameInput.form-control(name='username', placeholder='username')
+                                    input#usernameInput.form-control(ng-model='user.username', placeholder='username' required)
                                 .form-group
                                     label(for='passwordInput') Password
-                                    input#passwordInput.form-control(name='password', type='password', placeholder='password')
-                                if errors
-                                    p #{errors}
+                                    input#passwordInput.form-control(ng-model='user.password', type='password', placeholder='password' required)
                                 button.btn.btn-success(type='submit') Submit
+                    p(style='color:red;' ng-if='true') {{error}}
+block script
+    script(src='/js/controllers/login.js')
 

@@ -1,4 +1,4 @@
-angular.module('app.room', ['ngAnimate', 'rootApp.services', 'ui.ace'])
+angular.module('app.room', ['ngAnimate', 'app.services', 'ui.ace'])
     .controller('room', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.room_path = null
         $scope.error = null
