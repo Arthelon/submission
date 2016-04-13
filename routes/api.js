@@ -18,13 +18,15 @@ var async = require('async')
 var fs = require('fs')
 
 router.route('/register')
-    /*
-     username
-     password
-     email
-     first_name
-     last_name
-    */
+    /**
+     * @api {post} /register Create new User
+     *
+     * @apiParam {String} username Users unique ID
+     * @apiParam {String} password Users password
+     * @apiParam {String} email Users contact email
+     * @apiParam {String} first_name Users first name
+     * @apiParam {String} last_name Users last name
+     */
     .post(function(req, res) {
         User.findOne({username: req.body.username}, function (err, user) {
             if (err) {
@@ -55,6 +57,12 @@ router.route('/register')
     })
 
 router.route('/login')
+    /**
+     * @api {post} /login Request user token
+     *
+     * @apiParam {String} username User's unique username
+     * @apiParam {String} password Corresponding password
+     */
     .post(passport.authenticate('login'), function(req, res) {
         res.status(200)
         res.json({

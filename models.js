@@ -2,6 +2,7 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var findOrCreate = require('mongoose-findorcreate')
 
+//Model Schemas
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
     name: String,
@@ -63,6 +64,8 @@ var ProblemSchema = new Schema({
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
 })
+
+//Model Hooks
 ProblemSchema.pre('remove', function (next) {
     models.Submission.find({
         prob: this._id
@@ -126,7 +129,7 @@ RoomSchema.pre('remove', function (next) {
     })
 })
 
-
+//Other Methods
 RoomSchema.methods.verifyID = function (id) {
     this.findById(id, function (err, found) {
         if (err) throw err
