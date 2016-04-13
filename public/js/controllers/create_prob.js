@@ -6,8 +6,11 @@ angular.module('app.createProb', [])
         }
         $scope.submit = function() {
             var loc = $location.absUrl().split('/')
-            console.log(loc[loc.length-1])
-            $http.post('/problem/'+loc[loc.length-1], $scope.form).then(function(res) {
+            $http.post('/api/problems', {
+                room_path: loc[loc.length-1], //Room path
+                name: $scope.form.name,
+                desc: $scope.form.desc
+            }).then(function(res) {
                 $scope.success = res.data.success
                 $scope.form = {
                     name: '',
