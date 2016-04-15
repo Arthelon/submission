@@ -10,7 +10,7 @@ var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
 
-router
+router.route('/')
     .get(validateUser, function(req, res) {
         models.User
             .findOne({

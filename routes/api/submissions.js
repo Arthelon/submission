@@ -34,7 +34,7 @@ var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
 
-router
+router.route('/')
     .get(validateRoom, function (req, res) {
         Room
             .findOne({

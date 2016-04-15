@@ -12,7 +12,7 @@ var handleResp = util.handleResp
 
 
 
-router
+router.route('/')
 .get(validateRoom, function (req, res) {
     Submission
         .findOne({

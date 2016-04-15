@@ -1,21 +1,31 @@
-var express = require('express')
-var router = express.Router()
-var util = require('../util')
-var models = require('../models')
+var router = require('express').Router()
+var User = require('../../models').User
 
-var register = require('./api/register')
-var login = require('./api/login')
-var rooms = require('./api/rooms')
-var submissions = require('./api/submissions')
-var problems = require('./api/problems')
-var sub = require('./api/sub')
+var util = require('../../util')
+var handleResp = util.handleResp
 
-router.use('/register', register)
-router.use('/login', login)
-router.use('/rooms', rooms)
-router.use('/submissions', submissions)
-router.use('/problems', problems)
-router.use('/sub', sub)
-
-
+router.route('/')
+/**
+ * @api {post} /login Request user token
+ *
+ * @apiParam {String} username User's unique username
+ * @apiParam {String} password Corresponding password
+ */
+    .post(util.validateBody(['username', 'password']), function(req, res) {
+        User.findOne({
+            username: req.body.username,
+            password: req.body.password
+        }, function(err, user) {
+            if (err) return handleResp(res, 400, {error: err.message})
+            else if (!user) return handleResp(res, 401, {error: 'User not found'})
+            else {
+                req.user = user
+                var token = util.generateToken(user)
+                return handleResp(res, 200, {
+                    success: 'Authentication successful',
+                    token: token
+                })
+            }
+        })
+    })
 module.exports = router

@@ -86,11 +86,11 @@ angular.module('app.controllers', [])
         $scope.login = function() {
             $http({
                 method: 'post',
-                url:'http://localhost:3000/login',
+                url:'http://localhost:3000/api/login',
                 data: $scope.user
             }).then(
                 function(res) {
-                    $log.log(res.data.token)
+                    $log.log(res.data)
                     $window.localStorage.setItem('JWT', res.data.token)
                     $window.location = '/dashboard'
                 },

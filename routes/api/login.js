@@ -4,7 +4,7 @@ var User = require('../../models').User
 var util = require('../../util')
 var handleResp = util.handleResp
 
-router
+router.route('/')
     /**
      * @api {post} /login Request user token
      *
@@ -28,5 +28,4 @@ router
             }
         })
     })
-
 module.exports = router

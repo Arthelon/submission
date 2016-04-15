@@ -11,7 +11,7 @@ var validateRoom = util.validateRoom
 var validateUser = util.validateUser
 var handleResp = util.handleResp
 
-router
+router.route('/')
     .delete(validateUser, validateRoom, function (req, res) {
         var prob_name = req.body.problem
         var test_id = req.body.id

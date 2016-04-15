@@ -3,7 +3,7 @@ var User = require('../../models').User
 
 var handleResp = require('../../util').handleResp
 
-router
+router.route('/')
     /**
      * @api {post} /register Create new User
      *

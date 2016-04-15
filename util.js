@@ -1,6 +1,7 @@
 var util = {}
 var Room = require('./models').Room
 
+var async = require('async')
 var jwt = require('jsonwebtoken')
 
 function handleResp(res, status, data) {
@@ -51,9 +52,11 @@ util.handleErr = function(next, status, msg) {
 
 util.validateBody = function(fields) {
     return function(req, res, next) {
-        fields.forEach(function(field) {
-            if (!req.hasOwnProperty(field)) {
+        async.each(fields, function(field, done) {
+            if (!req.body.hasOwnProperty(field)) {
                 return handleResp(res, 400, {error: 'Invalid fields'})
+            } else {
+                done()
             }
         }, function() {
             next()
@@ -64,6 +67,7 @@ util.validateBody = function(fields) {
 util.generateToken = function(user) {
     jwt.sign(user, process.env.SECRET || 'dev_secret',
         function(token) {
+            console.log(token)
             return token
         }
     )
