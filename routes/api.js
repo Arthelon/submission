@@ -15,7 +15,7 @@ router.use('/login', login)
 router.use('/rooms', rooms)
 router.use('/submissions', submissions)
 router.use('/problems', problems)
-router.sub('/sub', sub)
+router.use('/sub', sub)
 
 
 module.exports = router
