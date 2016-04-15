@@ -2,6 +2,9 @@ angular.module('app', [
     'app.services',
     'app.controllers',
     'angular-jwt',
+    'controllers.room',
+    'controllers.problem',
+    'controllers.dashboard'
 ])
 .config(['$httpProvider', 'jwtInterceptorProvider',
     function ($httpProvider, jwtInterceptorProvider) {

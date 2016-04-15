@@ -1,4 +1,4 @@
-angular.module('app.problem', [])
+angular.module('controllers.problem', [])
     .controller('ProblemCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.toggle = true
         $scope.toggleForm = false
@@ -75,7 +75,7 @@ angular.module('app.problem', [])
             $scope.tests.matches.push(match)
         }
     }])
-    .controller('ProblemFormControl', ['$scope', '$http', function($scope, $http) {
+    .controller('ProblemFormCtrl', ['$scope', '$http', function($scope, $http) {
         $scope.case = {
             in: '',
             out: ''
