@@ -48,6 +48,18 @@ util.handleErr = function(next, status, msg) {
     next(err)
 }
 
+util.validateBody = function(fields) {
+    return function(req, res, next) {
+        fields.forEach(function(field) {
+            if (!req.hasOwnProperty(field)) {
+                return handleResp(res, 400, {error: 'Invalid fields'})
+            }
+        }, function() {
+            next()
+        })
+    }
+}
+
 util.handleResp = handleResp
 
 module.exports = util
