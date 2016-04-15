@@ -3,23 +3,17 @@ var router = express.Router();
 var passport = require('passport')
 var models = require('../models')
 
-var User = models.User
 var Room = models.Room
 
-var handleResp = require('../util').handleResp
-var validateRoom = require('../util').validateRoom
-
-/* GET home page. */
 router.get('/', function (req, res) {
-    console.log(req.cookies)
     if (req.user) {
         res.redirect('/dashboard')
     } else {
         res.render('index', {
-            title: 'submission | Home'
-        });
+            title: 'submission | Main'
+        })
     }
-});
+})
 
 router.get('/logout', function (req, res) {
     if (req.user) {
@@ -33,7 +27,6 @@ router.route('/register')
         payload = {
             title: 'submission | Register',
             user: false,
-            ngApp: 'app.register'
         }
         if (req.user) {
             payload.user = true
@@ -52,7 +45,7 @@ router.route('/login')
             })
         }
     })
-    .post(passport.authenticate('local'), function(req, res) {
+    .post(passport.authenticate('local'), function (req, res) {
         res.redirect('/dashboard') //If login successful
     })
 
@@ -61,12 +54,9 @@ router.route('/create_room')
         if (req.user) {
             res.render('create_room', {
                 title: 'submission | Create Room',
-                ngApp: 'app.createRoom'
             })
         } else {
             res.redirect('/')
         }
     })
 
-
-module.exports = router;

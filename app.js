@@ -7,16 +7,12 @@ var bodyParser = require('body-parser');
 var expressSession = require('express-session');
 
 //routes
-var root = require('./routes/index');
+var routes = require('./routes')
 var api = require('./routes/api');
-var room = require('./routes/room');
-var dashboard = require('./routes/dashboard')
-var problem = require('./routes/problem')
 
 //JWT setup
 var jwt = require('jsonwebtoken')
-var expressJwt = require('express-jwt')
-var unless = ['/login'] //URLs that do not require JWT auth
+var expressJwt = require('express-jwt')//URLs that do not require JWT auth
 
 //Passport setup
 var passport = require('passport')
@@ -37,7 +33,9 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use('/api', expressJwt({secret: 'dev_secret'}).unless({path: ['/api/login']}))
+app.use('/api', expressJwt({secret: 'dev_secret'}).unless(['/api/login', {
+    url: '/api/submissions', methods: ['POST']
+}]))
 app.use(expressSession({secret: 'dev_session', resave: 'false', saveUninitialized: 'false'}));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -78,11 +76,15 @@ passport.use(new LocalStrategy(
 ));
 
 //Routing
-app.use('/', root);
-app.use('/room', room)
+var dashboard = require('./routes/dashboard')
+var problem = require('./routes/problem')
+var index = require('./routes/index')
+var room = require('./routes/room')
+
 app.use('/dashboard', dashboard)
 app.use('/problem', problem)
-app.use('/api', api)
+app.use('/room', room)
+app.use('/', index)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

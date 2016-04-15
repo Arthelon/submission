@@ -1,5 +1,5 @@
 angular.module('app.problem', [])
-    .controller('problem', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    .controller('ProblemCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.toggle = true
         $scope.toggleForm = false
         $scope.loadPath = function() {
@@ -75,7 +75,7 @@ angular.module('app.problem', [])
             $scope.tests.matches.push(match)
         }
     }])
-    .controller('FormControl', ['$scope', '$http', function($scope, $http) {
+    .controller('ProblemFormControl', ['$scope', '$http', function($scope, $http) {
         $scope.case = {
             in: '',
             out: ''

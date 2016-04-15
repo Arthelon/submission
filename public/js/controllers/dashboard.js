@@ -1,5 +1,5 @@
 angular.module('app.dashboard', [])
-    .controller('dashboard', ['$scope', '$http', function($scope, $http) {
+    .controller('DashCtrl', ['$scope', '$http', function($scope, $http) {
         $scope.loadRooms = function() {
             $http.get('/api/rooms').then(function(res) {
                 $scope.rooms = res.data.rooms
