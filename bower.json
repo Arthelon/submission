@@ -23,6 +23,7 @@
     "angular": "^1.5.3",
     "font-awesome": "fontawesome#^4.5.0",
     "angular-ui-ace": "^0.2.3",
-    "angular-route": "^1.5.3"
+    "angular-route": "^1.5.3",
+    "angular-jwt": "^0.0.9"
   }
 }

@@ -8,7 +8,6 @@ router.route('/:room_path')
         if (req.user) {
             res.render('create_prob', {
                 room_name: req.room.name,
-                errors: req.flash('error'),
                 ngApp: 'app.createProb'
             })
         } else {

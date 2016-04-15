@@ -1,8 +1,9 @@
 var util = {}
 var Room = require('./models').Room
 
+var jwt = require('jsonwebtoken')
+
 function handleResp(res, status, data) {
-    console.log(data)
     if (!(typeof data == 'object')) {
         data = {error: data}
     }
@@ -58,6 +59,14 @@ util.validateBody = function(fields) {
             next()
         })
     }
+}
+
+util.generateToken = function(user) {
+    jwt.sign(user, process.env.SECRET || 'dev_secret',
+        function(token) {
+            return token
+        }
+    )
 }
 
 util.handleResp = handleResp

@@ -1,4 +1,4 @@
-angular.module('app.login', [])
+angular.module('app.controllers', [])
     .controller('LoginCtrl', function($scope, $http, $window, $log) {
         $scope.user = {
             username: '',

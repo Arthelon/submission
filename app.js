@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var expressSession = require('express-session');
 
 //routes
 var root = require('./routes/index');
@@ -12,18 +13,21 @@ var room = require('./routes/room');
 var dashboard = require('./routes/dashboard')
 var problem = require('./routes/problem')
 
-//Authentication setup
-var passport = require('passport');
-var session = require('express-session');
-var BasicStrategy = require('passport-http').BasicStrategy
+//JWT setup
+var jwt = require('jsonwebtoken')
+var expressJwt = require('express-jwt')
+var unless = ['/login'] //URLs that do not require JWT auth
+
+//Passport setup
+var passport = require('passport')
+var LocalStrategy = require('passport-local').Strategy
 
 //Mongoose
 var mongoose = require('mongoose')
 var models = require('./models')
 
 //Misc
-var flash = require('express-flash')
-var handleResp = require('./util').handleResp
+var cors = require('cors')
 
 var app = express();
 
@@ -33,51 +37,45 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use('/api', expressJwt({secret: 'dev_secret'}).unless({path: ['/api/login']}))
+app.use(expressSession({secret: 'dev_session', resave: 'false', saveUninitialized: 'false'}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-app.use(session({secret: 'mySecretKey', resave: false, saveUninitialized: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'bower_components')))
-app.use(flash())
+app.use(cors())
 
-//Passport and express-session
+//Models
 var User = models.User
 var Room = models.Room
-app.use(passport.initialize());
-app.use(passport.session());
 
+var handleResp = require('./util').handleResp
 
-passport.serializeUser(function (user, done) {
+//Passport setup
+passport.serializeUser(function(user, done) {
     done(null, user._id);
 });
 
-passport.deserializeUser(function (id, done) {
-    User.findById(id, function (err, user) {
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
         done(err, user);
     });
 });
 
-//Passport Strategies
-passport.use('login', new BasicStrategy(
-    function (username, password, done) {
-        User.findOne({username: username},
-            function (err, user) {
-                if (err)
-                    return done(err);
-                else if (!user) {
-                    return done(new Error('User not found'), false)
-                }
-                else if (!user.verifyPassword(password)) {
-                    return done(new Error('Incorrect password'), false)
-                }
-                else {
-                    return done(null, user);
-                }
-            }
-        );
-    }));
+passport.use(new LocalStrategy(
+    function(username, password, done) {
+        User.findOne({ username: username }, function (err, user) {
+            if (err) { return handleResp(res, 400, {error: err.message}) }
+            if (!user) { return handleResp(res, 404, {error: 'User not found'}) }
+            if (!user.verifyPassword(password)) { return handleResp(res, 401, {error: 'Invalid password'}) }
+            return done(null, user);
+        });
+    }
+));
 
 //Routing
 app.use('/', root);

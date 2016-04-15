@@ -2,11 +2,12 @@ var express = require('express')
 var router = express.Router()
 var util = require('../util')
 var models = require('../models')
-var passport = require('passport')
+var jwt = require('jsonwebtoken')
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
+var validateBody = util.validateBody
 
 var Submission = models.Submission
 var Room = models.Room
@@ -63,10 +64,21 @@ router.route('/login')
      * @apiParam {String} username User's unique username
      * @apiParam {String} password Corresponding password
      */
-    .post(passport.authenticate('login'), function(req, res) {
-        res.status(200)
-        res.json({
-            success: 'Logged In'
+    .post(validateBody(['username', 'password']), function(req, res) {
+        User.findOne({
+            username: req.body.username,
+            password: req.body.password
+        }, function(err, user) {
+            if (err) return handleResp(res, 400, {error: err.message})
+            else if (!user) return handleResp(res, 401, {error: 'User not found'})
+            else {
+                req.user = user
+                var token = util.generateToken(user)
+                return handleResp(res, 200, {
+                    success: 'Authentication successful',
+                    token: token
+                })
+            }
         })
     })
 
@@ -212,7 +224,6 @@ router.route('/problems')
     })
     .delete(validateUser, validateRoom, function(req, res) {
         var prob_name = req.body.problem
-        console.log(prob_name)
         if (!prob_name) {
             return handleResp(res, 400, 'Invalid Request. Please enter problem name')
         }

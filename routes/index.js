@@ -11,6 +11,7 @@ var validateRoom = require('../util').validateRoom
 
 /* GET home page. */
 router.get('/', function (req, res) {
+    console.log(req.cookies)
     if (req.user) {
         res.redirect('/dashboard')
     } else {
@@ -30,7 +31,6 @@ router.get('/logout', function (req, res) {
 router.route('/register')
     .get(function (req, res) {
         payload = {
-            errors: req.flash('error'),
             title: 'submission | Register',
             user: false,
             ngApp: 'app.register'
@@ -47,11 +47,13 @@ router.route('/login')
             res.redirect('/dashboard')
         } else {
             res.render('login', {
-                errors: req.flash('error'),
                 title: 'submission | Login',
                 ngApp: 'app.login'
             })
         }
+    })
+    .post(passport.authenticate('local'), function(req, res) {
+        res.redirect('/dashboard') //If login successful
     })
 
 router.route('/create_room')
