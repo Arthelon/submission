@@ -91,6 +91,7 @@ angular.module('controllers.problem', [])
                 out: $scope.case.out
             }).then(function(res) {
                 $scope.setSuccess(res.data.success)
+                // $scope.addCase($scope.case.in, $scope.case.out)
                 $scope.case = {in:'', out:''}
             }, function(err) {
                 $scope.setError(err.data.error)
@@ -104,6 +105,7 @@ angular.module('controllers.problem', [])
                 match: $scope.match
             }).then(function(res) {
                 $scope.setSuccess(res.data.success)
+                // $scope.addMatch($scope.match)
                 $scope.match = ''
             }, function(err) {
                 $scope.setError(err.data.error)

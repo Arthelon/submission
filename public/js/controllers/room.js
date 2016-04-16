@@ -78,7 +78,6 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         }
 
         $scope.loadPath()
-        $scope.loadSubmissions()
     }])
     .animation('.tableItem', [function() {
         return {
@@ -96,7 +95,6 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         }
     }])
     .controller('RoomFormControl', ['$scope', '$http', function($scope, $http) {
-        $scope.loadPath()
         $scope.loadProblems()
         var fillerText = '# Enter code here'
         var defaultForm = {
@@ -125,8 +123,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
                     fd.append('file', editor_file, $scope.form.name+'.py')
                 }
-                fd.append('room_path', $scope.room_path)
-                $http.post('/api/submissions/', fd, {
+                $http.post('/room/'+$scope.room_path, fd, {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
                     })
@@ -138,7 +135,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     })
                     .error(function(err){
                         console.log(err)
-                        $scope.setError(err.data.error)
+                        $scope.setError(err.error || err.data.error)
                     });
             }
         }])

@@ -14,6 +14,9 @@ var handleResp = util.handleResp
 
 var multer = require('multer')
 var PythonShell = require('python-shell')
+var archiver = require('archiver')
+
+var validateRoom = util.validateRoom
 
 var upload = multer({
     dest: 'uploads/',
@@ -157,4 +160,31 @@ function createSubCb(req, res, sub) {
     })
 }
 
+router.route('/:room_path/:submission')
+    .get(validateRoom, function(req, res) {
+        Submission
+            .findOne({
+                name: req.params.submission
+            })
+            .populate('files')
+            .exec(function (err, sub) {
+                if (err) return handleResp(res, 500, {error: err.message})
+                else if (!sub) {
+                    return handleResp(res, 404, {error: 'Submission not found'})
+                } else if (sub.files.length == 1) {
+                    res.download('uploads/' + sub.files[0].loc, sub.files[0].name, (err) => {
+                        if (err) return handleResp(res, 500, {error: err.message})
+                    })
+                } else {
+                    var file_bundle = archiver.create('zip', {})
+                    file_bundle.pipe(res)
+                    sub.files.forEach(function (file) {
+                        file_bundle.append(fs.createReadStream('uploads/' + file.loc), {
+                            name: file.name
+                        })
+                    })
+                    file_bundle.finalize()
+                }
+            })
+    })
 module.exports = router

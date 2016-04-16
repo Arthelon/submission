@@ -17,7 +17,7 @@ block content
                     p #{room_desc}
             .container
                 .row
-                    .col-md-3
+                    .col-md-3(ng-init='loadSubmissions()')
                         ul.nav.nav-pills.nav-stacked
                             li(ng-click='subToggle=true' ng-class='{active: subToggle == true}')
                                 a(href='') Submissions
