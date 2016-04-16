@@ -9,7 +9,7 @@ angular.module('controllers.problem', [])
         }
         $scope.loadData = function() {
             $log.log($scope.prob_name, $scope.room_path)
-            // if (!$scope.hasOwnProperty('problems')) {
+            if (!$scope.hasOwnProperty('problems')) {
                 $http.get('/api/problems/'+$scope.prob_name, {
                     params: {
                         room_path: $scope.room_path
@@ -25,7 +25,7 @@ angular.module('controllers.problem', [])
                     $scope.error = err.data.error
                     console.log(err)
                 })
-            // }
+            }
         }
         $scope.removeSubmission = function(index) {
             $http.delete('/api/submissions', {
@@ -77,7 +77,7 @@ angular.module('controllers.problem', [])
         $scope.loadPath()
         $scope.loadData()
     }])
-    .controller('ProblemFormCtrl', ['$scope', '$http', function($scope, $http) {
+    .controller('ProblemFormCtrl', ['$scope', '$http', '$log', function($scope, $http, $log) {
         $scope.case = {
             in: '',
             out: ''

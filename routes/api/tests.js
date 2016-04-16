@@ -62,6 +62,7 @@ router.route('/')
      */
     .post(validateRoom, function (req, res) {
         var prob_name = req.body.problem
+        console.log(prob_name)
         Problem.findOne({name: prob_name}, function (err, prob) {
             if (err) {
                 return handleResp(res, 500, err.message)
@@ -90,3 +91,4 @@ router.route('/')
             }
         })
     })
+module.exports = router
