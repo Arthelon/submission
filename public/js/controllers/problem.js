@@ -73,6 +73,9 @@ angular.module('controllers.problem', [])
         $scope.addMatch = function(match) {
             $scope.tests.matches.push(match)
         }
+
+        $scope.loadPath()
+        $scope.loadData()
     }])
     .controller('ProblemFormCtrl', ['$scope', '$http', function($scope, $http) {
         $scope.case = {

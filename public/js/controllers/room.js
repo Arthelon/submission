@@ -76,78 +76,83 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         $scope.setError = function(msg) {
             $scope.error = msg
         }
+
+        $scope.loadPath()
+        $scope.loadSubmissions()
     }])
-        .animation('.tableItem', [function() {
-            return {
-                enter: function(element, done) {
-                    var $element = $(element)
-                    $element.css({
-                        opacity: 0
-                    })
-                    $element.fadeIn(400, done)
-                },
-                leave: function(element, done) {
-                    var $element = $(element)
-                    $element.fadeOut(300, done)
+    .animation('.tableItem', [function() {
+        return {
+            enter: function(element, done) {
+                var $element = $(element)
+                $element.css({
+                    opacity: 0
+                })
+                $element.fadeIn(400, done)
+            },
+            leave: function(element, done) {
+                var $element = $(element)
+                $element.fadeOut(300, done)
+            }
+        }
+    }])
+    .controller('RoomFormControl', ['$scope', '$http', function($scope, $http) {
+        $scope.loadPath()
+        $scope.loadProblems()
+        var fillerText = '# Enter code here'
+        var defaultForm = {
+            name: '',
+            user: '',
+            prob: 'None',
+            desc: ''
+        }
+        $scope.form = jQuery.extend({}, defaultForm)
+        $scope.editor = fillerText
+        $scope.submit = function() {
+            if ($scope.editor != fillerText && $scope.file) {
+                $scope.error = 'Can\'t accept submissions from both file(s) and text editor'
+            } else if ($scope.editor == fillerText && !$scope.file) {
+                $scope.error = 'Please submit data'
+            } else {
+                var fd = new FormData();
+                for (var key in $scope.form) {
+                    if ($scope.form.hasOwnProperty(key))
+                        fd.append(key, $scope.form[key])
+                    }
                 }
+                if ($scope.file)
+                    fd.append('file', $scope.file);
+                else {
+                    var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
+                    fd.append('file', editor_file, $scope.form.name+'.py')
+                }
+                fd.append('room_path', $scope.room_path)
+                $http.post('/api/submissions/', fd, {
+                        transformRequest: angular.identity,
+                        headers: {'Content-Type': undefined}
+                    })
+                    .success(function(res){
+                        console.log(res)
+                        $scope.setSuccess(res.success)
+                        $scope.form = jQuery.extend({}, defaultForm)
+                        $scope.editor = fillerText
+                    })
+                    .error(function(err){
+                        console.log(err)
+                        $scope.setError(err.data.error)
+                    });
             }
         }])
-        .controller('RoomFormControl', ['$scope', '$http', function($scope, $http) {
-            var fillerText = '# Enter code here'
-            var defaultForm = {
-                name: '',
-                user: '',
-                prob: 'None',
-                desc: ''
-            }
-            $scope.form = jQuery.extend({}, defaultForm)
-            $scope.editor = fillerText
-            $scope.submit = function() {
-                if ($scope.editor != fillerText && $scope.file) {
-                    $scope.error = 'Can\'t accept submissions from both file(s) and text editor'
-                } else if ($scope.editor == fillerText && !$scope.file) {
-                    $scope.error = 'Please submit data'
-                } else {
-                    var fd = new FormData();
-                    for (var key in $scope.form) {
-                        if ($scope.form.hasOwnProperty(key))
-                            fd.append(key, $scope.form[key])
-                        }
-                    }
-                    if ($scope.file)
-                        fd.append('file', $scope.file);
-                    else {
-                        var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
-                        fd.append('file', editor_file, $scope.form.name+'.py')
-                    }
-                    fd.append('room_path', $scope.room_path)
-                    $http.post('/api/submissions/', fd, {
-                            transformRequest: angular.identity,
-                            headers: {'Content-Type': undefined}
-                        })
-                        .success(function(res){
-                            console.log(res)
-                            $scope.setSuccess(res.success)
-                            $scope.form = jQuery.extend({}, defaultForm)
-                            $scope.editor = fillerText
-                        })
-                        .error(function(err){
-                            console.log(err)
-                            $scope.setError(err.data.error)
-                        });
-                }
-            }])
-        .directive('fileModel', ['$parse', function ($parse) {
-            return {
-                restrict: 'A',
-                link: function(scope, element, attrs) {
-                    var model = $parse(attrs.fileModel);
-                    var modelSetter = model.assign;
-                    element.bind('change', function(){
-                        scope.$apply(function(){
-                            modelSetter(scope, element[0].files[0]);
-                        });
+    .directive('fileModel', ['$parse', function ($parse) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attrs) {
+                var model = $parse(attrs.fileModel);
+                var modelSetter = model.assign;
+                element.bind('change', function(){
+                    scope.$apply(function(){
+                        modelSetter(scope, element[0].files[0]);
                     });
-                }
-            };
-        }]);
+                });
+            }
+        };
+    }]);

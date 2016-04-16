@@ -4,7 +4,7 @@ block content
         //LOGO
         .float-right.btns
             a(href='logout') Logout
-    .container(ng-controller='DashCtrl' ng-init='loadRooms()')
+    .container(ng-controller='DashCtrl')
         .row
             h1.text-center Welcome !{name}
         .row(ng-if='rooms.length > 0')

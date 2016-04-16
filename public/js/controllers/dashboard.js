@@ -23,4 +23,6 @@ angular.module('controllers.dashboard', [])
                 console.log(err)
             })
         }
+
+        $scope.loadRooms()
     }])

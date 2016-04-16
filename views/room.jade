@@ -15,7 +15,7 @@ block content
                 .row.text-center
                     h1 #{room_name}
                     p #{room_desc}
-            .container(ng-init="loadPath();loadSubmissions()")
+            .container
                 .row
                     .col-md-3
                         ul.nav.nav-pills.nav-stacked
@@ -82,7 +82,7 @@ block content
                     .row.text-center
                         h1 #{room_name}
                         p #{room_desc}
-                .panel.panel-default(ng-init='loadPath();loadProblems()')
+                .panel.panel-default
                     .panel-body
                         form#uploadForm
                             .form-group.row
