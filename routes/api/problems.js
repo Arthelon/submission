@@ -22,47 +22,31 @@ router.route('/:problem')
      * @apiSuccess {Object[]} submissions List of submissions
      */
     .get(validateRoom, function(req, res) {
-        if (req.params.problem) {
-            Room.findOne({path: req.room.path})
-                .populate({
-                    path: 'problems',
-                    populate: {
-                        path: 'submissions',
-                        model: 'Submission'
-                    }
-                })
-                .exec(function (err, room) {
-                    if (err) return handleResp(res, 400, err.message)
-                    else {
-                        room.problems.forEach(function (prob) {
-                            if (prob.name == req.query.problem) {
-                                return handleResp(res, 200, {
-                                    submissions: prob.submissions,
-                                    tests: prob.test,
-                                    prob_desc: prob.desc,
-                                    success: 'Problem data loaded'
-                                })
-                            }
-                        }, function () {
-                            return handleResp(res, 404, {error: 'Problem not found'})
-                        })
-                    }
-                })
-        }
-        else {
-            Room
-                .findOne({path: req.room.path})
-                .populate('problems')
-                .exec(function(err, room) {
-                    if(err) return handleResp(res, 500, {error: err.message})
-                    else if (!room) return handleResp(res, 400, {error: 'Room not found'})
-                    else
-                        return handleResp(res, 200, {
-                            success: 'Problems retrieved',
-                            problems: room.problems
-                        })
-                })
-        }
+        Room.findOne({path: req.room.path})
+            .populate({
+                path: 'problems',
+                populate: {
+                    path: 'submissions',
+                    model: 'Submission'
+                }
+            })
+            .exec(function (err, room) {
+                if (err) return handleResp(res, 400, err.message)
+                else {
+                    room.problems.forEach(function (prob) {
+                        if (prob.name == req.query.problem) {
+                            return handleResp(res, 200, {
+                                submissions: prob.submissions,
+                                tests: prob.test,
+                                prob_desc: prob.desc,
+                                success: 'Problem data loaded'
+                            })
+                        }
+                    }, function () {
+                        return handleResp(res, 404, {error: 'Problem not found'})
+                    })
+                }
+            })
     })
     /**
      * @api {delete} /api/problems/:problem Remove problem
@@ -103,6 +87,26 @@ router.route('/:problem')
     })
 
 router.route('/')
+    /**
+     * @api {get} /api/problems Get Problems
+     *
+     * @apiSuccess {Object[]} problems List of problems
+     * @apiSuccess {String} success Success message
+     */
+    .get(validateRoom, function(req, res) {
+        Room
+            .findOne({path: req.room.path})
+            .populate('problems')
+            .exec(function(err, room) {
+                if(err) return handleResp(res, 500, {error: err.message})
+                else if (!room) return handleResp(res, 400, {error: 'Room not found'})
+                else
+                    return handleResp(res, 200, {
+                        success: 'Problems retrieved',
+                        problems: room.problems
+                    })
+            })
+    })
     /**
      * @api {post} /api/problems Create Problem
      *
