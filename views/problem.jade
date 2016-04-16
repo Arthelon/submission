@@ -89,5 +89,5 @@ block content
                                 input#matchString.form-control(ng-model='match' name='match' type='text', placeholder='String to Capture' ng-required)
                             button.btn.btn-success(type='submit') Submit
             .msg.text-center
-                p(style='color:red;' ng-if='error' ng-bind='error')
-                p(style='color:green;' ng-if='success' ng-bind='success')
+                p(style='color:red;' ng-if='error') {{error}}
+                p(style='color:green;' ng-if='success') {{success}}

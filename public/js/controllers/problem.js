@@ -1,5 +1,5 @@
 angular.module('controllers.problem', [])
-    .controller('ProblemCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    .controller('ProblemCtrl', ['$scope', '$http', '$location', '$log', function($scope, $http, $location, $log) {
         $scope.toggle = true
         $scope.toggleForm = false
         $scope.loadPath = function() {
@@ -8,7 +8,8 @@ angular.module('controllers.problem', [])
             $scope.prob_name = loc[loc.length-1]
         }
         $scope.loadData = function() {
-            if (!$scope.hasOwnProperty('problems')) {
+            $log.log($scope.prob_name, $scope.room_path)
+            // if (!$scope.hasOwnProperty('problems')) {
                 $http.get('/api/problems/'+$scope.prob_name, {
                     params: {
                         room_path: $scope.room_path
@@ -24,7 +25,7 @@ angular.module('controllers.problem', [])
                     $scope.error = err.data.error
                     console.log(err)
                 })
-            }
+            // }
         }
         $scope.removeSubmission = function(index) {
             $http.delete('/api/submissions', {
@@ -73,7 +74,6 @@ angular.module('controllers.problem', [])
         $scope.addMatch = function(match) {
             $scope.tests.matches.push(match)
         }
-
         $scope.loadPath()
         $scope.loadData()
     }])

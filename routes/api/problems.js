@@ -34,7 +34,7 @@ router.route('/:problem')
                 if (err) return handleResp(res, 400, err.message)
                 else {
                     room.problems.forEach(function (prob) {
-                        if (prob.name == req.query.problem) {
+                        if (prob.name == req.params.problem) {
                             return handleResp(res, 200, {
                                 submissions: prob.submissions,
                                 tests: prob.test,
