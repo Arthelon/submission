@@ -56,10 +56,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
 
         }
         $scope.removeProblem = function(index) {
-            $http.delete('/api/problems', {
+            $http.delete('/api/problems/'+$scope.problems[index].name, {
                 data: {
                     room_path: $scope.room_path,
-                    problem: $scope.problems[index].name
                 },
                 headers: {
                     'Content-Type': 'application/json'

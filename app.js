@@ -89,7 +89,7 @@ var apiLogin = require('./routes/api/login')
 var apiRooms = require('./routes/api/rooms')
 var apiSubmissions = require('./routes/api/submissions')
 var apiProblems = require('./routes/api/problems')
-var apiSub = require('./routes/api/sub')
+var apiSub = require('./routes/api/subs')
 
 app.use('/api/register', apiRegister)
 app.use('/api/login', apiLogin)

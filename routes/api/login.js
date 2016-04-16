@@ -6,7 +6,7 @@ var handleResp = util.handleResp
 
 router.route('/')
     /**
-     * @api {post} /login Request user token
+     * @api {post} /api/login Get JWT token
      *
      * @apiParam {String} username User's unique username
      * @apiParam {String} password Corresponding password

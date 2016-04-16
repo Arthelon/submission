@@ -9,10 +9,9 @@ angular.module('controllers.problem', [])
         }
         $scope.loadData = function() {
             if (!$scope.hasOwnProperty('problems')) {
-                $http.get('/api/problems', {
+                $http.get('/api/problems/'+$scope.prob_name, {
                     params: {
-                        room_path: $scope.room_path,
-                        problem: $scope.prob_name
+                        room_path: $scope.room_path
                     }
                 }).then(function(res) {
                     $scope.success = res.data.success

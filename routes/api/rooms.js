@@ -8,9 +8,15 @@ var util = require('../../util')
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
-var validateUser = util.validateUser
+var validateBody = util.validateBody
 
 router.route('/')
+    /**
+     * @api {get} /api/rooms Rooms list
+     *
+     * @apiSuccess {String} success Success message
+     * @apiSuccess {Object[]} rooms List of rooms
+     */
     .get(function(req, res) {
         models.User
             .findOne({
@@ -26,7 +32,13 @@ router.route('/')
                 })
             })
     })
-    .delete(validateUser, validateRoom, function(req, res) {
+    /**
+     * @api {delete} /api/rooms Remove room
+     *
+     * @apiParam {String} room_path Room path
+     * @apiSuccess {String} success Success message
+     */
+    .delete(validateRoom, function(req, res) {
         req.room.remove((err) => {
             if (err) return handleResp(res, 500, err.message)
             else return handleResp(res, 200, {
@@ -34,7 +46,16 @@ router.route('/')
             })
         })
     })
-    .post(function(req, res) {
+    /**
+     * @api {post} /api/rooms Create room
+     *
+     * @apiParam {String} room_path Room path
+     * @apiParam {String} name Room name
+     * @apiParam {String} desc Room description
+     *
+     * @apiSuccess {String} success Success message
+     */
+    .post(validateBody(['room_path', 'name', 'desc']), function(req, res) {
         Room.findOrCreate({
             path: req.body.room_path,
             name: req.body.name,

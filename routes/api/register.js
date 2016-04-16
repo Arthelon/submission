@@ -5,13 +5,15 @@ var handleResp = require('../../util').handleResp
 
 router.route('/')
     /**
-     * @api {post} /register Create new User
+     * @api {post} /api/register Create new User
      *
      * @apiParam {String} username Users unique ID
      * @apiParam {String} password Users password
      * @apiParam {String} email Users contact email
      * @apiParam {String} first_name Users first name
      * @apiParam {String} last_name Users last name
+     *
+     * @apiSuccess {String} success Success message
      */
     .post(function(req, res) {
         User.findOne({username: req.body.username}, function (err, user) {

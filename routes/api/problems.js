@@ -11,10 +11,19 @@ var util = require('../../util')
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 var validateUser = util.validateUser
+var validateBody = util.validateBody
 
-router.route('/')
+router.route('/:problem')
+    /**
+     * @api {get} /api/problems/:problem Get problems list
+     * 
+     * @apiSuccess {Object} tests Object containing problem tests
+     * @apiSuccess {String} prob_desc Problem Description
+     * @apiSuccess {String} success Success message
+     * @apiSuccess {Object[]} submissions List of submissions
+     */
     .get(validateRoom, function(req, res) {
-        if (req.query.problem) {
+        if (req.params.problem) {
             Room.findOne({path: req.room.path})
                 .populate({
                     path: 'problems',
@@ -36,7 +45,7 @@ router.route('/')
                                 })
                             }
                         }, function () {
-                            return handleResp(res, 404, 'Problem not found')
+                            return handleResp(res, 404, {error: 'Problem not found'})
                         })
                     }
                 })
@@ -56,66 +65,79 @@ router.route('/')
                 })
         }
     })
-        .delete(validateUser, validateRoom, function(req, res) {
-            var prob_name = req.body.problem
-            if (!prob_name) {
-                return handleResp(res, 400, 'Invalid Request. Please enter problem name')
-            }
-            Problem.findOne({name: prob_name},
-                function (err, prob) {
-                    if (err) {
-                        return handleResp(res, 500, err.message)
-                    } else if (!prob) {
-                        return handleResp(res, 404, 'Problem not found')
-                    } else if (prob.room.toString() == req.room._id.toString()) {
-                        prob.remove(function (err) {
-                            if (err) {
-                                return handleResp(res, 500, err.message)
-                            } else {
-                                req.room.update({
-                                    $pull: {
-                                        problems: prob._id
-                                    }
-                                }, (err) => {
-                                    if (err) {
-                                        return handleResp(res, 500, err.message)
-                                    } else {
-                                        return handleResp(res, 200, {success: 'Problem deleted'})
-                                    }
-                                })
-                            }
-                        })
-                    } else {
-                        return handleResp(res, 401, 'Room doesn\'t belong to user')
-                    }
-                })
-        })
-        .post(validateUser, validateRoom, function(req, res) {
-            if (req.body.name && req.body.desc) {
-                if (!req.body.name.match(/^[\d\w]+$/)) {
-                    return handleResp(res, 400, 'Name can only consist of alphanumeric characters')
+    /**
+     * @api {delete} /api/problems/:problem Remove problem
+     *
+     * @apiParam {String} room_path Room path
+     * @apiSuccess {String} success Success message
+     */
+    .delete(validateRoom, function(req, res) {
+        var prob_name = req.params.problem
+        Problem.findOne({name: prob_name},
+            function (err, prob) {
+                if (err) {
+                    return handleResp(res, 500, err.message)
+                } else if (!prob) {
+                    return handleResp(res, 404, 'Problem not found')
+                } else if (prob.room.toString() == req.room._id.toString()) {
+                    prob.remove(function (err) {
+                        if (err) {
+                            return handleResp(res, 500, err.message)
+                        } else {
+                            req.room.update({
+                                $pull: {
+                                    problems: prob._id
+                                }
+                            }, (err) => {
+                                if (err) {
+                                    return handleResp(res, 500, err.message)
+                                } else {
+                                    return handleResp(res, 200, {success: 'Problem deleted'})
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    return handleResp(res, 401, 'Room doesn\'t belong to user')
                 }
-                Problem.findOrCreate({
-                    name: req.body.name,
-                    desc: req.body.desc,
-                    room: req.room._id
-                }, (err, prob, created) => {
-                    if (err) {
-                        return handleResp(res, 500, err.message)
-                    }
-                    else if (!created) {
-                        return handleResp(res, 404, 'Problem already exists')
-                    } else {
-                        Room.findOneAndUpdate({
-                            _id: req.room._id
-                        }, {$push: {problems: prob._id}}, (err) => {
-                            if (err) return handleResp(res, 500, err.message)
-                        })
-                        return handleResp(res, 200, {success: 'Problem Created'})
-                    }
-                })
-            } else {
-                return handleResp(res, 400, 'Fields not filled')
+            })
+    })
+
+router.route('/')
+    /**
+     * @api {post} /api/problems Create Problem
+     *
+     * @apiParam {String} name Problem name
+     * @apiParam {String} desc Problem description
+     *
+     * @apiSuccess {String} success Success message
+     */
+    .post(validateRoom, validateBody(['name', 'desc']), function(req, res) {
+        if (req.body.name && req.body.desc) {
+            if (!req.body.name.match(/^[\d\w]+$/)) {
+                return handleResp(res, 400, 'Name can only consist of alphanumeric characters')
             }
-        })
+            Problem.findOrCreate({
+                name: req.body.name,
+                desc: req.body.desc,
+                room: req.room._id
+            }, (err, prob, created) => {
+                if (err) {
+                    return handleResp(res, 500, err.message)
+                }
+                else if (!created) {
+                    return handleResp(res, 404, 'Problem already exists')
+                } else {
+                    Room.findOneAndUpdate({
+                        _id: req.room._id
+                    }, {$push: {problems: prob._id}}, (err) => {
+                        if (err) return handleResp(res, 500, err.message)
+                    })
+                    return handleResp(res, 200, {success: 'Problem Created'})
+                }
+            })
+        } else {
+            return handleResp(res, 400, 'Fields not filled')
+        }
+    })
 module.exports = router
