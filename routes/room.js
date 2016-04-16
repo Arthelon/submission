@@ -21,7 +21,6 @@ var upload = multer({
         fileSize: 100000000 //100 MB
     }
 })
-
 var NotFoundError = require('../errors').NotFoundError
 
 router.route('/:room_path')

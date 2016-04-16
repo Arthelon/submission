@@ -21,7 +21,7 @@ angular.module('app.controllers', [])
             })
         }
     }])
-    .controller('CreateRoomCtrl', function($scope, $http, $log) {
+    .controller('CreateRoomCtrl', function($scope, $http) {
         $scope.form = {}
         $scope.submit = function() {
             $http.post('/api/rooms' , $scope.form).then(function(res) {

@@ -49,15 +49,15 @@ router.route('/')
     /**
      * @api {post} /api/rooms Create room
      *
-     * @apiParam {String} room_path Room path
+     * @apiParam {String} path Room path
      * @apiParam {String} name Room name
      * @apiParam {String} desc Room description
      *
      * @apiSuccess {String} success Success message
      */
-    .post(validateBody(['room_path', 'name', 'desc']), function(req, res) {
+    .post(validateBody(['path', 'name', 'desc']), function(req, res) {
         Room.findOrCreate({
-            path: req.body.room_path,
+            path: req.body.path,
             name: req.body.name,
             desc: req.body.desc,
             owner: req.user._id

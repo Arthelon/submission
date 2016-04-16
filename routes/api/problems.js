@@ -107,6 +107,7 @@ router.route('/')
     /**
      * @api {post} /api/problems Create Problem
      *
+     * @apiParam {String} room_path Room path
      * @apiParam {String} name Problem name
      * @apiParam {String} desc Problem description
      *
