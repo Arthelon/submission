@@ -110,9 +110,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                 } else {
                     var fd = new FormData();
                     for (var key in $scope.form) {
-                        if (!$scope.form.hasOwnProperty(key))
-                            continue
-                        else {
+                        if ($scope.form.hasOwnProperty(key))
                             fd.append(key, $scope.form[key])
                         }
                     }
@@ -138,8 +136,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                             $scope.setError(err.data.error)
                         });
                 }
-            }
-        }])
+            }])
         .directive('fileModel', ['$parse', function ($parse) {
             return {
                 restrict: 'A',

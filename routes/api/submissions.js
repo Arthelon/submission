@@ -26,8 +26,6 @@ router.route('/')
     /**
      * @api {get} /api/submissions Retrieve submissions
      *
-     * @apiParam {String} room_path Room path
-     *
      * @apiSuccess {String} success Success message
      * @apiSuccess {Object[]} submissions Submissions list
      */

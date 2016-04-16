@@ -10,9 +10,20 @@ var util = require('../../util')
 var validateRoom = util.validateRoom
 var validateUser = util.validateUser
 var handleResp = util.handleResp
+var validateBody = util.validateBody
 
 router.route('/')
-    .delete(validateUser, validateRoom, function (req, res) {
+    /**
+     * @api {delete} /api/tests Remove test
+     *
+     * @apiParam {String} room_path Room path
+     * @apiParam {String} problem Problem name
+     * @apiParam {String} id Test id
+     * @apiParam {String='cases', 'matches'} type Test type
+     *
+     * @apiSuccess {String} success Success message
+     */
+    .delete(validateRoom, validateBody(['type', 'id', 'problem']), function (req, res) {
         var prob_name = req.body.problem
         var test_id = req.body.id
         var test_type = req.body.type
@@ -38,7 +49,18 @@ router.route('/')
             }
         })
     })
-    .post(validateUser, validateRoom, function (req, res) {
+    /**
+     * @api {post} /api/tests Create test
+     *
+     * @apiParam {String} room_path Room path
+     * @apiParam {String} problem Problem name
+     * @apiParam {String} [in] Test input
+     * @apiParam {String} [out] Test output
+     * @apiParam {String} [match] Test match string
+     *
+     * @apiSuccess {String} success Success message
+     */
+    .post(validateRoom, function (req, res) {
         var prob_name = req.body.problem
         Problem.findOne({name: prob_name}, function (err, prob) {
             if (err) {
@@ -60,7 +82,7 @@ router.route('/')
                     if (err) {
                         return handleResp(res, 500, err.message)
                     } else {
-                        return handleResp(res, 200, {success: 'Success'})
+                        return handleResp(res, 200, {success: 'Test created'})
                     }
                 })
             } else {

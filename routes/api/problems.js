@@ -10,12 +10,11 @@ var util = require('../../util')
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
-var validateUser = util.validateUser
 var validateBody = util.validateBody
 
 router.route('/:problem')
     /**
-     * @api {get} /api/problems/:problem Get problems list
+     * @api {get} /api/problems/:problem Get problems details
      * 
      * @apiSuccess {Object} tests Object containing problem tests
      * @apiSuccess {String} prob_desc Problem Description
