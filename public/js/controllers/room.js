@@ -123,7 +123,8 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                         var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
                         fd.append('file', editor_file, $scope.form.name+'.py')
                     }
-                    $http.post('/room/'+$scope.room_path, fd, {
+                    fd.append('room_path', $scope.room_path)
+                    $http.post('/api/submissions/', fd, {
                             transformRequest: angular.identity,
                             headers: {'Content-Type': undefined}
                         })

@@ -27,7 +27,7 @@ util.validateRoom = function (req, res, next) {
             return next(err)
         } else if (!room) {
             return handleResp(res, 404, 'Room not found')
-        } else if (req.user && req.user._id.toString() != room.owner.toString()) {
+        } else if (req.user && req.user._id != room.owner.toString()) {
             return handleResp(res, 406, 'User does not own room')
         } else {
             req.room = room
@@ -65,12 +65,7 @@ util.validateBody = function(fields) {
 }
 
 util.generateToken = function(user) {
-    jwt.sign(user, process.env.SECRET || 'dev_secret',
-        function(token) {
-            console.log(token)
-            return token
-        }
-    )
+    return jwt.sign(user, process.env.SECRET || 'dev_secret')
 }
 
 util.handleResp = handleResp

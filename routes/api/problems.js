@@ -13,7 +13,7 @@ var handleResp = util.handleResp
 var validateUser = util.validateUser
 
 router.route('/')
-    .get(validateUser, validateRoom, function(req, res) {
+    .get(validateRoom, function(req, res) {
         if (req.query.problem) {
             Room.findOne({path: req.room.path})
                 .populate({

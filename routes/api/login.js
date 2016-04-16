@@ -21,6 +21,7 @@ router.route('/')
             else {
                 req.user = user
                 var token = util.generateToken(user)
+                console.log(token)
                 return handleResp(res, 200, {
                     success: 'Authentication successful',
                     token: token

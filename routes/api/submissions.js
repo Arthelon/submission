@@ -4,6 +4,7 @@ var models = require('../../models')
 var Room = models.Room
 var Submission = models.Submission
 var Problem = models.Problem
+var File = models.File
 var async = require('async')
 var fs = require('fs')
 
@@ -101,7 +102,6 @@ router.route('/')
                 } else {
                     req.files.forEach(function (file, findex) {
                         fs.readFile(file.path, 'utf8', function (err, data) {
-                            console.log('1')
                             if (err) return handleTestFail(req, res, err.message)
                             else if (!data) return handleTestFail(req, res, 'File not found')
                             else async.each(prob.test.matches, function (match, cb) {
@@ -167,7 +167,7 @@ function createSubCb(req, res, sub) {
             return handleResp(res, 500, {error: err.message})
         } else {
             Room.findOneAndUpdate({
-                path: req.params.room_path
+                path: req.body.room_path
             }, {$push: {submissions: submission._id}}, (err, room) => {
                 if (err) {
                     return handleResp(res, 500, {error: err.message})

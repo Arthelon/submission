@@ -11,7 +11,7 @@ var handleResp = util.handleResp
 var validateUser = util.validateUser
 
 router.route('/')
-    .get(validateUser, function(req, res) {
+    .get(function(req, res) {
         models.User
             .findOne({
                 username: req.user.username
@@ -34,9 +34,9 @@ router.route('/')
             })
         })
     })
-    .post(validateUser, function(req, res) {
+    .post(function(req, res) {
         Room.findOrCreate({
-            path: req.body.path,
+            path: req.body.room_path,
             name: req.body.name,
             desc: req.body.desc,
             owner: req.user._id

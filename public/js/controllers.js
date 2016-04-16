@@ -1,26 +1,4 @@
 angular.module('app.controllers', [])
-    .controller('LoginCtrl', function($scope, $http, $window, $log) {
-        $scope.user = {
-            username: '',
-            password: ''
-        }
-        $scope.login = function() {
-            $http({
-                method: 'post',
-                url:'http://localhost:3000/login',
-                data: $scope.user
-            }).then(
-                function(res) {
-                    $log.log(res.data.token)
-                    $window.localStorage.setItem('JWT', res.data.token)
-                    $window.location = '/dashboard'
-                },
-                function(err) {
-                    $scope.error = err.data.error
-                }
-            )
-        }
-    })
     .controller('CreateProbCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.form = {
             name: '',
@@ -86,13 +64,16 @@ angular.module('app.controllers', [])
         $scope.login = function() {
             $http({
                 method: 'post',
-                url:'http://localhost:3000/api/login',
+                url:'/api/login',
                 data: $scope.user
             }).then(
                 function(res) {
-                    $log.log(res.data)
                     $window.localStorage.setItem('JWT', res.data.token)
-                    $window.location = '/dashboard'
+                    $http.post('/login', $scope.user).then(function(){
+                        $window.location = '/dashboard'
+                    }, function(err) {
+                        $scope.error = err.data.error
+                    })
                 },
                 function(err) {
                     $scope.error = err.data.error

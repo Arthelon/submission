@@ -1,19 +1,23 @@
 var express = require('express')
 var router = express.Router()
-var multer = require('multer')
-var fs = require('fs')
 
-var validateRoom = require('../util').validateRoom
+var Room = require('../models').Room
+
+var NotFoundError = require('../errors').NotFoundError
 
 router.route('/:room_path')
-    .get(validateRoom, function (req, res) {
-        payload = {
-            room_name: req.room.name,
-            room_desc: req.room.desc,
-            ngApp: 'app.room'
-        }
-        payload.user_authenticated = req.user ? true : false
-        res.render('room', payload)
+    .get(function (req, res, next) {
+        Room.findOne({path: req.params.room_path}, function(err, room) {
+            if (err || !room) next(err || new NotFoundError('404'))
+            else {
+                payload = {
+                    room_name: room.name,
+                    room_desc: room.desc
+                }
+                payload.user_authenticated = req.user ? true : false
+                res.render('room', payload)
+            }
+        })
     })
 
 module.exports = router
