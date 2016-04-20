@@ -65,7 +65,7 @@ util.validateBody = function(fields) {
 }
 
 util.generateToken = function(user) {
-    return jwt.sign(user, process.env.SECRET || 'dev_secret')
+    return jwt.sign(user.toObject(), process.env.SECRET || 'dev_secret')
 }
 
 util.handleResp = handleResp

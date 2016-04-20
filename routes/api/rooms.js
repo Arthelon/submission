@@ -18,6 +18,7 @@ router.route('/')
      * @apiSuccess {Object[]} rooms List of rooms
      */
     .get(function(req, res) {
+        console.log(req.user)
         models.User
             .findOne({
                 username: req.user.username
