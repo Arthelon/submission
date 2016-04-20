@@ -2,6 +2,7 @@ var router = require('express').Router()
 var User = require('../../models').User
 
 var handleResp = require('../../util').handleResp
+var validateBody = require('../../util').validateBody
 
 router.route('/')
     /**
@@ -15,7 +16,7 @@ router.route('/')
      *
      * @apiSuccess {String} success Success message
      */
-    .post(function(req, res) {
+    .post(validateBody(['username', 'password', 'email', 'first_name', 'last_name']), function(req, res) {
         User.findOne({username: req.body.username}, function (err, user) {
             if (err) {
                 return handleResp(res, 400, {error: err.message})

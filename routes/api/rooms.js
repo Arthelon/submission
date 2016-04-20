@@ -26,6 +26,7 @@ router.route('/')
             .sort('username')
             .exec(function (err, user) {
                 if (err) return handleResp(res, 400, err.message)
+                else if (!user) return handleResp(res, 400,'User not found')
                 return handleResp(res, 200, {
                     success: 'Rooms retrieved',
                     rooms: user.rooms
