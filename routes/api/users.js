@@ -5,8 +5,11 @@ var handleResp = require('../../util').handleResp
 var validateBody = require('../../util').validateBody
 
 router.route('/')
+    .get(function(req, res) {
+    })
+
     /**
-     * @api {post} /api/register Create new User
+     * @api {post} /api/users Create new User
      *
      * @apiParam {String} username Users unique ID
      * @apiParam {String} password Users password
@@ -44,4 +47,5 @@ router.route('/')
             }
         })
     })
+
 module.exports = router

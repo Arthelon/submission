@@ -46,7 +46,7 @@ angular.module('app.controllers', [])
                 $scope.error = 'Passwords do not match'
                 $scope.form.password2 = ''
             } else {
-                $http.post('/api/register', $scope.form).then(function(res) {
+                $http.post('/api/users', $scope.form).then(function(res) {
                     $scope.success = res.data.success
                     $scope.form = {}
                 }, function(err) {

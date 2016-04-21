@@ -90,13 +90,14 @@ var apiRooms = require('./routes/api/rooms')
 var apiSubmissions = require('./routes/api/submissions')
 var apiProblems = require('./routes/api/problems')
 var apiTests = require('./routes/api/tests')
+var apiUsers = require('./routes/api/users')
 
-app.use('/api/register', apiRegister)
 app.use('/api/login', apiLogin)
 app.use('/api/rooms', apiRooms)
 app.use('/api/submissions', apiSubmissions)
 app.use('/api/problems', apiProblems)
 app.use('/api/tests', apiTests)
+app.use('/api/users', apiUsers)
 
 //Fallback Route
 app.use('/', index)
