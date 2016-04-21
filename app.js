@@ -84,7 +84,6 @@ app.use('/problem', problem)
 app.use('/room', room)
 
 //API Routes
-var apiRegister = require('./routes/api/register')
 var apiLogin = require('./routes/api/login')
 var apiRooms = require('./routes/api/rooms')
 var apiSubmissions = require('./routes/api/submissions')
