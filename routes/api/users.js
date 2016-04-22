@@ -7,17 +7,22 @@ var validateBody = require('../../util').validateBody
 
 router.route('/')
     .put(function(req, res) {
-        console.log(req.user._id)
+        console.log(req.body)
         User.findOneAndUpdate({
             _id: req.user._id
         }, req.body, (err, user) => {
             if (err) return handleResp(res, 400, err.message)
             else if (!user) return handleResp(res, 400, 'User not found')
             else {
-                var token = util.generateToken(user)
-                return handleResp(res, 200, {
-                    success: 'User updated',
-                    token: token
+                User.findOne({_id: req.user._id}, (err, doc) => {
+                    if (err) return handleResp(res, 400, err.message)
+                    else {
+                        var token = util.generateToken(doc)
+                        return handleResp(res, 200, {
+                            success: 'User updated',
+                            token: token
+                        })
+                    }
                 })
             }
         })

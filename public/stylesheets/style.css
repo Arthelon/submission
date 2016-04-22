@@ -69,3 +69,11 @@ a:hover, a:active {
 i {
     margin: 5px;
 }
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}

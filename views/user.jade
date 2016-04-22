@@ -10,6 +10,8 @@ block content
                 a(href='/logout') Logout
         .container
             h1 {{vm.user.username}}
-            form(ng-submit='updateUserData()')
+            form(ng-submit='vm.updateUserData()')
                 formly-form(fields='vm.fields' model='vm.model')
                 button.btn.btn-success(type='submit') Update
+            p.success(ng-if='vm.success') {{vm.success}}
+            p.error(ng-if='vm.error') {{vm.error}}
