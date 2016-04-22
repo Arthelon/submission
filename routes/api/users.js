@@ -1,13 +1,27 @@
 var router = require('express').Router()
 var User = require('../../models').User
+var util = require('../../util')
 
 var handleResp = require('../../util').handleResp
 var validateBody = require('../../util').validateBody
 
 router.route('/')
-    .get(function(req, res) {
+    .put(function(req, res) {
+        console.log(req.user._id)
+        User.findOneAndUpdate({
+            _id: req.user._id
+        }, req.body, (err, user) => {
+            if (err) return handleResp(res, 400, err.message)
+            else if (!user) return handleResp(res, 400, 'User not found')
+            else {
+                var token = util.generateToken(user)
+                return handleResp(res, 200, {
+                    success: 'User updated',
+                    token: token
+                })
+            }
+        })
     })
-
     /**
      * @api {post} /api/users Create new User
      *
