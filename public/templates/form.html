@@ -4,7 +4,13 @@
     <div class="validation"
          ng-if="options.validation.errorExistsAndShouldBeVisible"
          ng-messages="options.formControl.$error">
-        <div ng-messages-include="validation.html"></div>
+        <!-- Validation Code -->
+        <div style="color: red;">
+            <div ng-message="required">This field is required</div>
+            <div ng-message="minlength">Too short</div>
+            <div ng-message="maxlength">Too long</div>
+            <div ng-message="email">Invalid email address</div>
+        </div>
         <div style='color:red;' ng-message="{{::name}}" ng-repeat="(name, message) in ::options.validation.messages">
             {{message(fc.$viewValue, fc.$modelValue, this)}}
         </div>

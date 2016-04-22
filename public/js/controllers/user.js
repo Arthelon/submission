@@ -1,7 +1,8 @@
-angular.module('controllers.user', ['angular-jwt'])
+angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
     .controller('UserCtrl', function($window, $log, $http, jwtHelper) {
         var vm = this
         loadUser()
+        // vm.updateForm = FormlyFormController
         vm.fields = [
             {
                 type: 'input',
@@ -45,6 +46,12 @@ angular.module('controllers.user', ['angular-jwt'])
                 templateOptions: {
                     type: 'password',
                     label: 'Password'
+                },
+                validators: {
+                    lengthValidator: {
+                        expression: '$viewValue.length > 8 || !$viewValue',
+                        message: '"Password length has to be at least 8 characters"'
+                    }
                 }
             },
             {
@@ -53,6 +60,15 @@ angular.module('controllers.user', ['angular-jwt'])
                 templateOptions: {
                     type: 'password',
                     label: 'Confirm Password'
+                },
+                expressionProperties: {
+                    'templateOptions.disabled': '!model.password'
+                },
+                validators: {
+                    confirmPasswordValidator: {
+                        expression: 'model.password2 == model.password',
+                        message: '"Passwords do not match"'
+                    }
                 }
             }
         ]

@@ -38,6 +38,11 @@ angular.module('app', [
     .run(function(formlyConfig, formlyValidationMessages) {
 
         //Formly Messages
-        formlyValidationMessages.addStringMessage('required', 'Field cannot be left blank')
+        formlyConfig.extras.ngModelAttrsManipulatorPreferBound = true;
+        formlyValidationMessages.addStringMessage('maxlength', 'Your input is too long!');
+        formlyValidationMessages.messages.pattern = function (viewValue) {
+            return viewValue + ' is invalid';
+        };
+        formlyValidationMessages.addTemplateOptionValueMessage('minlength', 'minlength', '', 'is the minimum length', 'Too short');
     })
 

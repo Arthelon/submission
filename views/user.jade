@@ -11,7 +11,7 @@ block content
         .container
             h1 {{vm.user.username}}
             form(ng-submit='vm.updateUserData()')
-                formly-form(fields='vm.fields' model='vm.model')
-                button.btn.btn-success(type='submit') Update
+                formly-form(fields='vm.fields' model='vm.model' form='vm.updateForm')
+                    button.btn.btn-success(type='submit' ng-disabled='vm.updateForm.$invalid') Update
             p.success(ng-if='vm.success') {{vm.success}}
             p.error(ng-if='vm.error') {{vm.error}}
