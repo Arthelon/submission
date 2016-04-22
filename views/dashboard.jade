@@ -1,41 +1,44 @@
 extends ./layout
 block content
-    .header
-        //LOGO
-        .float-right.btns
-            a(href='logout') Logout
-    .container(ng-controller='DashCtrl')
-        .row
-            h1.text-center Welcome !{name}
-        .row(ng-if='rooms.length > 0')
-            table.table.table-striped.table-hover
-                thead
-                    tr
-                        th URL
-                        th Room Name
-                        th Room Description
-                        th Number of Submissions
-                tbody(ng-cloak)
-                        tr.tableItem(ng-repeat='room in rooms')
-                            td
-                                a(href='/room/{{room.path}}') {{room.path}}
-                            td {{room.name}}
-                            td {{room.desc}}
-                            td {{room.submissions.length}}
-                                i.fa.fa-times.cross(ng-click='removeRoom($index)')
-        .row(ng-if='rooms.length == 0')
-            .col-md-4.col-md-offset-4
-                .alert.alert-dismissible.alert-warning
-                    button.fa.fa-close.close(type='button', data-dismiss='alert')
-                    p No rooms found
-        .row
-            .btns.text-center
-                a(href='/create_room') Create Room
-        .msg.text-center.row
-            p(style='color:red;' ng-if='error') {{error}}
-            p(style='color:green;' ng-if='success') {{success}}
-block script
-    script(type='text/javascript' src='/js/controllers/dashboard.js')
+    div(ng-controller='DashCtrl')
+        .header
+            //LOGO
+            .float-left.btns
+                a(href='/user')
+                    i(class='fa fa-user')
+                    !{name}
+            .float-right.btns
+                a(href='logout') Logout
+        .container
+            .row
+                h1.text-center Welcome !{name}
+            .row(ng-if='rooms.length > 0')
+                table.table.table-striped.table-hover
+                    thead
+                        tr
+                            th URL
+                            th Room Name
+                            th Room Description
+                            th Number of Submissions
+                    tbody(ng-cloak)
+                            tr.tableItem(ng-repeat='room in rooms')
+                                td
+                                    a(href='/room/{{room.path}}') {{room.path}}
+                                td {{room.name}}
+                                td {{room.desc}}
+                                td {{room.submissions.length}}
+                                    i.fa.fa-times.cross(ng-click='removeRoom($index)')
+            .row(ng-if='rooms.length == 0')
+                .col-md-4.col-md-offset-4
+                    .alert.alert-dismissible.alert-warning
+                        button.fa.fa-close.close(type='button', data-dismiss='alert')
+                        p No rooms found
+            .row
+                .btns.text-center
+                    a(href='/create_room') Create Room
+            .msg.text-center.row
+                p(style='color:red;' ng-if='error') {{error}}
+                p(style='color:green;' ng-if='success') {{success}}
 
 
 

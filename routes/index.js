@@ -59,5 +59,14 @@ router.route('/create_room')
             res.redirect('/')
         }
     })
+
+router.route('/user')
+    .get(function(req, res) {
+        if (req.user) {
+            res.render('user')
+        } else {
+            res.redirect('/')
+        }
+    })
 module.exports = router
 

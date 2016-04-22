@@ -1,0 +1,15 @@
+extends ./layout
+
+block content
+    div(ng-controller='UserCtrl as vm')
+        .header
+            //LOGO
+            .float-left.btns
+                a(href='/dashboard') Main
+            .float-right.btns
+                a(href='/logout') Logout
+        .container
+            h1 {{vm.user.username}}
+            form(ng-submit='updateUserData()')
+                formly-form(fields='vm.fields' model='vm.model')
+                button.btn.btn-success(type='submit') Update

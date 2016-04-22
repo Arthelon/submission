@@ -1,0 +1,12 @@
+<div class="formly-template-wrapper form-group"
+     ng-class="{'has-error': options.validation.errorExistsAndShouldBeVisible, 'has-success': fc.$valid}">
+    <formly-transclude></formly-transclude>
+    <div class="validation"
+         ng-if="options.validation.errorExistsAndShouldBeVisible"
+         ng-messages="options.formControl.$error">
+        <div ng-messages-include="validation.html"></div>
+        <div style='color:red;' ng-message="{{::name}}" ng-repeat="(name, message) in ::options.validation.messages">
+            {{message(fc.$viewValue, fc.$modelValue, this)}}
+        </div>
+    </div>
+</div>

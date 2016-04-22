@@ -65,3 +65,7 @@ a:hover, a:active {
     position: relative;
     margin-top:20px;
 }
+
+i {
+    margin: 5px;
+}

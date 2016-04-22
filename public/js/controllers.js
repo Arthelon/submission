@@ -1,4 +1,4 @@
-angular.module('app.controllers', [])
+angular.module('app.controllers', ['angular-jwt'])
     .controller('CreateProbCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
         $scope.form = {
             name: '',
@@ -56,7 +56,7 @@ angular.module('app.controllers', [])
             }
         }
     })
-    .controller('LoginCtrl', function($scope, $http, $window, $log) {
+    .controller('LoginCtrl', function($scope, $http, $window, jwtHelper) {
         $scope.user = {
             username: '',
             password: ''
@@ -69,6 +69,7 @@ angular.module('app.controllers', [])
             }).then(
                 function(res) {
                     $window.localStorage.setItem('JWT', res.data.token)
+                    $window.localStorage.setItem('user', JSON.stringify(jwtHelper.decodeToken(res.data.token)))
                     $http.post('/login', $scope.user).then(function(){
                         $window.location = '/dashboard'
                     }, function(err) {
