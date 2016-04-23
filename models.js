@@ -3,13 +3,25 @@ var Schema = mongoose.Schema
 var findOrCreate = require('mongoose-findorcreate')
 
 //Model Schemas
+// var SubmissionSchema = new Schema({
+//     timestamp: {type: Date, default: Date.now},
+//     name: String,
+//     desc: String,
+//     user: {type: String, required: true},
+//     prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
+//     room: {type: Schema.Types.ObjectId, ref: 'Room'},
+//     files: [
+//         {type: Schema.Types.ObjectId, ref: 'File'}
+//     ]
+// })
+
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    name: String,
+    name: {type: String, required: true},
     desc: String,
-    user: {type: String, required: true},
     prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
     room: {type: Schema.Types.ObjectId, ref: 'Room'},
+    student: {type: Schema.Types.ObjectId, ref: 'Student'},
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}
     ]
@@ -21,6 +33,14 @@ var FileSchema = new Schema({
     type: String,
     loc: String,
     sub: {type: Schema.Types.ObjectId, ref: 'Submission'}
+})
+
+var StudentSchema = new Schema({
+    name: {type: String, unique: true, required: true},
+    email: {type: String, unique: true, required: true},
+    submissions: [
+        {type: Schema.Types.ObjectId, ref: 'Submission'}
+    ]
 })
 
 var UserSchema = new Schema({
@@ -44,6 +64,9 @@ var RoomSchema = new Schema({
     ],
     problems: [
         {type: Schema.Types.ObjectId, ref: 'Problem'}
+    ],
+    students: [
+        {type: Schema.Types.ObjectId, ref: 'Student'}
     ]
 })
 
@@ -145,11 +168,17 @@ UserSchema.methods.validatePassword = function () {
     return !!this.password.match(/^[\d\w]{8,}$/);
 }
 
+StudentSchema.methods.compareNames = function(name1, name2) {
+    
+}
+
+
 //Plugins
 UserSchema.plugin(findOrCreate)
 RoomSchema.plugin(findOrCreate)
 ProblemSchema.plugin(findOrCreate)
 SubmissionSchema.plugin(findOrCreate)
+StudentSchema.plugin(findOrCreate)
 
 var models = {}
 
@@ -158,5 +187,6 @@ models.Submission = mongoose.model('Submission', SubmissionSchema)
 models.Room = mongoose.model('Room', RoomSchema)
 models.User = mongoose.model('User', UserSchema)
 models.Problem = mongoose.model('Problem', ProblemSchema)
+models.Student = mongoose.model('Student', StudentSchema)
 
 module.exports = models

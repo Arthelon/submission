@@ -3,6 +3,7 @@ var router = express.Router()
 var models = require('../models')
 
 var Room = models.Room
+var Student = models.Student
 var Problem = models.Problem
 var File = models.File
 var Submission = models.Submission
@@ -41,76 +42,90 @@ router.route('/:room_path')
         })
     })
     .post(upload.array('file'), function (req, res) {
-        var prob_name = req.body.prob
+        var student;
         var submissions = new Submission({
             name: req.body.name,
-            desc: req.body.desc,
-            user: req.body.user
+            desc: req.body.desc
         })
-        if (prob_name == 'None') {
-            createSubCb(req, res, submissions)
-        } else {
-            Problem.findOne({name: prob_name}, (err, prob) => {
-                if (err) {
-                    return handleTestFail(req, res, err.message)
-                } else if (!prob) {
-                    return handleTestFail(req, res, 'Problem not found', 404)
-                } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
-                    return createSubCb(req, res, submissions)
-                } else {
-                    req.files.forEach(function (file, findex) {
-                        fs.readFile(file.path, 'utf8', function (err, data) {
-                            if (err) return handleTestFail(req, res, err.message)
-                            else if (!data) return handleTestFail(req, res, 'File not found')
-                            else async.each(prob.test.matches, function (match, cb) {
-                                    if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"' + match.text + '\" not found.')
-                                    else cb()
-                                }, function (err) {
-                                    if (err) return handleTestFail(req, res, err)
-                                    else if (!prob.test.cases) {
-                                        PythonShell.run(file.path, function (err) {
-                                            if (err) {
-                                                if (!err.stacktrace) err.stacktrace = 'Error Occured'
-                                                return handleTestFail(req, res, err.stacktrace)
-                                            } else {
-                                                createSubCb(req, res, submissions)
-                                            }
-                                        })
-                                    } else {
-                                        prob.test.cases.forEach(function (c, index) {
-                                            var pyshell = new PythonShell(file.path, {mode: 'text'})
-                                            pyshell.send("\'" + c.in + "\'")
-                                            pyshell.on('message', function (data) {
-                                                if (data != c.out) {
-                                                    return handleTestFail(req, res, 'Failed Test. \"' + data + '\" != ' + c.out)
-                                                }
-                                            })
-                                            pyshell.end(function (err) {
+        var prob_name = req.body.prob
+        Student.findOne({
+            email: req.body.email
+        }, (err, stud) => {
+            if (err) handleFail(req, res, err.message)
+            else if (!stud) {
+                student = new Student({
+                    email: req.body.email,
+                    name: req.body.user,
+                    submissions: []
+                })
+            } else {
+                student = stud
+            }
+            if (prob_name == 'None') {
+                createSubCb(req, res, submissions, student)
+            } else {
+                Problem.findOne({name: prob_name}, (err, prob) => {
+                    if (err) {
+                        return handleFail(req, res, err.message)
+                    } else if (!prob) {
+                        return handleFail(req, res, 'Problem not found', 404)
+                    } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
+                        return createSubCb(req, res, submissions, student)
+                    } else {
+                        req.files.forEach(function (file, findex) {
+                            fs.readFile(file.path, 'utf8', function (err, data) {
+                                if (err) return handleFail(req, res, err.message)
+                                else if (!data) return handleFail(req, res, 'File not found')
+                                else async.each(prob.test.matches, function (match, cb) {
+                                        if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"' + match.text + '\" not found.')
+                                        else cb()
+                                    }, function (err) {
+                                        if (err) return handleFail(req, res, err)
+                                        else if (!prob.test.cases) {
+                                            PythonShell.run(file.path, function (err) {
                                                 if (err) {
-                                                    console.log(err.stack)
-                                                    if (!err.stack) err.stack = 'Error Occured'
-                                                    return handleTestFail(req, res, err.stack)
-                                                } else if (findex + 1 == req.files.length && index + 1 == prob.test.cases.length) {
-                                                    submissions.prob = prob._id
-                                                    prob.update({
-                                                        $push: {submissions: submissions._id}
-                                                    }, (err) => {
-                                                        if (err) return handleResp(res, 500, {error: err.message})
-                                                        else createSubCb(req, res, submissions)
-                                                    })
+                                                    if (!err.stacktrace) err.stacktrace = 'Error Occured'
+                                                    return handleFail(req, res, err.stacktrace)
+                                                } else {
+                                                    createSubCb(req, res, submissions, student)
                                                 }
                                             })
-                                        })
-                                    }
-                                })
+                                        } else {
+                                            prob.test.cases.forEach(function (c, index) {
+                                                var pyshell = new PythonShell(file.path, {mode: 'text'})
+                                                pyshell.send("\'" + c.in + "\'")
+                                                pyshell.on('message', function (data) {
+                                                    if (data != c.out) {
+                                                        return handleFail(req, res, 'Failed Test. \"' + data + '\" != ' + c.out)
+                                                    }
+                                                })
+                                                pyshell.end(function (err) {
+                                                    if (err) {
+                                                        console.log(err.stack)
+                                                        if (!err.stack) err.stack = 'Error Occured'
+                                                        return handleFail(req, res, err.stack)
+                                                    } else if (findex + 1 == req.files.length && index + 1 == prob.test.cases.length) {
+                                                        submissions.prob = prob._id
+                                                        prob.update({
+                                                            $push: {submissions: submissions._id}
+                                                        }, (err) => {
+                                                            if (err) return handleResp(res, 500, {error: err.message})
+                                                            else createSubCb(req, res, submissions, student)
+                                                        })
+                                                    }
+                                                })
+                                            })
+                                        }
+                                    })
+                            })
                         })
-                    })
-                }
-            })
-        }
+                    }
+                })
+            }
+        })
     })
 
-function handleTestFail(req, res, msg, status) {
+function handleFail(req, res, msg, status) {
     req.files.forEach(function (file) {
         fs.unlink(file.path, (err) => {
             if (err) return handleResp(res, 500, {error: err.message})
@@ -119,11 +134,16 @@ function handleTestFail(req, res, msg, status) {
     return handleResp(res, status || 500, {error: msg})
 }
 
-function createSubCb(req, res, sub) {
+function createSubCb(req, res, sub, student) {
+    console.log(student)
     sub.save((err, submission) => {
         if (err) {
+            console.log(err)
             return handleResp(res, 500, {error: err.message})
         } else {
+            student.submissions.push(submission)
+            student.save()
+            submission.student = student
             Room.findOneAndUpdate({
                 path: req.params.room_path
             }, {$push: {submissions: submission._id}}, (err, room) => {

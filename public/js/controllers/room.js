@@ -101,7 +101,8 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
             name: '',
             user: '',
             prob: 'None',
-            desc: ''
+            desc: '',
+            email: ''
         }
         $scope.form = jQuery.extend({}, defaultForm)
         $scope.editor = fillerText
@@ -123,6 +124,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
                     fd.append('file', editor_file, $scope.form.name+'.py')
                 }
+                console.log(fd)
                 $http.post('/room/'+$scope.room_path, fd, {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}

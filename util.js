@@ -52,14 +52,18 @@ util.handleErr = function(next, status, msg) {
 
 util.validateBody = function(fields) {
     return function(req, res, next) {
+        console.log(req.body)
         async.each(fields, function(field, done) {
             if (!req.body.hasOwnProperty(field)) {
-                return handleResp(res, 400, {error: 'Invalid fields'})
+                handleResp(res, 400, {error: 'Invalid fields'})
+                return done('Invalid Fields')
             } else {
                 done()
             }
-        }, function() {
-            next()
+        }, function(err) {
+            if (!err) {
+                next()
+            }
         })
     }
 }
