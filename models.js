@@ -88,6 +88,12 @@ var ProblemSchema = new Schema({
     ]
 })
 
+var AttemptSchema = new Schema({
+    timestamp: {type: Date, default: Date.now},
+    stacktrace: {type: String, required: true},
+    status: {type: String, enum: ['FAILED', 'OK']}
+})
+
 //Model Hooks
 ProblemSchema.pre('remove', function (next) {
     models.Submission.find({
@@ -188,5 +194,6 @@ models.Room = mongoose.model('Room', RoomSchema)
 models.User = mongoose.model('User', UserSchema)
 models.Problem = mongoose.model('Problem', ProblemSchema)
 models.Student = mongoose.model('Student', StudentSchema)
+models.Atttempt = mongoose.model('Attempt', AttemptSchema)
 
 module.exports = models
