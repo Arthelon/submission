@@ -15,6 +15,9 @@ var SubmissionSchema = new Schema({
     student: {type: Schema.Types.ObjectId, ref: 'Student'},
     files: [
         {type: Schema.Types.ObjectId, ref: 'File'}
+    ],
+    attempts: [
+        {type: Schema.Types.ObjectId, ref: 'Attempt'}
     ]
 })
 
@@ -119,7 +122,7 @@ SubmissionSchema.pre('remove', function (next) {
         .findOne({
             _id: this._id
         })
-        .populate('files')
+        .populate('files attempts')
         .populate({
             path: 'student',
             populate: {
@@ -143,6 +146,11 @@ SubmissionSchema.pre('remove', function (next) {
                     })
                 }, function (err) {
                     if (err) throw err
+                })
+                submission.attempts.forEach(attempt => {
+                    attempt.remove((err) => {
+                        if (err) throw err
+                    })
                 })
             }
         })
