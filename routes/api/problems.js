@@ -96,6 +96,7 @@ router.route('/:problem')
 router.route('/')
     /**
      * @api {get} /api/problems Get Problems
+     * @apiParam {String} room_path Room path
      *
      * @apiSuccess {Object[]} problems List of problems
      * @apiSuccess {String} success Success message

@@ -123,7 +123,8 @@ SubmissionSchema.pre('remove', function (next) {
         .findOne({
             _id: this._id
         })
-        .populate('files attempts')
+        .populate('files')
+        .populate('attempts')
         .populate({
             path: 'student',
             populate: {
@@ -237,42 +238,46 @@ ProblemSchema.methods = {
      * Functions that run problem tests against a list of files
      *
      * @param{File[]} files List of File mongoose documents
-     * @returns {boolean | Error} Returns true if tests succeed, otherwise an error
+     * @returns {Promise} Returns true if tests succeed, otherwise an error
      */
     runTest: function(files) {
         var prob = this
-        files.forEach((file, findex) => {
-            fs.readFile(file.path, 'utf8', function (err, data) {
-                if (err || !data) return err || new Error('File not found')
-                else async.each(prob.test.matches, function (match, cb) {
-                    if (data.search(new RegExp(match.text)) == -1) cb('Failed match. \"' + match.text + '\" not found.')
-                    else cb()
-                }, (err) => {
-                    if (err) return err
-                    // If no I/O cases are found
-                    else if (!prob.test.cases) {
-                        PythonShell.run(file.path, function (err) {
-                            if (err) return err
-                            else return true
-                        })
-                    } else {
-                        prob.test.cases.forEach(function (c, index) {
-                            var pyshell = new PythonShell(file.path, {mode: 'text'})
-                            pyshell.send("\'" + c.in + "\'")
-                            pyshell.on('message', function (data) {
-                                if (data != c.out) {
-                                    return new Error('Failed Test. \"' + data + '\" != ' + c.out)
-                                }
+        return new Promise((resolve, reject) => {
+            files.forEach((file, findex) => {
+                fs.readFile(file.path, 'utf8', function (err, data) {
+                    if (err || !data) reject('File not found')
+                    else async.each(prob.test.matches, function (match, cb) {
+                        if (data.search(new RegExp(match.text)) == -1) {
+                            return reject('Failed match. \"' + match.text + '\" not found.')
+                        }
+                        else cb()
+                    }, (err) => {
+                        if (err) reject(err.message)
+                        // If no I/O cases are found
+                        else if (prob.test.cases.length == 0) {
+                            PythonShell.run(file.path, function (err) {
+                                if (err) reject(err.message)
+                                else resolve()
                             })
-                            pyshell.end(function (err) {
-                                if (err) {
-                                    return new Error('Error Occurred when ending program')
-                                } else if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {
-                                    return true
-                                }
+                        } else {
+                            prob.test.cases.forEach(function (c, index) {
+                                var pyshell = new PythonShell(file.path, {mode: 'text'})
+                                pyshell.send("\'" + c.in + "\'")
+                                pyshell.on('message', function (data) {
+                                    if (data != c.out) {
+                                        return reject('Failed Test. \"' + data + '\" != ' + c.out)
+                                    }
+                                })
+                                pyshell.end(function (err) {
+                                    if (err) {
+                                        reject('Error Occurred when ending program')
+                                    } else if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {
+                                        resolve()
+                                    }
+                                })
                             })
-                        })
-                    }
+                        }
+                    })
                 })
             })
         })

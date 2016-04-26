@@ -1,5 +1,5 @@
 angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
-    .controller('RoomCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    .controller('RoomCtrl', ['$scope', '$http', '$location', function($scope, $http, $location, $log) {
         $scope.room_path = null
         $scope.error = null
         $scope.success = null

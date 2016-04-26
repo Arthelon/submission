@@ -46,21 +46,26 @@ router.route('/:room_path')
             desc: req.body.desc
         })
         var prob_name = req.body.prob
-        Student.findOne({
-            email: req.body.email
-        }, (err, stud) => {
-            var student
-            if (err) handleFail(req, res, err.message)
-            else if (!stud) {
-                student = new Student({
-                    email: req.body.email,
-                    name: req.body.user,
-                    submissions: []
-                })
-            } else {
-                student = stud
-            }
-            return student
+        new Promise((resolve) => {
+            Student.findOne({
+                email: req.body.email
+            }, (err, stud) => {
+                var student
+                if (err) {
+                    handleFail(req, res, err.message)
+                    reject()
+                }
+                else if (!stud) {
+                    student = new Student({
+                        email: req.body.email,
+                        name: req.body.user,
+                        submissions: []
+                    })
+                } else {
+                    student = stud
+                }
+                resolve(student)
+            })
         }).then((student) => {
             if (prob_name == 'None') {
                 createSubCb(req, res, submissions, student)
@@ -73,19 +78,17 @@ router.route('/:room_path')
                     } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
                         createSubCb(req, res, submissions, student)
                     } else {
-                        var testResult = prob.runTest(req.files)
-                        if (testResult instanceof Error) {
-                            handleFail(req, res, testResult.message)
-                        } else {
+                        prob.runTest(req.files).then(() => {
                             submissions.prob = prob._id
                             prob.update({
                                 $push: {submissions: submissions._id}
                             }, (err) => {
                                 if (err) return handleResp(res, 500, {error: err.message})
-                                else return true
                             })
                             createSubCb(req, res, submissions, student)
-                        }
+                        }, (err) => {
+                            handleFail(req, res, err)
+                        })
                     }
                 })
             }
@@ -104,10 +107,8 @@ function handleFail(req, res, msg, status) {
 }
 
 function createSubCb(req, res, sub, student) {
-    console.log(student)
     sub.save((err, submission) => {
         if (err) {
-            console.log(err)
             return handleResp(res, 500, {error: err.message})
         } else {
             student.submissions.push(submission)
@@ -140,6 +141,7 @@ function createSubCb(req, res, sub, student) {
                             })
                         })
                     }, function (err) {
+                        console.log('2')
                         if (err) return handleResp(res, 500, {error: err.message})
                         else return handleResp(res, 200, {success: 'Success'})
                     })
