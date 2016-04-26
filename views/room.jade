@@ -46,7 +46,7 @@ block content
                                 tr.tableItem(ng-repeat='submission in submissions')
                                     td
                                         a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
-                                    td {{submission.user}}
+                                    td {{submission.student.name}}
                                     td {{submission.desc}}
                                     td {{submission.timestamp}}
                                     td {{submission.files.length}}

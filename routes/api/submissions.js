@@ -34,13 +34,17 @@ router.route('/')
             .findOne({
                 path: req.room.path
             })
-            .populate('submissions')
+            .populate({
+                path: 'submissions',
+                populate: {path: 'student', model: 'Student'}
+            })
             .sort('timestamp')
             .exec(function (err, room) {
                 if (err) return handleResp(res, 400, err.message)
                 if (!room) {
                     return handleResp(res, 404, 'Room not found')
                 } else
+                    console.log(room.submissions)
                     return handleResp(res, 200, {
                         success: 'Submissions retrieved',
                         submissions: room.submissions

@@ -30,6 +30,13 @@ router.route('/:problem')
                     model: 'Submission'
                 }
             })
+            .populate({
+                path: 'problems',
+                populate: {
+                    path: 'student',
+                    model: 'Student'
+                }
+            })
             .exec(function (err, room) {
                 if (err) return handleResp(res, 400, err.message)
                 else {
