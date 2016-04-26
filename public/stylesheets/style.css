@@ -77,3 +77,16 @@ i {
 .error {
     color: red;
 }
+
+[ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+table {
+    -webkit-animation: fadein 0.5s
+}
+
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

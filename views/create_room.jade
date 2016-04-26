@@ -28,5 +28,5 @@ block content
                                 input#roomDesc.form-control(ng-model='form.desc' type='text', placeholder='Optional')
                             button.btn.btn-success(type='submit') Submit
         .row.msg.text-center
-            p(style='color:red;' ng-if='error') {{error}}
-            p(style='color:green;' ng-if='success') {{success}}
+            p(style='color:red;' ng-if='error' ng-bind='error')
+            p(style='color:green;' ng-if='success' ng-bind='success')

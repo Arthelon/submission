@@ -13,14 +13,14 @@ block content
             .row
                 h1.text-center Welcome !{name}
             .row(ng-if='rooms.length > 0')
-                table.table.table-striped.table-hover
+                table.table.table-striped.table-hover(ng-cloak)
                     thead
                         tr
                             th URL
                             th Room Name
                             th Room Description
                             th Number of Submissions
-                    tbody(ng-cloak)
+                    tbody
                             tr.tableItem(ng-repeat='room in rooms')
                                 td
                                     a(href='/room/{{room.path}}') {{room.path}}
@@ -37,8 +37,8 @@ block content
                 .btns.text-center
                     a(href='/create_room') Create Room
             .msg.text-center.row
-                p(style='color:red;' ng-if='error') {{error}}
-                p(style='color:green;' ng-if='success') {{success}}
+                p(style='color:red;' ng-if='error' ng-bind='error')
+                p(style='color:green;' ng-if='success' ng-bind='success')
 
 
 

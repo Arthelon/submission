@@ -40,7 +40,7 @@ block content
                                     input#passwordDupInput.form-control(ng-model='form.password2', type='password', placeholder='re-enter password' required)
                                 button.btn.btn-success(type='submit') Submit
                     .msg.text-center
-                        p(style='color:green;' ng-if='success') {{success}}
-                        p(style='color:red;' ng-if='error') {{error}}
+                        p(style='color:green;' ng-if='success' ng-bind='success')
+                        p(style='color:red;' ng-if='error' ng-bind='error')
 block script
     script(src='js/controllers/register.js')

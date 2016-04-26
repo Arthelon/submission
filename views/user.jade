@@ -8,10 +8,10 @@ block content
                 a(href='/dashboard') Main
             .float-right.btns
                 a(href='/logout') Logout
-        .container
+        .container(ng-cloak)
             h1 {{vm.user.username}}
             form(ng-submit='vm.updateUserData()')
                 formly-form(fields='vm.fields' model='vm.model' form='vm.updateForm')
                     button.btn.btn-success(type='submit' ng-disabled='vm.updateForm.$invalid') Update
-            p.success(ng-if='vm.success') {{vm.success}}
-            p.error(ng-if='vm.error') {{vm.error}}
+            p.success(ng-if='vm.success' ng-bind='vm.success')
+            p.error(ng-if='vm.error' ng-bind='vm.error')

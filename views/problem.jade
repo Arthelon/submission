@@ -28,7 +28,7 @@ block content
                                 th Description
                                 th Timestamp
                                 th Files
-                        tbody
+                        tbody(ng-cloak)
                             tr(ng-repeat='sub in submissions')
                                 td
                                     a#downloadFile(href='/room/{{room_path}}/{{sub.name}}') {{sub.name}}
@@ -43,7 +43,7 @@ block content
                             p No submissions found
                 #testContent(ng-if='!toggle')
                     .col-md-6
-                        table.table.table-striped.table-hover(ng-if='tests.cases.length > 0')
+                        table.table.table-striped.table-hover(ng-if='tests.cases.length > 0' ng-cloak)
                             thead
                                 tr
                                     th Input
@@ -58,7 +58,7 @@ block content
                                 button.fa.fa-close.close(type='button', data-dismiss='alert')
                                 p No I/O cases found
                     .col-md-3
-                        table.table.table-striped.table-hover(ng-if='tests.matches.length > 0')
+                        table.table.table-striped.table-hover(ng-if='tests.matches.length > 0' ng-cloak)
                             thead
                                 tr
                                     th Match
