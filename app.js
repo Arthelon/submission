@@ -111,7 +111,7 @@ app.use(function (req, res, next) {
 // error handlers
 app.use(function (err, req, res, next) {
     if (err.status == 404) {
-        res.render('error', {
+        res.render('404', {
             message: 'Page not found'
         })
     } else {

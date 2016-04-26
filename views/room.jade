@@ -117,8 +117,8 @@ block content
                             button.btn.btn-default(ng-click='submit()') Upload
                         .col-lg-8
                             #editor(ui-ace="{theme: 'monokai', mode: 'python'}" ng-model='editor')
-                        .msg.text-center.row(ng-cloak)
-                            p(style='color:red;' ng-if='error' ng-bind='error')
-                            p(style='color:green;' ng-if='success' ng-bind='success')
+                    .msg.text-center.row(ng-cloak)
+                        p(style='color:red;' ng-if='error' ng-bind='error')
+                        p(style='color:green;' ng-if='success' ng-bind='success')
 
 

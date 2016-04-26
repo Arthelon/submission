@@ -261,17 +261,22 @@ ProblemSchema.methods = {
                             })
                         } else {
                             prob.test.cases.forEach(function (c, index) {
+                                var outputSeen = false
                                 var pyshell = new PythonShell(file.path, {mode: 'text'})
                                 pyshell.send("\'" + c.in + "\'")
                                 pyshell.on('message', function (data) {
+                                    outputSeen = true
                                     if (data != c.out) {
                                         return reject('Failed Test. \"' + data + '\" != ' + c.out)
                                     }
                                 })
+
                                 pyshell.end(function (err) {
                                     if (err) {
                                         reject('Error Occurred when ending program')
-                                    } else if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {
+                                    } else if (!outputSeen) {
+                                        reject('No program output!')
+                                    } if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {
                                         resolve()
                                     }
                                 })
