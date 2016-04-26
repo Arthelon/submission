@@ -2,6 +2,9 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var findOrCreate = require('mongoose-findorcreate')
 var emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
+var fs = require('fs')
+var async = require('async')
+
 
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
@@ -99,10 +102,50 @@ ProblemSchema.pre('remove', function (next) {
             next()
         }
     })
+    models.Room.findOneAndUpdate({
+        _id: this.room._id
+    }, {
+        $pull: {
+            problems: this._id
+        }
+    }, (err) => {
+        if (err) throw err
+    })
 })
 
 SubmissionSchema.pre('remove', function (next) {
     sub = this
+    models.Submission
+        .findOne({
+            _id: this._id
+        })
+        .populate('files')
+        .populate({
+            path: 'student',
+            populate: {
+                path: 'submissions',
+                model: 'Submission'
+            }
+        })
+        .exec(function(err, submission) {
+            if (err) throw err
+            else if (!submission) throw new Error('Submission not found')
+            else {
+                //Pulls submission from student submission array
+                submission.student.submissions.pull({
+                    _id: submission._id
+                })
+                //Removes all files associated with submission
+                async.each(submission.files, function (file, cb) {
+                    file.remove((err) => {
+                        if (err) cb(err)
+                        else cb()
+                    })
+                }, function (err) {
+                    if (err) throw err
+                })
+            }
+        })
     models.Room.findOneAndUpdate({_id: sub.room}, {
         $pull: {
             submissions: sub._id
@@ -114,7 +157,7 @@ SubmissionSchema.pre('remove', function (next) {
             $pull: {
                 submissions: sub._id
             }
-        }, (err, prob) => {
+        }, (err) => {
             if (err) throw err
             else next()
         })
@@ -145,6 +188,14 @@ RoomSchema.pre('remove', function (next) {
         }
     })
 })
+
+FileSchema.pre('remove', function(next) {
+    fs.unlink('uploads/' + this.loc, (err) => {
+        if (err) throw err
+        else next()
+    })
+})
+
 
 //Validation
 

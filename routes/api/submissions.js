@@ -3,13 +3,10 @@ var router = require('express').Router()
 var models = require('../../models')
 var Room = models.Room
 var Submission = models.Submission
-var Problem = models.Problem
-var File = models.File
 var async = require('async')
 var fs = require('fs')
 
 var multer = require('multer')
-var PythonShell = require('python-shell')
 
 var upload = multer({
     dest: 'uploads/',
@@ -44,7 +41,6 @@ router.route('/')
                 if (!room) {
                     return handleResp(res, 404, 'Room not found')
                 } else
-                    console.log(room.submissions)
                     return handleResp(res, 200, {
                         success: 'Submissions retrieved',
                         submissions: room.submissions
@@ -69,18 +65,7 @@ router.route('/')
                     if (err) {
                         return handleResp(res, 500, {error: err.message})
                     } else {
-                        async.each(sub.files, function (id, cb) {
-                            File.findOneAndRemove({_id: id}, (err, file) => {
-                                if (err) cb(err)
-                                fs.unlink('uploads/' + file.loc, (err) => {
-                                    if (err) cb(err)
-                                    else cb()
-                                })
-                            })
-                        }, function (err) {
-                            if (err) return handleResp(res, 500, {error: err.message})
-                            return handleResp(res, 200, {success: 'Submission deleted'})
-                        })
+                        return handleResp(res, 200, {success: 'Submission deleted'})
                     }
                 })
             } else {
