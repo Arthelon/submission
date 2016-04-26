@@ -1,23 +1,11 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 var findOrCreate = require('mongoose-findorcreate')
-
-//Model Schemas
-// var SubmissionSchema = new Schema({
-//     timestamp: {type: Date, default: Date.now},
-//     name: String,
-//     desc: String,
-//     user: {type: String, required: true},
-//     prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
-//     room: {type: Schema.Types.ObjectId, ref: 'Room'},
-//     files: [
-//         {type: Schema.Types.ObjectId, ref: 'File'}
-//     ]
-// })
+var emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i
 
 var SubmissionSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    name: {type: String, required: true},
+    name: {type: String, required: true, match: [/\w+/, 'Name can only include words']},
     desc: String,
     prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
     room: {type: Schema.Types.ObjectId, ref: 'Room'},
@@ -37,7 +25,7 @@ var FileSchema = new Schema({
 
 var StudentSchema = new Schema({
     name: {type: String, unique: true, required: true},
-    email: {type: String, unique: true, required: true},
+    email: {type: String, unique: true, required: true, match: [emailRegex, '{VALUE} is not a valid email address']},
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
@@ -45,10 +33,10 @@ var StudentSchema = new Schema({
 
 var UserSchema = new Schema({
     username: {type: String, unique: true, required: true},
-    password: {type: String, required: true},
+    password: {type: String, required: true, match: [/^[\d\w]{8,}$/, 'Password must be alphanumeric with at least 8 characters']},
     first_name: {type: String, required: true},
     last_name: {type: String, required: true},
-    email: {type: String, unique: true, required: true},
+    email: {type: String, unique: true, required: true, match: [emailRegex, '{VALUE} is not a valid email address']},
     rooms: [
         {type: Schema.Types.ObjectId, ref: 'Room'}
     ]
@@ -158,6 +146,9 @@ RoomSchema.pre('remove', function (next) {
     })
 })
 
+//Validation
+
+
 //Other Methods
 RoomSchema.methods.verifyID = function (id) {
     this.findById(id, function (err, found) {
@@ -166,17 +157,20 @@ RoomSchema.methods.verifyID = function (id) {
     })
 }
 
-UserSchema.methods.verifyPassword = function (password) {
-    return this.password == password;
-
-}
-UserSchema.methods.validatePassword = function () {
-    return !!this.password.match(/^[\d\w]{8,}$/);
+UserSchema.methods = {
+    verifyPassword: function (password) {
+        return this.password == password;
+    }
 }
 
-StudentSchema.methods.compareNames = function(name1, name2) {
-    
-}
+// StudentSchema.methods =  {
+//     compareNames: function(name1, name2) {
+//         if (name1.toLowerCase().trim() == name2.toLowerCase().trim()) {
+//             return true
+//         }
+//         return false
+//     }
+// }
 
 
 //Plugins
