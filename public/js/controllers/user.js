@@ -49,7 +49,7 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
                 },
                 validators: {
                     lengthValidator: {
-                        expression: '$viewValue.length > 8 || !$viewValue',
+                        expression: '$viewValue.length >= 8 || !$viewValue',
                         message: '"Password length has to be at least 8 characters"'
                     }
                 }
@@ -66,7 +66,7 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
                 },
                 validators: {
                     confirmPasswordValidator: {
-                        expression: 'model.password2 == model.password',
+                        expression: '$viewValue == model.password',
                         message: '"Passwords do not match"'
                     }
                 }
