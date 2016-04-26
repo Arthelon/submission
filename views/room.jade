@@ -84,39 +84,41 @@ block content
                         p #{room_desc}
                 .panel.panel-default
                     .panel-body
-                        form#uploadForm
-                            .form-group.row
-                                label.col-lg-2.col-lg-offset-4.control-label(for='nameInput') Submission Title
-                                .col-lg-4
-                                    input.form-control#nameInput(ng-model='form.name' type='text' placeholder='Title' ng-required)
-                            .form-group.row
-                                label.col-lg-2.col-lg-offset-4.control-label(for='userInput') Name
-                                .col-lg-4
+                        form#uploadForm.col-lg-4
+                            .form-group
+                                label.text-left.col-lg-2.control-label(for='nameInput') Title
+                                .col-lg-10
+                                    input.form-control#nameInput(ng-model='form.name' type='text' placeholder='Submission Title' ng-required)
+                            .form-group
+                                label.text-left.col-lg-2.control-label(for='userInput') Name
+                                .col-lg-10
                                     input.form-control#userInput(type='text' ng-model='form.user' placeholder='Enter your name' ng-required)
-                            .form-group.row
-                                label.col-lg-2.col-lg-offset-4.control-label(for='emailInput') Email
-                                .col-lg-4
+                            .form-group
+                                label.text-left.col-lg-2.control-label(for='emailInput') Email
+                                .col-lg-10
                                     input.form-control#emailInput(type='email' ng-model='form.email' placeholder='Enter your email' ng-required)
-                            .form-group.row
-                                label.col-lg-2.col-lg-offset-4.control-label(for='descInput') Description
-                                .col-lg-4
-                                    input.form-control#descInput(type='text' ng-model='form.desc' placeholder='Optional')
-                            .form-group.row
-                                label.col-lg-2.col-lg-offset-4.control-label(for='select') Problem
-                                .col-lg-4
+                            .form-group
+                                label.text-left.col-lg-2.control-label(for='descInput') Desc
+                                .col-lg-10
+                                    input.form-control#descInput(type='text' ng-model='form.desc' placeholder='Optional Description')
+                            .form-group
+                                label.text-left.col-lg-2.control-label(for='select') Problem
+                                .col-lg-10
                                     select#select.form-control(ng-model='form.prob')
                                         option None
                                         each
                                             option(ng-repeat='problem in problems')
                                                 | {{problem.name}}
-                            .fileInput.form-group
+                            .fileInput
                                 input(type="file" name="file" id="file" file-model='file' multiple)
                                 label(for="file")
                                     i.fa.fa-upload
                                     span Choose a file...
-                            #editor(ui-ace="{theme: 'monokai', mode: 'python'}" ng-model='editor')
                             button.btn.btn-default(ng-click='submit()') Upload
-        .msg.text-center.row(ng-cloak)
-            p(style='color:red;' ng-if='error' ng-bind='error')
-            p(style='color:green;' ng-if='success' ng-bind='success')
+                        .col-lg-8
+                            #editor(ui-ace="{theme: 'monokai', mode: 'python'}" ng-model='editor')
+                        .msg.text-center.row(ng-cloak)
+                            p(style='color:red;' ng-if='error' ng-bind='error')
+                            p(style='color:green;' ng-if='success' ng-bind='success')
+
 
