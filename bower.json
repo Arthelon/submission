@@ -28,6 +28,7 @@
     "angular-formly": "^8.2.0",
     "api-check": "^7.5.5",
     "angular-formly-templates-bootstrap": "^6.3.2",
-    "angular-messages": "^1.5.5"
+    "angular-messages": "^1.5.5",
+    "angular-chart.js": "^0.10.2"
   }
 }

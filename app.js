@@ -33,7 +33,12 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use('/api', token.unless({path: ['/api/login', '/api/register', '/api/problems']}))
+app.use('/api', token.unless({path: [
+    {url: '/api/login', methods: 'POST'},
+    {url: '/api/register', methods: 'POST'},
+    {url: '/api/problems', methods: 'GET'},
+    {url: '/api/submissions', methods: 'POST'}
+    ]}))
 app.use(expressSession({secret: 'dev_session', resave: 'false', saveUninitialized: 'false'}));
 app.use(passport.initialize());
 app.use(passport.session());
