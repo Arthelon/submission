@@ -32,7 +32,7 @@ var FileSchema = new Schema({
 
 var StudentSchema = new Schema({
     name: {type: String, unique: true, required: true},
-    email: {type: String, unique: true, required: true, match: [emailRegex, '{VALUE} is not a valid email address']},
+    email: {type: String, unique: true, required: true,  match: [emailRegex, '{VALUE} is not a valid email address']},
     submissions: [
         {type: Schema.Types.ObjectId, ref: 'Submission'}
     ]
@@ -224,13 +224,84 @@ UserSchema.methods = {
     }
 }
 
-StudentSchema.methods =  {
-    compareNames: function(name1, name2) {
-        if (name1.toLowerCase().trim() == name2.toLowerCase().trim()) {
-            return true
-        }
-        return false
+StudentSchema.statics =  {
+    getStudent: function(name, email) {
+        var formattedName = name.toLowerCase().trim()
+        var defaultStudent = new models.Student({
+            name: name,
+            email: email
+        })
+        return new Promise((resolve, reject) => {
+            models.Student.findOne({email: email}, (err, student) => {
+                if (err) reject(err.message)
+                else if (student) { //If Student found
+                    resolve(student)
+                } else {
+                    //Find by formatted name (lower-case, trimmed)
+                    models.Student.find({name: { $regex: new RegExp("^" + formattedName, "i") }}, (err, students) => {
+                        if (err) reject(err.message)
+                        else if (students.length == 1) { //Only one student document found
+                            resolve(students[0])
+                        } else if (students.length > 1) {  //If multiple documents found
+                            models.Student.getClosestMatch(email, students).then(function(student) {
+                                resolve(student)
+                            }, () => {
+                                var name_parts = formattedName.split(' ')
+                                if (name_parts.length > 1) {
+                                    name_parts.forEach((word) => {
+
+                                    })
+                                } else {
+                                    resolve(defaultStudent)
+                                }
+                            })
+                        } else {
+                            resolve(defaultStudent)
+                        }
+                    })
+                }
+            })
+        })
+    },
+    getClosestMatch: function(email, list) {
+        var DIFFERENCE_THRESHOLD = 4
+        var matchList = []
+        return new Promise((resolve, reject) => {
+            list.forEach((student) => {
+                var diffCount = getDifference(email, student.email)
+                if (diffCount <= DIFFERENCE_THRESHOLD) {
+                    matchList.append({count: diffCount, student: student})
+                }
+            }, () => {
+                if (matchList.length == 0) {
+                    reject()
+                } else {
+                    var min
+                    for (var i in matchList) {
+                        if (!min || matchList[i].count < matchList[min].count)  {
+                            min = i
+                        }
+                    }
+                    return matchList[min].student
+                }
+            })
+        })
     }
+}
+
+function getDifference(first, second) {
+    var i = 0;
+    var j = 0;
+    var result = 0;
+
+    while (j < b.length) {
+        if (first[i] != second[j] || i == first.length)
+            result ++;
+        else
+            i++;
+        j++;
+    }
+    return result;
 }
 
 ProblemSchema.methods = {

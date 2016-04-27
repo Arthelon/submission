@@ -83,53 +83,36 @@ router.route('/')
             desc: req.body.desc
         })
         var prob_name = req.body.prob
-        new Promise((resolve) => {
-            Student.findOne({
-                email: req.body.email
-            }, (err, stud) => {
-                var student
-                if (err) {
-                    handleFail(req, res, err.message)
-                    reject()
-                }
-                else if (!stud) {
-                    student = new Student({
-                        email: req.body.email,
-                        name: req.body.user,
-                        submissions: []
-                    })
+
+        Student.getStudent(req.body.name, req.body.email)
+            .then((student) => {
+                console.log(student)
+                if (prob_name == 'None') {
+                    createSubCb(req, res, submissions, student)
                 } else {
-                    student = stud
-                }
-                resolve(student)
-            })
-        }).then((student) => {
-            if (prob_name == 'None') {
-                createSubCb(req, res, submissions, student)
-            } else {
-                Problem.findOne({name: prob_name}, (err, prob) => {
-                    if (err) {
-                        handleFail(req, res, err.message)
-                    } else if (!prob) {
-                        handleFail(req, res, 'Problem not found', 404)
-                    } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
-                        createSubCb(req, res, submissions, student)
-                    } else {
-                        prob.runTest(req.files).then(() => {
-                            submissions.prob = prob._id
-                            prob.update({
-                                $push: {submissions: submissions._id}
-                            }, (err) => {
-                                if (err) return handleResp(res, 500, {error: err.message})
-                            })
+                    Problem.findOne({name: prob_name}, (err, prob) => {
+                        if (err) {
+                            handleFail(req, res, err.message)
+                        } else if (!prob) {
+                            handleFail(req, res, 'Problem not found', 404)
+                        } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
                             createSubCb(req, res, submissions, student)
-                        }, (err) => {
-                            handleFail(req, res, err)
-                        })
-                    }
-                })
-            }
-        })
+                        } else {
+                            prob.runTest(req.files).then(() => {
+                                submissions.prob = prob._id
+                                prob.update({
+                                    $push: {submissions: submissions._id}
+                                }, (err) => {
+                                    if (err) return handleResp(res, 500, {error: err.message})
+                                })
+                                createSubCb(req, res, submissions, student)
+                            }, (err) => {
+                                handleFail(req, res, err)
+                            })
+                        }
+                    })
+                }
+            })
     })
 
 
