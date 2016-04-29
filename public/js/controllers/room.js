@@ -96,8 +96,8 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
             }
         }
     }])
-    .controller('RoomFormControl', ['$scope', '$http', function($scope, $http, $document) {
-        hljs.initHighlightingOnLoad();
+    .controller('RoomFormControl', ['$scope', '$http', '$window', function($scope, $http, $window) {
+        hljs.initHighlightingOnLoad(); //HighlightJS initialization
         $scope.loadProblems()
         var fillerText = '# Enter code here'
         var defaultForm = {
@@ -109,42 +109,56 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         }
         $scope.form = jQuery.extend({}, defaultForm)
         $scope.editor = fillerText
+        $scope.clearAttempts = function() {
+            $window.localStorage.setItem('attempts', null)
+        }
         $scope.submit = function() {
             if ($scope.editor != fillerText && $scope.file) {
                 $scope.error = 'Can\'t accept submissions from both file(s) and text editor'
             } else if ($scope.editor == fillerText && !$scope.file) {
                 $scope.error = 'Please submit data'
             } else {
-                var fd = new FormData();
+                var fd = new FormData()
                 for (var key in $scope.form) {
                     if ($scope.form.hasOwnProperty(key))
                         fd.append(key, $scope.form[key])
-                    }
+                }
+                if ($window.localStorage.getItem('attempts')) {
+                    fd.append('attempts', $window.localStorage.getItem('attempts'))
                 }
                 if ($scope.file)
                     fd.append('file', $scope.file);
                 else {
                     var editor_file = new Blob([$scope.editor], {type: 'text/x-script.python'})
-                    fd.append('file', editor_file, $scope.form.name+'.py')
+                    fd.append('file', editor_file, $scope.form.name + '.py')
                 }
                 fd.append('room_path', $scope.room_path)
                 $http.post('/api/submissions', fd, {
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
                     })
-                    .success(function(res){
+                    .success(function (res) {
                         console.log(res)
                         $scope.setSuccess(res.success)
+                        $window.localStorage.setItem('attempts', null)
                         $scope.form = jQuery.extend({}, defaultForm)
                         $scope.editor = fillerText
+                        fd = new FormData()
                     })
-                    .error(function(err){
+                    .error(function (err) {
                         console.log(err)
                         if (err.stack) {
                             $scope.setStack(err.stack)
                         }
+                        if (err.attempt) {
+                            var attempts = JSON.parse($window.localStorage.getItem('attempts')) || []
+                            attempts.push(err.attempt)
+                            $window.localStorage.setItem('attempts', JSON.stringify(attempts))
+                            console.log(attempts)
+                        }
                         $scope.setError(err.error || err.data.error)
                     });
+                }
             }
         }])
     .directive('fileModel', ['$parse', function ($parse) {

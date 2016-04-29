@@ -336,7 +336,6 @@ ProblemSchema.methods = {
                                 var pyshell = new PythonShell(file.path, {mode: 'text'})
                                 pyshell.send("\'" + c.in + "\'")
                                 pyshell.on('message', function (data) {
-                                    console.log(data)
                                     outputSeen = true
                                     if (data != c.out) {
                                         return reject('Failed Test. \"' + data + '\" != ' + c.out)
@@ -377,6 +376,6 @@ models.Room = mongoose.model('Room', RoomSchema)
 models.User = mongoose.model('User', UserSchema)
 models.Problem = mongoose.model('Problem', ProblemSchema)
 models.Student = mongoose.model('Student', StudentSchema)
-models.Atttempt = mongoose.model('Attempt', AttemptSchema)
+models.Attempt = mongoose.model('Attempt', AttemptSchema)
 
 module.exports = models
