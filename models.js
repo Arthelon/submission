@@ -85,7 +85,7 @@ var ProblemSchema = new Schema({
 
 var AttemptSchema = new Schema({
     timestamp: {type: Date, default: Date.now},
-    stacktrace: {type: String, required: true},
+    stack: {type: String, required: true},
     status: {type: String, enum: ['FAILED', 'OK']}
 })
 
@@ -336,6 +336,7 @@ ProblemSchema.methods = {
                                 var pyshell = new PythonShell(file.path, {mode: 'text'})
                                 pyshell.send("\'" + c.in + "\'")
                                 pyshell.on('message', function (data) {
+                                    console.log(data)
                                     outputSeen = true
                                     if (data != c.out) {
                                         return reject('Failed Test. \"' + data + '\" != ' + c.out)
@@ -344,7 +345,7 @@ ProblemSchema.methods = {
 
                                 pyshell.end(function (err) {
                                     if (err) {
-                                        reject('Error Occurred when ending program')
+                                        reject({stack: err.stack})
                                     } else if (!outputSeen) {
                                         reject('No program output!')
                                     } if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {

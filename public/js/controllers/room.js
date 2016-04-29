@@ -76,7 +76,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         $scope.setError = function(msg) {
             $scope.error = msg
         }
-
+        $scope.setStack = function(stack) {
+            $scope.stack = stack
+        }
         $scope.loadPath()
     }])
     .animation('.tableItem', [function() {
@@ -94,7 +96,8 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
             }
         }
     }])
-    .controller('RoomFormControl', ['$scope', '$http', function($scope, $http) {
+    .controller('RoomFormControl', ['$scope', '$http', function($scope, $http, $document) {
+        hljs.initHighlightingOnLoad();
         $scope.loadProblems()
         var fillerText = '# Enter code here'
         var defaultForm = {
@@ -137,6 +140,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     })
                     .error(function(err){
                         console.log(err)
+                        if (err.stack) {
+                            $scope.setStack(err.stack)
+                        }
                         $scope.setError(err.error || err.data.error)
                     });
             }

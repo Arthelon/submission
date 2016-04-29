@@ -2,7 +2,7 @@ extends ./layout
 
 block head
     link(rel='stylesheet' href='/stylesheets/room.css')
-
+    link(rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css")
 block content
     div(ng-controller='RoomCtrl')
         if user_authenticated
@@ -120,5 +120,9 @@ block content
                     .msg.text-center.row(ng-cloak)
                         p(style='color:red;' ng-if='error' ng-bind='error')
                         p(style='color:green;' ng-if='success' ng-bind='success')
+                        pre#stack.col-md-6.col-md-offset-3
+                            code.nohighlight(ng-bind='stack')
+            block script
+                script(src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js")
 
 

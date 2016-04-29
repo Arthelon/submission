@@ -86,7 +86,6 @@ router.route('/')
 
         Student.getStudent(req.body.name, req.body.email)
             .then((student) => {
-                console.log(student)
                 if (prob_name == 'None') {
                     createSubCb(req, res, submissions, student)
                 } else {
@@ -107,7 +106,11 @@ router.route('/')
                                 })
                                 createSubCb(req, res, submissions, student)
                             }, (err) => {
-                                handleFail(req, res, err)
+                                if (err.stack) {
+                                    handleFail(req, res, {error: 'Error during run-time', stack: err.stack})
+                                } else {
+                                    handleFail(req, res, err)
+                                }
                             })
                         }
                     })
@@ -123,7 +126,11 @@ function handleFail(req, res, msg, status) {
             if (err) return handleResp(res, 500, {error: err.message})
         })
     })
-    return handleResp(res, status || 500, {error: msg})
+    if (typeof msg == 'object') {
+        handleResp(res, status || 500, msg)
+    } else {
+        return handleResp(res, status || 500, {error: msg})
+    }
 }
 
 function createSubCb(req, res, sub, student) {
