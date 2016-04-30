@@ -1,4 +1,4 @@
-angular.module('controllers.submission', [])
+angular.module('controllers.submission', ['chart.js'])
     .controller('SubmissionCtrl', function($scope, $http, $location) {
         //Path variable init
         var loc = $location.absUrl().split('/')
@@ -6,6 +6,8 @@ angular.module('controllers.submission', [])
         $scope.submission_id = loc[loc.length-1]
 
         $scope.success, $scope.error, $scope.submission, $scope.attempts = null
+        $scope.chart_data = [[]]
+        $scope.chart_labels = []
         $scope.selectedTab = 'info'
 
         $scope.loadSubmission = function() {
@@ -27,8 +29,14 @@ angular.module('controllers.submission', [])
                     room_path: $scope.room_path
                 }
             }).then(function(succ) {
-                $scope.attempts = succ.data.attempts
+                $scope.attempts = _.orderBy(succ.data.attempts, ['timestamp'], ['desc'])
                 $scope.success = succ.data.success
+
+                _.forEach($scope.attempts, function(val) {
+                    $scope.chart_data[0].push(val.rating)
+                    $scope.chart_labels.push(val.timestamp)
+                    console.log($scope.chart_data, $scope.chart_labels)
+                })
             }, function(err) {
                 console.log(err.error)
                 $scope.error= err.error
@@ -37,37 +45,4 @@ angular.module('controllers.submission', [])
         //Init
         $scope.loadSubmission()
         $scope.loadAttempts()
-    })
-    .directive('attemptgraph', function() {
-        return {
-            restrict: 'A',
-            scope: {
-                attempts: '=attempts'
-            },
-            link: function(scope, element) {
-                scope.ctx = element[0].getContext('2d')
-                var myChart = new Chart(scope.ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                        datasets: [{
-                            label: '# of Votes',
-                            data: [12, 19, 3, 5, 2, 3]
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero:true
-                                }
-                            }]
-                        }
-                    }
-                });
-            },
-            controller: function() {
-                
-            }
-        }
     })

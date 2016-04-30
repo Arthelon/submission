@@ -85,9 +85,9 @@ var ProblemSchema = new Schema({
 
 var AttemptSchema = new Schema({
     timestamp: {type: Number, default: new Date().getTime()},
-    stack: {type: String, required: true},
-    status: {type: String, enum: ['FAILED', 'OK']},
-    rating: {type: Number, min: 0, max: 5}
+    stack: {type: String},
+    status: {type: String, enum: ['FAILED', 'OK'], required: true},
+    rating: {type: Number, min: 0, max: 5, required: true}
 })
 
 //Model Hooks
@@ -333,7 +333,7 @@ ProblemSchema.methods = {
                     if (err || !data) reject({error: 'File not found', rating: 5})
                     else async.each(prob.test.matches, function (match, cb) {
                         if (data.search(new RegExp(match.text)) == -1) {
-                            return reject({error: 'Failed match. \"' + match.text + '\" not found.'}, {rating: 1})
+                            return reject({error: 'Failed match. \"' + match.text + '\" not found.', rating: 1})
                         }
                         else cb()
                     }, (err) => {
@@ -355,7 +355,6 @@ ProblemSchema.methods = {
                                         return reject({error: 'Failed Test. \"' + data + '\" != ' + c.out, rating: 4})
                                     }
                                 })
-
                                 pyshell.end(function (err) {
                                     if (err) {
                                         reject({stack: err.stack, rating: 3})

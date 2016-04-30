@@ -160,7 +160,7 @@ function createSubCb(req, res, sub, student) {
                         else {
                             Attempt.create({
                                 status: 'OK',
-                                stack: 'Test succeeded'
+                                rating: 5
                             }, (err, doc) => {
                                 if (err) handleResp(res, 500, {error: err.message})
                                 else {
