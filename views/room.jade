@@ -17,11 +17,13 @@ block content
                     p #{room_desc}
             .container
                 .row
-                    .col-md-3(ng-init='loadSubmissions()' ng-cloak)
+                    .col-md-3(ng-cloak)
                         ul.nav.nav-pills.nav-stacked
-                            li(ng-click='subToggle=true' ng-class='{active: subToggle == true}')
+                            li(ng-click='selectedTab="submissions"' ng-class='{active: selectedTab=="submissions"}')
                                 a(href='') Submissions
-                            li.dropdown(ng-mouseover='loadProblems()' ng-click='subToggle=false' ng-class='{active: subToggle == false}')
+                            li(ng-click='selectedTab="students"' ng-class='{active: selectedTab=="students"}')
+                                a(href='') Students
+                            li.dropdown(ng-mouseover='loadProblems()' ng-click='selectedTab="problems"' ng-class='{active: selectedTab=="problems"}')
                                 a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
                                     | Problems
                                     span.caret
@@ -33,49 +35,52 @@ block content
                                     li.divider
                                     li
                                         a#createProb(href='/problem/{{room_path}}') Create Problem
-                    .col-md-9#subContent(ng-if='subToggle == true')
-                        table.table.table-striped.table-hover(ng-if='submissions.length > 0' ng-cloak)
-                            thead
-                                tr
-                                    th Submission Title
-                                    th Submitted by
-                                    th Description
-                                    th Timestamp
-                                    th Files
-                            tbody
-                                tr.tableItem(ng-repeat='submission in submissions')
-                                    td
-                                        a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
-                                    td {{submission.student.name}}
-                                    td {{submission.desc}}
-                                    td {{submission.timestamp}}
-                                    td {{submission.files.length}}
-                                        i.fa.fa-times.cross(ng-click='removeSubmission($index)')
-                        .text-center(ng-if='submissions.length == 0')
-                            .alert.alert-dismissible.alert-warning
-                                button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                p No submissions found
-                    .col-md-9#probContent(ng-if='subToggle == false')
-                        table.table.table-striped.table-hover(ng-if='problems.length > 0' ng-cloak)
-                            thead
-                                tr
-                                    th Problem Name
-                                    th Problem Description
-                                    th Number of Submissions
-                            tbody
-                                tr.tableItem(ng-repeat='problem in problems')
-                                    td
-                                        a(href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
-                                    td {{problem.desc}}
-                                    td {{problem.submissions.length}}
-                                        i.fa.fa-times.cross(ng-click='removeProblem($index)')
-                        .text-center(ng-if='problems.length == 0')
-                            .alert.alert-dismissible.alert-warning
-                                button.fa.fa-close.close(type='button', data-dismiss='alert')
-                                p No problems found
-                        .row
-                            .btns.text-center
-                                a(ng-href='/problem/{{room_path}}') Create Problem
+
+                    .col-md-9(ng-switch='selectedTab')
+                        div(ng-switch-when='submissions')
+                            table.table.table-striped.table-hover(ng-if='submissions.length > 0' ng-cloak)
+                                thead
+                                    tr
+                                        th Submission Title
+                                        th Submitted by
+                                        th Description
+                                        th Timestamp
+                                        th Files
+                                tbody
+                                    tr.tableItem(ng-repeat='submission in submissions')
+                                        td
+                                            a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
+                                        td {{submission.student.name}}
+                                        td {{submission.desc}}
+                                        td {{submission.timestamp}}
+                                        td {{submission.files.length}}
+                                            i.fa.fa-times.cross(ng-click='removeSubmission($index)')
+                            .text-center(ng-if='submissions.length == 0')
+                                .alert.alert-dismissible.alert-warning
+                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                    p No submissions found
+                        div(ng-switch-when='problems')
+                            table.table.table-striped.table-hover(ng-if='problems.length > 0' ng-cloak)
+                                thead
+                                    tr
+                                        th Problem Name
+                                        th Problem Description
+                                        th Number of Submissions
+                                tbody
+                                    tr.tableItem(ng-repeat='problem in problems')
+                                        td
+                                            a(href='/problem/{{room_path}}/{{problem.name}}') {{problem.name}}
+                                        td {{problem.desc}}
+                                        td {{problem.submissions.length}}
+                                            i.fa.fa-times.cross(ng-click='removeProblem($index)')
+                            .text-center(ng-if='problems.length == 0')
+                                .alert.alert-dismissible.alert-warning
+                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                    p No problems found
+                            .row
+                                .btns.text-center
+                                    a(ng-href='/problem/{{room_path}}') Create Problem
+                        div(ng-switch-when='students')
         else
             div(ng-controller='RoomFormControl')
                 .container

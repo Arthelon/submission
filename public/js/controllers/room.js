@@ -3,7 +3,7 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         $scope.room_path = null
         $scope.error = null
         $scope.success = null
-        $scope.subToggle = true
+        $scope.selectedTab = 'submissions'
         $scope.room_path = null
         $scope.loadPath = function() {
             var loc = $location.absUrl().split('/')
@@ -79,7 +79,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         $scope.setStack = function(stack) {
             $scope.stack = stack
         }
+        //Init Fns
         $scope.loadPath()
+        $scope.loadSubmissions()
     }])
     .animation('.tableItem', [function() {
         return {

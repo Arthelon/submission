@@ -2,8 +2,8 @@ var router = require('express').Router()
 var Submission = require('../../models').Submission
 
 var util = require('../../util')
-var validateRoom = util.validateRoom()
-var handleResp = util.handleResp()
+var validateRoom = util.validateRoom
+var handleResp = util.handleResp
 
 
 router.route('/:submission_id')
