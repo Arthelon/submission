@@ -96,6 +96,7 @@ var apiProblems = require('./routes/api/problems')
 var apiTests = require('./routes/api/tests')
 var apiUsers = require('./routes/api/users')
 var apiAttempts = require('./routes/api/attempts')
+var apiStudents=  require('./routes/api/students')
 
 app.use('/api/login', apiLogin)
 app.use('/api/rooms', apiRooms)
@@ -104,6 +105,7 @@ app.use('/api/problems', apiProblems)
 app.use('/api/tests', apiTests)
 app.use('/api/users', apiUsers)
 app.use('/api/attempts', apiAttempts)
+app.use('/api/students', apiStudents)
 
 //Fallback Route
 app.use('/', index)

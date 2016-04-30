@@ -22,6 +22,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                 console.log(err)
             })
         }
+        $scope.loadStudents = function() {
+            $http.get('/api/')
+        }
         $scope.loadProblems = function() {
             if (!$scope.hasOwnProperty('problems')) {
                 $http.get('/api/problems', {
