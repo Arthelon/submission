@@ -43,7 +43,7 @@ util.validateRoom = function (req, res, next) {
 //Verifies the presence of an authenticated user
 util.validateUser = function(req, res, next) {
     if (!req.user) {
-        return handleResp(res, 401, 'User not authenticated')
+        res.redirect('/')
     } else {
         next()
     }
