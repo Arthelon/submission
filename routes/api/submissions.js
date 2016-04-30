@@ -108,9 +108,9 @@ router.route('/')
                                 createSubCb(req, res, submissions, student)
                             }, (err) => {
                                 if (err.stack) {
-                                    handleFail(req, res, {error: 'Error during run-time', stack: err.stack}, true)
+                                    handleFail(req, res, {error: 'Error during run-time', stack: err.stack, rating: err.rating}, true)
                                 } else {
-                                    handleFail(req, res, {error: err}, true)
+                                    handleFail(req, res, {error: err.error, rating: err.rating}, true)
                                 }
                             })
                         }
@@ -130,7 +130,8 @@ function handleFail(req, res, errorObj, isTest, status) {
         errorObj.attempt = {
             timestamp: Date.now(),
             stack: errorObj.stack || errorObj.error,
-            status: 'FAILED'
+            status: 'FAILED',
+            rating: errorObj.rating
         }
     }
     return handleResp(res, status || 500, errorObj)

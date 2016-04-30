@@ -86,7 +86,8 @@ var ProblemSchema = new Schema({
 var AttemptSchema = new Schema({
     timestamp: {type: Number, default: new Date().getTime()},
     stack: {type: String, required: true},
-    status: {type: String, enum: ['FAILED', 'OK']}
+    status: {type: String, enum: ['FAILED', 'OK']},
+    rating: {type: Number, min: 0, max: 5}
 })
 
 //Model Hooks
@@ -329,18 +330,18 @@ ProblemSchema.methods = {
         return new Promise((resolve, reject) => {
             files.forEach((file, findex) => {
                 fs.readFile(file.path, 'utf8', function (err, data) {
-                    if (err || !data) reject('File not found')
+                    if (err || !data) reject({error: 'File not found', rating: 5})
                     else async.each(prob.test.matches, function (match, cb) {
                         if (data.search(new RegExp(match.text)) == -1) {
-                            return reject('Failed match. \"' + match.text + '\" not found.')
+                            return reject({error: 'Failed match. \"' + match.text + '\" not found.'}, {rating: 1})
                         }
                         else cb()
                     }, (err) => {
-                        if (err) reject(err.message)
+                        if (err) reject({error: err.message, rating: 3})
                         // If no I/O cases are found
                         else if (prob.test.cases.length == 0) {
                             PythonShell.run(file.path, function (err) {
-                                if (err) reject(err.message)
+                                if (err) reject({stack: err.stack, rating: 3})
                                 else resolve()
                             })
                         } else {
@@ -351,15 +352,15 @@ ProblemSchema.methods = {
                                 pyshell.on('message', function (data) {
                                     outputSeen = true
                                     if (data != c.out) {
-                                        return reject('Failed Test. \"' + data + '\" != ' + c.out)
+                                        return reject({error: 'Failed Test. \"' + data + '\" != ' + c.out, rating: 4})
                                     }
                                 })
 
                                 pyshell.end(function (err) {
                                     if (err) {
-                                        reject({stack: err.stack})
+                                        reject({stack: err.stack, rating: 3})
                                     } else if (!outputSeen) {
-                                        reject('No program output!')
+                                        reject({error: 'No program output!', rating: 2})
                                     } if (findex + 1 == files.length && index + 1 == prob.test.cases.length) {
                                         resolve()
                                     }
