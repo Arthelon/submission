@@ -49,7 +49,7 @@ block content
                                 tbody
                                     tr.tableItem(ng-repeat='submission in submissions')
                                         td
-                                            a#downloadFile(ng-href='/room/{{room_path}}/{{submission.name}}') {{submission.name}}
+                                            a(ng-href='/room/{{room_path}}/submission/{{submission._id}}') {{submission.name}}
                                         td {{submission.student.name}}
                                         td {{submission.desc}}
                                         td {{submission.timestamp}}
@@ -90,7 +90,7 @@ block content
                                 tbody
                                     tr.tableItem(ng-repeat='student in students')
                                         td
-                                            a(href='') {{student.name}}
+                                            a(ng-href='/room/{{room_path}}/student/{{student._id}}') {{student.name}}
                                         td {{student.email}}
                                         td {{student.submissions.length}}
                             .text-center(ng-if='students.length == 0')

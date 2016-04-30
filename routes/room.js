@@ -33,7 +33,7 @@ router.route('/:room_path')
     })
 
 //Submission page Route
-router.route('/:room_path/:submission_id')
+router.route('/:room_path/submission/:submission_id')
     .get(validateRoom, function(req, res) {
         res.render('submission')
     })

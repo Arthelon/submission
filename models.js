@@ -96,6 +96,7 @@ ProblemSchema.pre('remove', function (next) {
     }, function (err, subs) {
         if (err) throw err
         else {
+            //Removes problem reference from all submissions associated with this problem
             subs.forEach(function (sub) {
                 sub.update({
                     prob: null
@@ -106,6 +107,7 @@ ProblemSchema.pre('remove', function (next) {
             next()
         }
     })
+    //Pulls problem reference from parent room document
     models.Room.findOneAndUpdate({
         _id: this.room._id
     }, {
@@ -149,6 +151,7 @@ SubmissionSchema.pre('remove', function (next) {
                 }, function (err) {
                     if (err) throw err
                 })
+                //Remove all submission attempts
                 submission.attempts.forEach(attempt => {
                     attempt.remove((err) => {
                         if (err) throw err
@@ -156,27 +159,32 @@ SubmissionSchema.pre('remove', function (next) {
                 })
             }
         })
+    //Removes submission reference from parent Room document
     models.Room.findOneAndUpdate({_id: sub.room}, {
         $pull: {
             submissions: sub._id
         }
     }, function (err, room) {
         if (err) throw err
-        if (!room) throw new Error('Room not found')
-        models.Problem.findOneAndUpdate({_id: sub.prob}, {
-            $pull: {
-                submissions: sub._id
-            }
-        }, (err) => {
-            if (err) throw err
-            else next()
-        })
+        else if (!room) throw new Error('Room not found')
+        if (sub.prob) { //If submission references a problem document
+            models.Problem.findOneAndUpdate({_id: sub.prob}, {
+                $pull: {
+                    submissions: sub._id
+                }
+            }, (err) => {
+                if (err) throw err
+                else next()
+            })
+        } else {
+            next()
+        }
     })
 })
 
 RoomSchema.pre('remove', function (next) {
     var Room = this
-    models.User.findOneAndUpdate({_id: this.owner}, {
+    models.User.findOneAndUpdate({_id: this.owner}, { //Pulls room reference from room owner
         $pull: {
             rooms: this._id
         }
@@ -185,13 +193,16 @@ RoomSchema.pre('remove', function (next) {
         else if (!user) throw new Error('User not found')
         else {
             Room.problems.forEach(function (prob) {
+                //Removes all problems that fall under the room
                 models.Problem.findOneAndRemove({_id: prob}, (err) => {
                     if (err) throw err
                 })
+                //Removes all submission that are part of the room
                 Room.submissions.forEach(function (sub) {
                     models.Submission.findOneAndRemove({_id: sub}, (err) => {
                         if (err) throw err
                     })
+                    // sub.remove()
                 })
             })
             next()
@@ -199,7 +210,9 @@ RoomSchema.pre('remove', function (next) {
     })
 })
 
+
 FileSchema.pre('remove', function(next) {
+    //Removes server-side file associated with the File document
     fs.unlink('uploads/' + this.loc, (err) => {
         if (err) throw err
         else next()
@@ -224,8 +237,8 @@ UserSchema.methods = {
     }
 }
 
-StudentSchema.statics =  {
-    getStudent: function(name, email) {
+StudentSchema.statics = {
+    getStudent: function (name, email) {
         var formattedName = name.toLowerCase().trim()
         var defaultStudent = new models.Student({
             name: name,
@@ -238,12 +251,12 @@ StudentSchema.statics =  {
                     resolve(student)
                 } else {
                     //Find by formatted name (lower-case, trimmed)
-                    models.Student.find({name: { $regex: new RegExp("^" + formattedName, "i") }}, (err, students) => {
+                    models.Student.find({name: {$regex: new RegExp("^" + formattedName, "i")}}, (err, students) => {
                         if (err) reject(err.message)
                         else if (students.length == 1) { //Only one student document found
                             resolve(students[0])
                         } else if (students.length > 1) {  //If multiple documents found
-                            models.Student.getClosestMatch(email, students).then(function(student) {
+                            models.Student.getClosestMatch(email, students).then(function (student) {
                                 resolve(student)
                             }, () => {
                                 var name_parts = formattedName.split(' ')
@@ -263,7 +276,7 @@ StudentSchema.statics =  {
             })
         })
     },
-    getClosestMatch: function(email, list) {
+    getClosestMatch: function (email, list) {
         var DIFFERENCE_THRESHOLD = 4
         var matchList = []
         return new Promise((resolve, reject) => {
@@ -278,7 +291,7 @@ StudentSchema.statics =  {
                 } else {
                     var min
                     for (var i in matchList) {
-                        if (!min || matchList[i].count < matchList[min].count)  {
+                        if (!min || matchList[i].count < matchList[min].count) {
                             min = i
                         }
                     }

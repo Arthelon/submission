@@ -33,6 +33,8 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+//Express Middleware
 app.use('/api', token.unless({path: [
     {url: '/api/login', methods: 'POST'},
     {url: '/api/register', methods: 'POST'},
@@ -50,13 +52,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'bower_components')))
 app.use(cors())
 
-//Models
+//Database Models
 var User = models.User
 var Room = models.Room
 
 var handleResp = require('./util').handleResp
 
-//Passport setup
+//Passport authentication setup
 passport.serializeUser(function(user, done) {
     done(null, user._id);
 });
@@ -133,7 +135,7 @@ app.use(function (err, req, res, next) {
     console.log(err.message)
 });
 
-//Mongoose
+//Mongoose Connection
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function (err) {
     if (err) throw err
     // User.findOrCreate({

@@ -4,6 +4,7 @@ var Room = require('./models').Room
 var async = require('async')
 var jwt = require('jsonwebtoken')
 
+//Helper function that sends JSON responses
 function handleResp(res, status, data) {
     if (!(typeof data == 'object')) {
         data = {error: data}
@@ -13,8 +14,10 @@ function handleResp(res, status, data) {
     res.end()
 }
 
+//Function used for validating request when a room is accessed
 util.validateRoom = function (req, res, next) {
     var room_path = null
+    //Pulls room_path identifier from body, path, or query string
     if (req.body.room_path) {
         room_path = req.body.room_path
     } else if (req.params.room_path) {
@@ -22,13 +25,14 @@ util.validateRoom = function (req, res, next) {
     } else {
         room_path = req.query.room_path
     }
+
     Room.findOne({path: room_path}, function (err, room) {
         if (err) {
             return next(err)
         } else if (!room) {
             return handleResp(res, 404, 'Room not found')
         } else if (req.user && req.user._id != room.owner.toString()) {
-            return handleResp(res, 406, 'User does not own room')
+            return handleResp(res, 406, 'User does not own room') //Matches req.user against the owner of the Room
         } else {
             req.room = room
             next()
@@ -36,6 +40,7 @@ util.validateRoom = function (req, res, next) {
     })
 }
 
+//Verifies the presence of an authenticated user
 util.validateUser = function(req, res, next) {
     if (!req.user) {
         return handleResp(res, 401, 'User not authenticated')
@@ -44,30 +49,25 @@ util.validateUser = function(req, res, next) {
     }
 }
 
-util.handleErr = function(next, status, msg) {
-    var err = new Error(msg || '');
-    err.status = status;
-    next(err)
-}
-
+//Helper function used to verify the presence of certain fields in the request body
 util.validateBody = function(fields) {
     return function(req, res, next) {
-
         async.each(fields, function(field, done) {
-            if (!Object.prototype.hasOwnProperty.call(req.body, field)) {
+            if (!Object.prototype.hasOwnProperty.call(req.body, field)) { //If field is not found in request body
                 handleResp(res, 400, {error: 'Invalid fields'})
                 return done('Invalid Fields')
             } else {
                 done()
             }
         }, function(err) {
-            if (!err) {
+            if (!err) { //Passes request onto next route middleware if all fields are present
                 next()
             }
         })
     }
 }
 
+//Helper function used for generating jsonwebtoken containing a user instance
 util.generateToken = function(user) {
     return jwt.sign(user.toObject(), process.env.SECRET || 'dev_secret')
 }
