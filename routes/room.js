@@ -35,12 +35,12 @@ router.route('/:room_path')
 //Submission page Route
 router.route('/:room_path/:submission_id')
     .get(validateRoom, function(req, res) {
-
+        res.render('submission')
     })
 
 //Student page route
 router.get('/:room_path/student/:student_name', validateRoom, function(req, res) {
-    
+    res.render('student')
 })
 
 //Submission download route

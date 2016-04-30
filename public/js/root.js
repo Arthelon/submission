@@ -6,6 +6,8 @@ angular.module('app', [
     'controllers.problem',
     'controllers.dashboard',
     'controllers.user',
+    'controllers.submission',
+    'controllers.student',
     'formly',
     'formlyBootstrap'
 ])
