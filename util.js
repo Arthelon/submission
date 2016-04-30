@@ -25,7 +25,7 @@ util.validateRoom = function (req, res, next) {
     } else {
         room_path = req.query.room_path
     }
-    console.log(room_path)
+    console.log('Room Path: '+room_path)
     Room.findOne({path: room_path}, function (err, room) {
         if (err) {
             return next(err)

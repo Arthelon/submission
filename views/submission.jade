@@ -38,5 +38,9 @@ block content
                                 h4.text-muted.list-group-item-heading Download Link
                                 a(ng-href='/room/{{room_path}}/download/{{submission_id}}') Click Here
                     div(ng-switch-when='attempt')
+                        canvas(attemptgraph width='400' height='400' attempts='attempts')
+
+block script
+    script(src='/Chart.js/dist/Chart.min.js')
 
 
