@@ -85,7 +85,7 @@ router.route('/')
         })
         var prob_name = req.body.prob
 
-        Student.getStudent(req.body.name, req.body.email)
+        Student.getStudent(req.body.user, req.body.email)
             .then((student) => {
                 if (prob_name == 'None') {
                     createSubCb(req, res, submissions, student)
@@ -132,8 +132,6 @@ function handleFail(req, res, errorObj, isTest, status) {
             stack: errorObj.stack || errorObj.error,
             status: 'FAILED'
         }
-        console.log(errorObj.stack)
-        console.log(errorObj)
     }
     return handleResp(res, status || 500, errorObj)
 }
@@ -144,33 +142,34 @@ function createSubCb(req, res, sub, student) {
             return handleResp(res, 500, {error: err.message})
         } else {
             new Promise(function (resolve) {
-                var attempts = JSON.parse(req.body.attempts)
-                console.log(attempts[0])
-                async.each(attempts, function (attempt, done) {
-                    Attempt.create(attempt, function (err, doc) {
-                        if (err) done(err)
-                        else {
-                            submission.attempts.push(doc)
-                            done()
-                        }
-                    })
-                }, function (err) {
-                    if (err) handleResp(req, 500, {error: err.message})
-                    else {
-                        console.log('2')
-                        Attempt.create({
-                            status: 'OK',
-                            stack: 'Test succeeded'
-                        }, (err, doc) => {
-                            console.log('3')
-                            if (err) handleResp(res, 500, {error: err.message})
+                if (!req.body.attempts) {
+                    resolve()
+                } else {
+                    var attempts = JSON.parse(req.body.attempts)
+                    async.each(attempts, function (attempt, done) {
+                        Attempt.create(attempt, function (err, doc) {
+                            if (err) done(err)
                             else {
                                 submission.attempts.push(doc)
-                                resolve()
+                                done()
                             }
                         })
-                    }
-                })
+                    }, function (err) {
+                        if (err) handleResp(req, 500, {error: err.message})
+                        else {
+                            Attempt.create({
+                                status: 'OK',
+                                stack: 'Test succeeded'
+                            }, (err, doc) => {
+                                if (err) handleResp(res, 500, {error: err.message})
+                                else {
+                                    submission.attempts.push(doc)
+                                    resolve()
+                                }
+                            })
+                        }
+                    })
+                }
             })
                 .then(() => {
                     student.submissions.push(submission)

@@ -1,4 +1,42 @@
 extends layout
 
 block content
-    h1 Submission Page
+    div(ng-controller='SubmissionCtrl')
+        .header.btns
+            .float-left
+                a(href='/dashboard') Main
+            .float-right
+                a(href='/logout') Logout
+        .container
+            .row(ng-cloak)
+                h2 {{submission.name}}
+                p Submitted by
+                    a(ng-href='/room/{{room_path}}/student/{{submission.student.name}}')  {{submission.student.name}}
+        .container
+            .row
+                .col-md-3
+                    ul.nav.nav-pills.nav-stacked
+                        li(ng-click='selectedTab="info"' ng-class='{active: selectedTab=="info"}')
+                            a(href='') Info
+                        li(ng-click='selectedTab="attempt"' ng-class='{active: selectedTab=="attempt"}')
+                            a(href='') Attempts
+                .col-md-9(ng-switch='selectedTab')
+                    div(ng-switch-when='info' ng-cloak)
+                        .panel.panel-success.list-group
+                            .panel-heading
+                                h3.panel-title Submission Details
+                            .list-group-item
+                                h4.text-muted.list-group-item-heading Submitted on
+                                p {{submission.timestamp | date:'HH:mm a MMM dd, yyyy'}}
+                            .list-group-item(ng-if='submission.desc')
+                                h4.text-muted.list-group-item-heading Description
+                                p {{submission.desc}}
+                            .list-group-item(ng-if='submission.attempts')
+                                h4.text-muted.list-group-item-heading Number of attempts
+                                p {{submission.attempts.length}}
+                            .list-group-item
+                                h4.text-muted.list-group-item-heading Download Link
+                                a(ng-href='/room/{{room_path}}/download/{{submission_id}}') Click Here
+                    div(ng-switch-when='attempt')
+
+

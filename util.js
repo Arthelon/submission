@@ -25,7 +25,7 @@ util.validateRoom = function (req, res, next) {
     } else {
         room_path = req.query.room_path
     }
-
+    console.log(room_path)
     Room.findOne({path: room_path}, function (err, room) {
         if (err) {
             return next(err)
@@ -41,11 +41,41 @@ util.validateRoom = function (req, res, next) {
 }
 
 //Verifies the presence of an authenticated user
-util.validateUser = function(req, res, next) {
+util.clientValidateUser = function(req, res, next) {
     if (!req.user) {
         res.redirect('/')
     } else {
         next()
+    }
+}
+
+util.clientValidateRoom = function(req, res, next) {
+    var room_path = null
+    //Pulls room_path identifier from body, path, or query string
+    if (!req.user) {
+        res.redirect('/')
+    } else {
+        if (req.body.room_path) {
+            room_path = req.body.room_path
+        } else if (req.params.room_path) {
+            room_path = req.params.room_path
+        } else {
+            room_path = req.query.room_path
+        }
+        if (!req.user) {
+
+        }
+        Room.findOne({path: room_path}, function (err, room) {
+            if (err) {
+                return next(err)
+            } else if (!room) {
+                next(new Error('Room not found'))
+            } else if (req.user && req.user._id != room.owner.toString()) {
+                next(new Error('User does not own room'))
+            } else {
+                next()
+            }
+        })
     }
 }
 

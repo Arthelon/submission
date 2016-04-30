@@ -1,4 +1,12 @@
 extends layout
 
 block content
-    h1 Student page
+    div(ng-controller='StudentCtrl')
+        .header.btns
+            .float-left
+                a(href='/dashboard') Main
+            .float-right
+                a(href='/logout') Logout
+        .container
+
+

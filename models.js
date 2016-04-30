@@ -8,7 +8,7 @@ var PythonShell = require('python-shell')
 
 
 var SubmissionSchema = new Schema({
-    timestamp: {type: Date, default: Date.now},
+    timestamp: {type: Number, default: new Date().getTime()},
     name: {type: String, required: true, match: [/\w+/, 'Name can only include words']},
     desc: String,
     prob: {type: Schema.Types.ObjectId, ref: 'Problem'},
@@ -84,7 +84,7 @@ var ProblemSchema = new Schema({
 })
 
 var AttemptSchema = new Schema({
-    timestamp: {type: Date, default: Date.now},
+    timestamp: {type: Number, default: new Date().getTime()},
     stack: {type: String, required: true},
     status: {type: String, enum: ['FAILED', 'OK']}
 })

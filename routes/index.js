@@ -4,6 +4,7 @@ var passport = require('passport')
 var models = require('../models')
 
 var Room = models.Room
+var clientValidateUser = require('../util').clientValidateUser
 
 router.get('/', function (req, res) {
     if (req.user) {
@@ -50,23 +51,15 @@ router.route('/login')
     })
 
 router.route('/create_room')
-    .get(function (req, res) {
-        if (req.user) {
-            res.render('create_room', {
-                title: 'submission | Create Room',
-            })
-        } else {
-            res.redirect('/')
-        }
+    .get(clientValidateUser, function (req, res) {
+        res.render('create_room', {
+            title: 'submission | Create Room',
+        })
     })
 
 router.route('/user')
-    .get(function(req, res) {
-        if (req.user) {
-            res.render('user')
-        } else {
-            res.redirect('/')
-        }
+    .get(clientValidateUser, function(req, res) {
+        res.render('user')
     })
 module.exports = router
 

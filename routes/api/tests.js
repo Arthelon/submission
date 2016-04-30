@@ -8,7 +8,6 @@ var Problem = models.Problem
 var util = require('../../util')
 
 var validateRoom = util.validateRoom
-var validateUser = util.validateUser
 var handleResp = util.handleResp
 var validateBody = util.validateBody
 

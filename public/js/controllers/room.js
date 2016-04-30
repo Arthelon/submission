@@ -88,7 +88,6 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         }
         //Init Fns
         $scope.loadPath()
-        $scope.loadSubmissions()
     }])
     .animation('.tableItem', [function() {
         return {

@@ -12,13 +12,13 @@ var handleResp = util.handleResp
 var multer = require('multer')
 var archiver = require('archiver')
 
-var validateRoom = util.validateRoom
+var clientValidateRoom = util.clientValidateRoom
 
 var NotFoundError = require('../errors').NotFoundError
 
 //Room page route
 router.route('/:room_path')
-    .get(function (req, res, next) {
+    .get(function (req, res) {
         Room.findOne({path: req.params.room_path}, function(err, room) {
             if (err || !room) next(err || new NotFoundError('404'))
             else {
@@ -34,20 +34,20 @@ router.route('/:room_path')
 
 //Submission page Route
 router.route('/:room_path/submission/:submission_id')
-    .get(validateRoom, function(req, res) {
+    .get(clientValidateRoom, function(req, res) {
         res.render('submission')
     })
 
 //Student page route
-router.get('/:room_path/student/:student_name', validateRoom, function(req, res) {
+router.get('/:room_path/student/:student_name', clientValidateRoom, function(req, res) {
     res.render('student')
 })
 
 //Submission download route
-router.get('/:room_path/download/:submission_id', validateRoom, function(req, res) {
+router.get('/:room_path/download/:submission_id', clientValidateRoom, function(req, res) {
     Submission
         .findOne({
-            name: req.params.submission
+            _id: req.params.submission_id
         })
         .populate('files')
         .exec(function (err, sub) {
