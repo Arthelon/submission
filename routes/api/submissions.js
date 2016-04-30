@@ -94,7 +94,7 @@ router.route('/')
                         if (err) {
                             handleFail(req, res, {error: err.message})
                         } else if (!prob) {
-                            handleFail(req, res, {error:'Problem not found'}, false, 404)
+                            handleFail(req, res, {error: 'Problem not found'}, false, 404)
                         } else if (prob.test.matches.length == 0 && prob.test.cases.length == 0) {
                             createSubCb(req, res, submissions, student)
                         } else {
@@ -120,7 +120,6 @@ router.route('/')
     })
 
 
-
 function handleFail(req, res, errorObj, isTest, status) {
     req.files.forEach(function (file) {
         fs.unlink(file.path, (err) => {
@@ -140,22 +139,22 @@ function handleFail(req, res, errorObj, isTest, status) {
 }
 
 function createSubCb(req, res, sub, student) {
-    sub.save(function(err, submission) {
+    sub.save(function (err, submission) {
         if (err) {
             return handleResp(res, 500, {error: err.message})
         } else {
-            new Promise(function(resolve) {
+            new Promise(function (resolve) {
                 var attempts = JSON.parse(req.body.attempts)
                 console.log(attempts[0])
-                async.each(attempts, function(attempt, done) {
-                    Attempt.create(attempt, function(err, doc) {
+                async.each(attempts, function (attempt, done) {
+                    Attempt.create(attempt, function (err, doc) {
                         if (err) done(err)
                         else {
                             submission.attempts.push(doc)
                             done()
                         }
                     })
-                }, function(err) {
+                }, function (err) {
                     if (err) handleResp(req, 500, {error: err.message})
                     else {
                         console.log('2')
@@ -173,44 +172,74 @@ function createSubCb(req, res, sub, student) {
                     }
                 })
             })
-            .then(() => {
-                student.submissions.push(submission)
-                student.save()
-                submission.student = student
-                Room.findOneAndUpdate({
-                    _id: req.room._id
-                }, {$push: {submissions: submission._id}}, (err, room) => {
-                    if (err) {
-                        return handleResp(res, 500, {error: err.message})
-                    } else if (!room) {
-                        return handleResp(res, 404, {error: 'Room not found'})
-                    } else {
-                        submission.room = room._id
-                        submission.save()
-                        async.each(req.files, function (file, cb) {
-                            File.create({
-                                name: file.originalname,
-                                type: file.mimetype,
-                                loc: file.filename
-                            }, function (err, created_file) {
-                                if (err) cb(err)
-                                submission.update({
-                                    $push: {
-                                        files: created_file._id
-                                    }
-                                }, (err) => {
+                .then(() => {
+                    student.submissions.push(submission)
+                    student.save()
+                    submission.student = student
+                    Room.findOneAndUpdate({
+                        _id: req.room._id
+                    }, {
+                        $push: {
+                            submissions: submission._id,
+                            students: student._id
+                        },
+                    }, (err, room) => {
+                        if (err) {
+                            return handleResp(res, 500, {error: err.message})
+                        } else if (!room) {
+                            return handleResp(res, 404, {error: 'Room not found'})
+                        } else {
+                            submission.room = room._id
+                            submission.save()
+                            async.each(req.files, function (file, cb) {
+                                File.create({
+                                    name: file.originalname,
+                                    type: file.mimetype,
+                                    loc: file.filename
+                                }, function (err, created_file) {
                                     if (err) cb(err)
-                                    else cb()
+                                    submission.update({
+                                        $push: {
+                                            files: created_file._id
+                                        }
+                                    }, (err) => {
+                                        if (err) cb(err)
+                                        else cb()
+                                    })
                                 })
+                            }, function (err) {
+                                if (err) return handleResp(res, 500, {error: err.message})
+                                else return handleResp(res, 200, {success: 'Success'})
                             })
-                        }, function (err) {
-                            if (err) return handleResp(res, 500, {error: err.message})
-                            else return handleResp(res, 200, {success: 'Success'})
-                        })
-                    }
+                        }
+                    })
                 })
-            })
         }
     })
 }
+
+router.route('/:submission_id')
+    /**
+     * @api {get} /api/submissions/:submission_id Retrieve submission data
+     *
+     * @apiParam {String} room_path Name of room path
+     * @apiSuccess {Object} submission Database document of the requested submission
+     * @apiSuccess {String} success Success message
+     */
+    .get(validateRoom, function(req, res) {
+        var id = req.params.submission_id
+        if (!id) {
+            handleResp(req, 400, {error: 'Submission Id not found'})
+        } else {
+            Submission.findOne({_id: id}, (err, sub) => {
+                if (err || !sub) handleResp(res, 400, {error: err.message || 'Submission not found'})
+                else {
+                    handleResp(res, 200, {
+                        success: 'Submission data retrieved',
+                        submission: sub
+                    })
+                }
+            })
+        }
+    })
 module.exports = router
