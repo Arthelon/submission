@@ -6,8 +6,10 @@ angular.module('controllers.submission', ['chart.js'])
         $scope.submission_id = loc[loc.length-1]
 
         $scope.success, $scope.error, $scope.submission, $scope.attempts = null
-        $scope.chart_data = [[]]
-        $scope.chart_labels = []
+        $scope.chart = {
+            data: [[]],
+            labels: []
+        }
         $scope.selectedTab = 'info'
 
         $scope.loadSubmission = function() {
@@ -33,9 +35,9 @@ angular.module('controllers.submission', ['chart.js'])
                 $scope.success = succ.data.success
 
                 _.forEach($scope.attempts, function(val) {
-                    $scope.chart_data[0].push(val.rating)
-                    $scope.chart_labels.push(val.timestamp)
-                    console.log($scope.chart_data, $scope.chart_labels)
+                    $scope.chart.data[0].push(val.rating)
+                    var date = new Date(val.timestamp)
+                    $scope.chart.labels.push(date.getDay()+'/'+date.getMonth()+'/'+date.getYear()+' '+date.getHours()+':'+date.getMinutes())
                 })
             }, function(err) {
                 console.log(err.error)
