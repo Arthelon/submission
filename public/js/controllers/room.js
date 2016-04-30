@@ -1,10 +1,8 @@
 angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
     .controller('RoomCtrl', ['$scope', '$http', '$location', function($scope, $http, $location, $log) {
-        $scope.room_path = null
-        $scope.error = null
-        $scope.success = null
+        $scope.room_path, $scope.error, $scope.success, $scope.room_path, $scope.students, $scope.problems = null
         $scope.selectedTab = 'submissions'
-        $scope.room_path = null
+
         $scope.loadPath = function() {
             var loc = $location.absUrl().split('/')
             $scope.room_path = loc[loc.length-1]
@@ -23,10 +21,16 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
             })
         }
         $scope.loadStudents = function() {
-            $http.get('/api/')
+            $http.get('/api/students/room/'+$scope.room_path).then(function(succ) {
+                $scope.setSuccess(succ.data.success)
+                $scope.students = succ.data.students
+                console.log(succ.data)
+            }, function(err) {
+                $scope.setError(err.error)
+            })
         }
         $scope.loadProblems = function() {
-            if (!$scope.hasOwnProperty('problems')) {
+            if (!$scope.problems) {
                 $http.get('/api/problems', {
                     params: {
                         room_path: $scope.room_path

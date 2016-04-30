@@ -21,8 +21,9 @@ router.route('/room/:room_path')
      */
     .get(validateRoom, (req, res) => {
         Room
+            .findOne({_id: req.room._id})
             .populate('students')
-            .findOne({_id: req.room._id}, (err, room) => {
+            .exec((err, room) => {
                 if (err) handleResp(res, 500, err.message)
                 else {
                     handleResp(res, 200, {

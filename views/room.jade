@@ -23,7 +23,7 @@ block content
                                 a(href='') Submissions
                             li(ng-click='selectedTab="students"' ng-class='{active: selectedTab=="students"}')
                                 a(href='') Students
-                            li.dropdown(ng-mouseover='loadProblems()' ng-click='selectedTab="problems"' ng-class='{active: selectedTab=="problems"}')
+                            li.dropdown(ng-click='selectedTab="problems"' ng-class='{active: selectedTab=="problems"}')
                                 a.dropdown-toggle(data-toggle='dropdown', href='#', aria-expanded='false')
                                     | Problems
                                     span.caret
@@ -59,7 +59,7 @@ block content
                                 .alert.alert-dismissible.alert-warning
                                     button.fa.fa-close.close(type='button', data-dismiss='alert')
                                     p No submissions found
-                        div(ng-switch-when='problems')
+                        div(ng-switch-when='problems' ng-init='loadProblems()')
                             table.table.table-striped.table-hover(ng-if='problems.length > 0' ng-cloak)
                                 thead
                                     tr
@@ -80,7 +80,25 @@ block content
                             .row
                                 .btns.text-center
                                     a(ng-href='/problem/{{room_path}}') Create Problem
-                        div(ng-switch-when='students')
+                        div(ng-switch-when='students' ng-init='loadStudents()')
+                            table.table.table-striped.table-hover(ng-if='students.length > 0' ng-cloak)
+                                thead
+                                    tr
+                                        th Student Name
+                                        th Student Email
+                                        th Number of Submissions
+                                tbody
+                                    tr.tableItem(ng-repeat='student in students')
+                                        td
+                                            a(href='') {{student.name}}
+                                        td {{student.email}}
+                                        td {{student.submissions.length}}
+                            .text-center(ng-if='students.length == 0')
+                                .alert.alert-dismissible.alert-warning
+                                    button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                    p No students found
+
+
         else
             div(ng-controller='RoomFormControl')
                 .container
