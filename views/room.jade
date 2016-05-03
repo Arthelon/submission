@@ -52,7 +52,7 @@ block content
                                             a(ng-href='/room/{{room_path}}/submission/{{submission._id}}') {{submission.name}}
                                         td {{submission.student.name}}
                                         td {{submission.desc}}
-                                        td {{submission.timestamp}}
+                                        td {{submission.timestamp | date: "MMM dd, HH:mm"}}
                                         td {{submission.files.length}}
                                             i.fa.fa-times.cross(ng-click='removeSubmission($index)')
                             .text-center(ng-if='submissions.length == 0')

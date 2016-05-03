@@ -34,7 +34,7 @@ block content
                                     a#downloadFile(href='/room/{{room_path}}/{{sub.name}}') {{sub.name}}
                                 td {{sub.student.name}}
                                 td {{sub.desc}}
-                                td {{sub.timestamp}}
+                                td {{sub.timestamp| date: "MMM dd, HH:mm"}}
                                 td {{sub.files.length}}
                                     i.fa.fa-times.cross(ng-click='removeSubmission($index)')
                     .text-center(ng-if='submissions.length == 0')

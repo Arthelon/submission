@@ -12,7 +12,7 @@ block content
             .row(ng-cloak)
                 h2 {{submission.name}}
                 p Submitted by
-                    a(ng-href='/room/{{room_path}}/student/{{submission.student.name}}')  {{submission.student.name}}
+                    a(ng-href='/room/{{room_path}}/student/{{submission.student._id}}')  {{submission.student.name}}
         .container
             .row
                 .col-md-3
@@ -23,7 +23,7 @@ block content
                             a(href='') Attempts
                 .col-md-9(ng-switch='selectedTab')
                     div(ng-switch-when='info' ng-cloak)
-                        .panel.panel-success.list-group
+                        .panel.panel-primary.list-group
                             .panel-heading
                                 h3.panel-title Submission Details
                             .list-group-item

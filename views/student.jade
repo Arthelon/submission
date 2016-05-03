@@ -7,6 +7,41 @@ block content
                 a(href='/dashboard') Main
             .float-right
                 a(href='/logout') Logout
+        .container(ng-cloak)
+            h2(ng-bind='student.name')
         .container
+            .row
+                .col-md-3
+                    ul.nav.nav-pills.nav-stacked
+                        li(ng-click='selectedTab = "submissions"' ng-class='{active: selectedTab == "submissions"}')
+                            a(href='') Submissions
+                        li(ng-click='selectedTab = "graph"' ng-class='{active: selectedTab == "graph"}')
+                            a(href='') Graph
+                .col-md-9(ng-switch='selectedTab')
+                    div(ng-switch-when='submissions')
+                        table.table.table-striped.table-hover(ng-if='student.submissions.length > 0' ng-cloak)
+                            thead
+                                tr
+                                    th Submission Title
+                                    th Description
+                                    th Timestamp
+                                    th Files
+                            tbody
+                                tr.tableItem(ng-repeat='submission in student.submissions')
+                                    td
+                                        a(ng-href='/room/{{room_path}}/submission/{{submission._id}}') {{submission.name}}
+                                    td {{submission.desc}}
+                                    td {{submission.timestamp| date: "MMM dd, HH:mm"}}
+                                    td {{submission.files.length}}
+                                        i.fa.fa-times.cross(ng-click='removeSubmission($index)')
+                        .text-center(ng-if='student.submissions.length == 0')
+                            .alert.alert-dismissible.alert-warning
+                                button.fa.fa-close.close(type='button', data-dismiss='alert')
+                                p No submissions found
+                    div(ng-switch-when='graph')
+                        h1 Graph Content
+
+
+
 
 

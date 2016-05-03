@@ -10,6 +10,25 @@ var validateRoom = util.validateRoom
 var handleResp = util.handleResp
 
 router.route('/:student_id')
+    .get(validateRoom, (req, res) => {
+        var student_id = req.params.student_id
+        if (!student_id) return handleResp(res, 400, 'Student ID not found')
+        Room.findOne({
+            students: student_id
+        }, (err, room) => {
+            if (err || !room) handleResp(res, 500, err.message || 'Room not found')
+            else {
+                Student.findOne({_id: student_id})
+                    .populate('submissions')
+                    .exec(function(err, student) {
+                    if (err || !student) handleResp(res, 500, err.message || 'Student not found')
+                    else {
+                        handleResp(res, 200, {success: 'Student data retrieved', student: student})
+                    }
+                })
+            }
+        })
+    })
 
 router.route('/room/:room_path')
     /**

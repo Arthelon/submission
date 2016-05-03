@@ -39,7 +39,7 @@ router.route('/:room_path/submission/:submission_id')
     })
 
 //Student page route
-router.get('/:room_path/student/:student_name', clientValidateRoom, function(req, res) {
+router.get('/:room_path/student/:student_id', clientValidateRoom, function(req, res) {
     res.render('student')
 })
 
