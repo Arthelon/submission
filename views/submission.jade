@@ -1,6 +1,7 @@
 extends layout
 block head
     link(rel='stylesheet' href='/angular-chart.js/dist/angular-chart.css')
+    link(rel='stylesheet' href='/angular-fancy-modal/dist/angular-fancy-modal.min.css')
 block content
     div(ng-controller='SubmissionCtrl')
         .header.btns
@@ -10,9 +11,12 @@ block content
                 a(href='/logout') Logout
         .container
             .row(ng-cloak)
-                h2 {{submission.name}}
-                p Submitted by
-                    a(ng-href='/room/{{room_path}}/student/{{submission.student._id}}')  {{submission.student.name}}
+                .float-left
+                    h2 {{submission.name}}
+                    p Submitted by
+                        a(ng-href='/room/{{room_path}}/student/{{submission.student._id}}')  {{submission.student.name}}
+                .float-right.btns
+                    a(href='' ng-click='openEmailModal()') Send Response
         .container
             .row
                 .col-md-3
@@ -40,5 +44,6 @@ block content
                                 a(ng-href='/room/{{room_path}}/download/{{submission_id}}') Click Here
                     div(ng-switch-when='attempt')
                         canvas.chart.chart-bar(chart-data='chart.data' chart-labels='chart.labels')
+
 
 

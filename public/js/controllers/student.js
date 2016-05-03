@@ -8,14 +8,14 @@ angular.module('controllers.student', [])
         $scope.selectedTab = 'submissions'
 
         $scope.loadStudent = function() {
-            $http.get('/api/students/'+$scope.student_id, {
+            $http.get('/api/students/' + $scope.student_id, {
                 params: {
                     room_path: $scope.room_path
                 }
-            }).then(function(succ) {
+            }).then(function (succ) {
                 console.log(succ.data)
                 $scope.student = succ.data.student
-            }, function(err) {
+            }, function (err) {
                 $scope.error = err.error
             })
         }

@@ -8,6 +8,9 @@ var Room = models.Room
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
+var validateBody = util.validateBody
+
+var nodemailer = require('nodemailer')
 
 router.route('/:student_id')
     .get(validateRoom, (req, res) => {
@@ -51,6 +54,40 @@ router.route('/room/:room_path')
                     })
                 }
             })
+    })
+
+router.route('/email/:student_id')
+    /**
+     * @api {post} /api/students/email/:student_id Send email to student
+     *
+     * @apiParam {String} room_path Path to room
+     * @apiParam {String} message Email contents
+     * @apiSuccess {String} success Success message
+     */
+    .post(validateRoom, validateBody(['room_path', 'message']), (req, res) => {
+        Student.findOne({_id: req.params.student_id}, (err, student) => {
+            if (err || !student) handleResp(res, 500, err.message || 'Student not found')
+            else {
+                var transport = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: req.user.email,
+                        pass: req.user.email_password,
+                    }
+                })
+                transport.sendMail({
+                    from: req.user.email,
+                    to: student.email,
+                    subject: 'Submission - Response from ' + req.user.first_name,
+                    text: req.body.message
+                }, function(err) {
+                    if (err) handleResp(res, 500, err.message)
+                    else {
+                        return handleResp(res, 200, {success: 'Email response sent to '+req.user.email})
+                    }
+                })
+            }
+        })
     })
 
 module.exports = router

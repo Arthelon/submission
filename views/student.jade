@@ -8,7 +8,10 @@ block content
             .float-right
                 a(href='/logout') Logout
         .container(ng-cloak)
-            h2(ng-bind='student.name')
+            .float-left
+                h2(ng-bind='student.name')
+            .float-right.btns
+                a(href='') Send Email
         .container
             .row
                 .col-md-3

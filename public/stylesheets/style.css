@@ -20,6 +20,10 @@ a:hover, a:active {
     border-radius:5%;
     text-decoration: none;
     cursor: pointer;
+    margin-top: 10px;
+}
+.btns {
+    margin-top: 20px;
 }
 .btns a:hover, a:active {
     background-color: white;
@@ -89,4 +93,9 @@ table {
 @-webkit-keyframes fadein {
     from { opacity: 0; }
     to   { opacity: 1; }
+}
+
+#emailContent {
+    width: 100%;
+    min-height: 300px;
 }
