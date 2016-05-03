@@ -19,6 +19,22 @@ angular.module('controllers.student', [])
                 $scope.error = err.error
             })
         }
+        $scope.removeSubmission = function(index) {
+            $http.delete('/api/submissions', {
+                data: {
+                    submission: $scope.student.submissions[index].name,
+                    room_path: $scope.room_path
+                },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function(res) {
+                $scope.success = res.data.success
+                $scope.student.submissions.splice(index, 1)
+            }, function(err) {
+                $scope.error = err.data.error || err.error
+            })
+        }
         //Init Fn
         $scope.loadStudent()
     })
