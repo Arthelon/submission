@@ -181,8 +181,10 @@ function createSubCb(req, res, sub, student) {
                     }, {
                         $push: {
                             submissions: submission._id,
-                            students: student._id
                         },
+                        $addToSet:{
+                            students: student._id
+                        }
                     }, (err, room) => {
                         if (err) {
                             return handleResp(res, 500, {error: err.message})

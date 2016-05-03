@@ -37,7 +37,7 @@ angular.module('controllers.submission', ['chart.js'])
                 _.forEach($scope.attempts, function(val) {
                     $scope.chart.data[0].push(val.rating)
                     var date = new Date(val.timestamp)
-                    $scope.chart.labels.push(date.getDay()+'/'+date.getMonth()+'/'+date.getYear()+' '+date.getHours()+':'+date.getMinutes())
+                    $scope.chart.labels.push(date.getDay()+'/'+date.getMonth()+'/'+date.getFullYear()+' '+date.getHours()+':'+date.getMinutes())
                 })
             }, function(err) {
                 console.log(err.error)
