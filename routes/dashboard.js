@@ -5,7 +5,7 @@ var models = require('../models')
 router.route('/')
     .get(function (req, res) {
         if (req.user) {
-            res.render('dashboard', {
+            res.render('pages/dashboard', {
                 name: req.user.username,
                 title: 'submission | Dashboard'
             })

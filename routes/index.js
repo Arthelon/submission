@@ -10,7 +10,7 @@ router.get('/', function (req, res) {
     if (req.user) {
         res.redirect('/dashboard')
     } else {
-        res.render('index', {
+        res.render('pages/index', {
             title: 'submission | Main'
         })
     }
@@ -32,7 +32,7 @@ router.route('/register')
         if (req.user) {
             payload.user = true
         }
-        res.render('register', payload)
+        res.render('pages/register', payload)
     })
 
 router.route('/login')
@@ -40,7 +40,7 @@ router.route('/login')
         if (req.user) {
             res.redirect('/dashboard')
         } else {
-            res.render('login', {
+            res.render('pages/login', {
                 title: 'submission | Login',
                 ngApp: 'app.login'
             })
@@ -52,14 +52,14 @@ router.route('/login')
 
 router.route('/create_room')
     .get(clientValidateUser, function (req, res) {
-        res.render('create_room', {
+        res.render('pages/create_room', {
             title: 'submission | Create Room',
         })
     })
 
 router.route('/user')
     .get(clientValidateUser, function(req, res) {
-        res.render('user')
+        res.render('pages/user')
     })
 module.exports = router
 

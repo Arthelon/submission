@@ -71,7 +71,7 @@ passport.use(new LocalStrategy(
 ));
 
 //Mongoose Connection
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function() {
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function(err) {
     if (err) throw err
     // User.findOrCreate({
     //    username: 'Arthelon',

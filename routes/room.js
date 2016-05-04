@@ -27,7 +27,7 @@ router.route('/:room_path')
                     room_desc: room.desc
                 }
                 payload.user_authenticated = req.user ? true : false
-                res.render('room', payload)
+                res.render('pages/room', payload)
             }
         })
     })
@@ -35,12 +35,12 @@ router.route('/:room_path')
 //Submission page Route
 router.route('/:room_path/submission/:submission_id')
     .get(clientValidateRoom, function(req, res) {
-        res.render('submission')
+        res.render('pages/submission')
     })
 
 //Student page route
 router.get('/:room_path/student/:student_id', clientValidateRoom, function(req, res) {
-    res.render('student')
+    res.render('pages/student')
 })
 
 //Submission download route
