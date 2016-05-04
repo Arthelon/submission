@@ -7,7 +7,6 @@ var validateBody = require('../../util').validateBody
 
 router.route('/')
     .put(function(req, res) {
-        console.log(req.body)
         User.findOneAndUpdate({
             _id: req.user._id
         }, req.body, (err, user) => {

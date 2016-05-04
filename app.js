@@ -1,3 +1,4 @@
+//Module Dependencies
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -5,26 +6,21 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressSession = require('express-session');
-
-//routes
-var routes = require('./routes')
-
-//JWT setup
 var jwt = require('jsonwebtoken')
 var expressJwt = require('express-jwt')
 var token = expressJwt({secret: 'dev_secret'})
-
-//Passport setup
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy
-
-//Mongoose
 var mongoose = require('mongoose')
 var models = require('./models')
-
-//Misc
 var cors = require('cors')
+var handleResp = require('./util').handleResp
 
+//Database Models
+var User = models.User
+var Room = models.Room
+
+//Express App
 var app = express();
 
 // view engine setup
@@ -52,12 +48,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'bower_components')))
 app.use(cors())
 
-//Database Models
-var User = models.User
-var Room = models.Room
-
-var handleResp = require('./util').handleResp
-
 //Passport authentication setup
 passport.serializeUser(function(user, done) {
     done(null, user._id);
@@ -72,13 +62,47 @@ passport.deserializeUser(function(id, done) {
 passport.use(new LocalStrategy(
     function(username, password, done) {
         User.findOne({ username: username }, function (err, user) {
-            if (err) { return handleResp(res, 400, {error: err.message}) }
-            if (!user) { return handleResp(res, 404, {error: 'User not found'}) }
+            if (err) return handleResp(res, 400, {error: err.message})
+            if (!user) return handleResp(res, 404, {error: 'User not found'})
             if (!user.verifyPassword(password)) { return handleResp(res, 401, {error: 'Invalid password'}) }
             return done(null, user);
         });
     }
 ));
+
+//Mongoose Connection
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function() {
+    if (err) throw err
+    // User.findOrCreate({
+    //    username: 'Arthelon',
+    //    password: '123456789',
+    //    email: 'hsing.daniel@gmail.com',
+    //    first_name: 'Daniel',
+    //    last_name: 'Hsing',
+    // }, (err, doc, created) => {
+    //    if (err) throw err
+    //    Room.findOrCreate({
+    //        path: 'hello',
+    //        name: 'MyRoom',
+    //        desc: 'test',
+    //        owner: doc._id
+    //    }, (err, room, created) => {
+    //        User.findOneAndUpdate({
+    //            username: doc.username
+    //        }, {
+    //            $push: {
+    //                rooms: room._id
+    //            }
+    //        }, (err) => {
+    //            if (err) throw err
+    //        })
+    //    })
+    // })
+})
+mongoose.connection.on('error', function() {
+    console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+    process.exit(1);
+})
 
 //Routing
 var dashboard = require('./routes/dashboard')
@@ -134,35 +158,5 @@ app.use(function (err, req, res, next) {
     res.send({error: err.message || 'Internal server error'})
     console.log(err.message)
 });
-
-//Mongoose Connection
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/test', function (err) {
-    if (err) throw err
-    // User.findOrCreate({
-    //    username: 'Arthelon',
-    //    password: '123456789',
-    //    email: 'hsing.daniel@gmail.com',
-    //    first_name: 'Daniel',
-    //    last_name: 'Hsing',
-    // }, (err, doc, created) => {
-    //    if (err) throw err
-    //    Room.findOrCreate({
-    //        path: 'hello',
-    //        name: 'MyRoom',
-    //        desc: 'test',
-    //        owner: doc._id
-    //    }, (err, room, created) => {
-    //        User.findOneAndUpdate({
-    //            username: doc.username
-    //        }, {
-    //            $push: {
-    //                rooms: room._id
-    //            }
-    //        }, (err) => {
-    //            if (err) throw err
-    //        })
-    //    })
-    // })
-})
 
 module.exports = app;

@@ -1,0 +1,6 @@
+.alert.alert-dismissible.alert-danger(ng-if='error')
+    button.close(type='button', data-dismiss='alert') ×
+    p(ng-bind='error')
+.alert.alert-dismissible.alert-success(ng-if='success')
+    button.close(type='button', data-dismiss='alert') ×
+    p(ng-bind='success')

@@ -78,6 +78,7 @@ angular.module('app.controllers', ['angular-jwt'])
                     })
                 },
                 function(err) {
+                    console.log(err)
                     $scope.error = err.data.error
                 }
             )

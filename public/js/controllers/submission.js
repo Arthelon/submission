@@ -46,18 +46,21 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
             })
         }
         $scope.sendMail = function() {
-            // console.log(text)
-            $http.post('/api/students/email/'+$scope.submission.student._id, {
-                message: $scope.emailMsg,
-                room_path: $scope.room_path
-            }).then(function(succ) {
-                $scope.emailMsg = ''
-                console.log(succ.data)
-                $scope.success = succ.data.success
-            }, function(err) {
-                $scope.error = err.error
-                console.log(err.error)
-            })
+            if (!$scope.emailMsg) {
+                $scope.error = 'Please enter email content'
+            } else {
+                $http.post('/api/students/email/'+$scope.submission.student._id, {
+                    message: $scope.emailMsg,
+                    room_path: $scope.room_path
+                }).then(function(succ) {
+                    $scope.emailMsg = ''
+                    console.log(succ.data)
+                    $scope.success = succ.data.success
+                }, function(err) {
+                    $scope.error = err.data.error
+                    console.log(err.data.error)
+                })
+            }
         }
         $scope.openEmailModal = function() {
             $fancyModal.open({
@@ -66,6 +69,14 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
                     <h3>Enter response message here</h3>
                     <textarea ng-model="emailMsg" id='emailContent'></textarea>
                     <button class="btn btn-info" ng-click="sendMail()">Submit Email</button>
+                    <div ng-if="error" class="alert alert-dismissible alert-danger">
+                      <button type="button" data-dismiss="alert" class="close">×</button>
+                      <p ng-bind="error"></p>
+                    </div>
+                    <div ng-if="success" class="alert alert-dismissible alert-success">
+                      <button type="button" data-dismiss="alert" class="close">×</button>
+                      <p ng-bind="success"></p>
+                    </div>
                 </div>`,
             })
         }

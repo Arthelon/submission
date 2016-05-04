@@ -7,6 +7,7 @@ var jwt = require('jsonwebtoken')
 //Helper function that sends JSON responses
 function handleResp(res, status, data) {
     if (!(typeof data == 'object')) {
+        console.log(data)
         data = {error: data}
     }
     res.status(status)
