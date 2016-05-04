@@ -23,24 +23,25 @@ block content
                             form(ng-submit='register()')
                                 .form-group
                                     label(for='fnameInput') First Name
-                                    input#fnameInput.form-control(ng-model='form.first_name', placeholder='first name' required)
+                                    input#fnameInput.form-control(ng-model='form.first_name', placeholder='First Name' required)
                                 .form-group
                                     label(for='lnameInput') Last Name
-                                    input#lnameInput.form-control(ng-model='form.last_name', placeholder='last name' required)
+                                    input#lnameInput.form-control(ng-model='form.last_name', placeholder='Last Name' required)
                                 .form-group
                                     label(for='usernameInput') Username
-                                    input#usernameInput.form-control(ng-model='form.username', placeholder='username' required)
+                                    input#usernameInput.form-control(ng-model='form.username', placeholder='Username' required)
                                 .form-group
                                     label(for='emailInput') Email
-                                    input#emailInput.form-control(ng-model='form.email', placeholder='email' required)
+                                    input#emailInput.form-control(ng-model='form.email', placeholder='Email Address' required)
+                                .form-group
+                                    label(for='emailPassInput') Email Password
+                                    input#emailPassInput.form-control(ng-model='form.emailPass', placeholder='Optional' type='password')
                                 .form-group
                                     label(for='passwordInput') Password
-                                    input#passwordInput.form-control(ng-model='form.password', type='password', placeholder='password' required)
+                                    input#passwordInput.form-control(ng-model='form.password', type='password', placeholder='Password' required)
                                 .form-group
-                                    input#passwordDupInput.form-control(ng-model='form.password2', type='password', placeholder='re-enter password' required)
+                                    input#passwordDupInput.form-control(ng-model='form.password2', type='password', placeholder='Re-enter password' required)
                                 button.btn.btn-success(type='submit') Submit
                     .msg.text-center
                         p(style='color:green;' ng-if='success' ng-bind='success')
                         p(style='color:red;' ng-if='error' ng-bind='error')
-block script
-    script(src='js/controllers/register.js')

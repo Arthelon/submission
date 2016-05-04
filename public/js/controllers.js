@@ -39,7 +39,8 @@ angular.module('app.controllers', ['angular-jwt'])
             password2: '',
             first_name: '',
             last_name: '',
-            email: ''
+            email: '',
+            emailPass: ''
         }
         $scope.register = function() {
             if ($scope.form.password != $scope.form.password2) {
