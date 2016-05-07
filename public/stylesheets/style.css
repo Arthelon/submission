@@ -87,15 +87,30 @@ i {
 }
 
 table {
-    -webkit-animation: fadein 0.5s
+    -webkit-animation: fadeIn 300ms
 }
 
-@-webkit-keyframes fadein {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
 
 #emailContent {
     width: 100%;
     min-height: 300px;
+}
+
+.alert {
+    -webkit-animation: fadeIn 300ms;
+}
+
+@-moz-keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
+@keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
 }
