@@ -76,7 +76,10 @@ router.route('/email/:student_id')
                     }
                 })
                 transport.sendMail({
-                    from: req.user.email,
+                    from: {
+                        name: req.user.first_name + ' ' + req.user.last_name,
+                        address: req.user.email
+                    },
                     to: student.email,
                     subject: 'Submission - Response from ' + req.user.first_name,
                     text: req.body.message
