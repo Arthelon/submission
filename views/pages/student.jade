@@ -1,5 +1,8 @@
 extends layout
 
+block head
+    link(rel='stylesheet' href='/angular-fancy-modal/dist/angular-fancy-modal.min.css')
+
 block content
     div(ng-controller='StudentCtrl')
         .header.btns
@@ -11,7 +14,7 @@ block content
             .float-left
                 h2(ng-bind='student.name')
             .float-right.btns
-                a(href='') Send Email
+                a(href='' ng-click='openEmailModal()') Send Email
         .container
             .row
                 .col-md-3

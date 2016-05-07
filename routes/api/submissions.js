@@ -236,7 +236,8 @@ router.route('/:submission_id')
             Submission.findOne({_id: id})
                 .populate('student')
                 .exec((err, sub) => {
-                    if (err || !sub) handleResp(res, 400, {error: err.message || 'Submission not found'})
+                    if (err) handleResp(res, 500, {error: err.message})
+                    else if (!sub) handleResp(res, 400, 'Submission not found')
                     else {
                         handleResp(res, 200, {
                             success: 'Submission data retrieved',

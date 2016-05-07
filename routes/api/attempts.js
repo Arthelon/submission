@@ -15,7 +15,8 @@ router.route('/:submission_id')
                 .findOne({_id: sub_id})
                 .populate('attempts')
                 .exec((err, sub) => {
-                    if (err || !sub) handleResp(res, 400, err.message || 'Submission not found')
+                    if (err) handleResp(res, 500, err.message)
+                    else if (!sub) handleResp(res, 400, 'Submission not found')
                     else {
                         handleResp(res, 200, {success: 'Attempts retrieved', attempts: sub.attempts})
                     }
