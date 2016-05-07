@@ -1,7 +1,7 @@
 extends ./layout
 
 block content
-    div(ng-controller='UserCtrl as vm')
+    div(ng-controller='UserCtrl')
         .header
             //LOGO
             .float-left.btns
@@ -9,9 +9,8 @@ block content
             .float-right.btns
                 a(href='/logout') Logout
         .container(ng-cloak)
-            h1 {{vm.user.username}}
-            form(ng-submit='vm.updateUserData()')
-                formly-form(fields='vm.fields' model='vm.model' form='vm.updateForm')
-                    button.btn.btn-success(type='submit' ng-disabled='vm.updateForm.$invalid') Update
-            p.success(ng-if='vm.success' ng-bind='vm.success')
-            p.error(ng-if='vm.error' ng-bind='vm.error')
+            h1 {{user.username}}
+            form(ng-submit='updateUserData()')
+                formly-form(fields='fields' model='model' form='updateForm')
+                    button.btn.btn-success(type='submit' ng-disabled='updateForm.$invalid') Update
+            include ../partials/messages

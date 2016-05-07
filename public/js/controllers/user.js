@@ -1,9 +1,8 @@
 angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
-    .controller('UserCtrl', function($window, $log, $http, jwtHelper) {
-        var vm = this
+    .controller('UserCtrl', function($window, $log, $http, jwtHelper, $scope) {
         loadUser()
-        // vm.updateForm = FormlyFormController
-        vm.fields = [
+        // updateForm = FormlyFormController
+        $scope.fields = [
             {
                 type: 'input',
                 key: 'username',
@@ -80,32 +79,32 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
                 }
             }
         ]
-        vm.model = angular.copy(vm.user)
+        $scope.model = angular.copy($scope.user)
 
-        vm.updateUserData = function() {
+        $scope.updateUserData = function() {
             var data = {}
             //Filters out changed user data
-            for (var key in vm.model) {
-                if (vm.model.hasOwnProperty(key) && vm.user[key] != vm.model[key]) {
-                    data[key] = vm.model[key]
+            for (var key in $scope.model) {
+                if ($scope.model.hasOwnProperty(key) && $scope.user[key] != $scope.model[key]) {
+                    data[key] = $scope.model[key]
                 }
             }
             $http.put('/api/users', data).then(function(res) {
                 $log.log(res.data)
-                vm.success = res.data.success
+                $scope.success = res.data.success
                 var userData = jwtHelper.decodeToken(res.data.token)
                 $window.localStorage.setItem('JWT', res.data.token)
                 $window.localStorage.setItem('user', JSON.stringify(userData))
                 loadUser()
-                vm.model = angular.copy(vm.user)
+                $scope.model = angular.copy($scope.user)
             }, function(err) {
-                vm.error = err.data.error
+                $scope.error = err.data.error
             })
         }
 
         function loadUser() {
             var userData = JSON.parse($window.localStorage.getItem('user'))
-            vm.user = {
+            $scope.user = {
                 username: userData.username,
                 first_name: userData.first_name,
                 last_name: userData.last_name,

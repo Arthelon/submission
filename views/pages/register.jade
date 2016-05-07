@@ -42,6 +42,4 @@ block content
                                 .form-group
                                     input#passwordDupInput.form-control(ng-model='form.password2', type='password', placeholder='Re-enter password' required)
                                 button.btn.btn-success(type='submit') Submit
-                    .msg.text-center
-                        p(style='color:green;' ng-if='success' ng-bind='success')
-                        p(style='color:red;' ng-if='error' ng-bind='error')
+                    include ../partials/messages

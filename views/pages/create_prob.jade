@@ -24,6 +24,4 @@ block content
                                 label.col-lg-4.control-label(for='probDesc') Problem Description
                                 input#probDesc.form-control(name='desc' ng-model='form.desc' type='text', placeholder='Description' ng-required)
                             button.btn.btn-success(type='submit') Submit
-        .row.msg.text-center
-            p(style='color:red;' ng-if='error' ng-bind='error')
-            p(style='color:green;' ng-if='success' ng-bind='success')
+        include ../partials/messages

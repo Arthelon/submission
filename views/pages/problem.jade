@@ -88,6 +88,4 @@ block content
                                 label.col-lg-4.control-label(for='matchString') Match
                                 input#matchString.form-control(ng-model='match' name='match' type='text', placeholder='String to Capture' ng-required)
                             button.btn.btn-success(type='submit') Submit
-            .msg.text-center
-                p(style='color:red;' ng-if='error') {{error}}
-                p(style='color:green;' ng-if='success') {{success}}
+            include ../partials/messages

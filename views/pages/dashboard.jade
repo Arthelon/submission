@@ -36,9 +36,7 @@ block content
             .row
                 .btns.text-center
                     a(href='/create_room') Create Room
-            .msg.text-center.row
-                p(style='color:red;' ng-if='error' ng-bind='error')
-                p(style='color:green;' ng-if='success' ng-bind='success')
+            include ../partials/messages
 
 
 
