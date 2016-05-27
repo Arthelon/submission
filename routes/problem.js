@@ -16,8 +16,8 @@ router.route('/:room_path')
 router.route('/:room_path/:problem')
     .get(validateRoom, function (req, res) {
         if (req.user) {
-            res.render('problem', {
-                title: 'pages/submission | '+req.params.problem,
+            res.render('pages/problem', {
+                title: 'Problem | '+req.params.problem,
                 prob_name: req.params.problem,
             })
         } else {

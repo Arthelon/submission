@@ -5,15 +5,13 @@ block content
         //LOGO
         .float-left.btns
             a(href='/') Main
-    .container(ng-controller='LoginCtrl')
+    .container.main-container(ng-controller='LoginCtrl')
         .container-fluid
-            h3 Login Here
+            h3 Login
             hr
             .row
                 .col-md-6
                     .panel.panel-default
-                        .panel-heading.clearfix
-                            h3.panel-title Login
                         .panel-body
                             form(ng-submit='login()')
                                 .form-group

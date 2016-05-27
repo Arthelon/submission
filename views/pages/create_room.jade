@@ -7,14 +7,12 @@ block content
                 a(href='/') Home
             .float-right
                 a(href='/logout') Logout
-    .container(ng-controller='CreateRoomCtrl')
-        h3 Create Room Here
+    .container.main-container(ng-controller='CreateRoomCtrl')
+        h3 Create Room
         hr
         .row
             .col-md-6
                 .panel.panel-default
-                    .panel-heading.clearfix
-                        h3.panel-title Create Room
                     .panel-body
                         form(ng-submit='submit()')
                             .form-group

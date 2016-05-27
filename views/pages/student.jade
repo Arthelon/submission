@@ -12,7 +12,7 @@ block content
                 a(href='/logout') Logout
         .container(ng-cloak)
             .float-left
-                h2(ng-bind='student.name')
+                h2 Student - {{student.name}}
             .float-right.btns
                 a(href='' ng-click='openEmailModal()') Send Email
         .container

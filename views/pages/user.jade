@@ -9,8 +9,11 @@ block content
             .float-right.btns
                 a(href='/logout') Logout
         .container(ng-cloak)
-            h1 {{user.username}}
-            form(ng-submit='updateUserData()')
-                formly-form(fields='fields' model='model' form='updateForm')
-                    button.btn.btn-success(type='submit' ng-disabled='updateForm.$invalid') Update
-            include ../partials/messages
+            h1 User Profile
+            h4.text-warning {{user.username}}
+        .row(ng-cloak)
+            .container
+                form(ng-submit='updateUserData()')
+                    formly-form(fields='fields' model='model' form='updateForm')
+                        button.btn.btn-success(type='submit' ng-disabled='updateForm.$invalid') Update
+                include ../partials/messages

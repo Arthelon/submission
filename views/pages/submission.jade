@@ -12,7 +12,7 @@ block content
         .container
             .row(ng-cloak)
                 .float-left
-                    h2 {{submission.name}}
+                    h2 Submission - {{submission.name}}
                     p Submitted by
                         a(ng-href='/room/{{room_path}}/student/{{submission.student._id}}')  {{submission.student.name}}
                 .float-right.btns

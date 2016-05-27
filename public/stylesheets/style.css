@@ -114,3 +114,7 @@ table {
     from {opacity:0;}
     to {opacity:1;}
 }
+
+.main-container {
+    min-height: 600px;
+}
