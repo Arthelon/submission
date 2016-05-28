@@ -34,6 +34,7 @@ angular.module('controllers.student', ['vesparny.fancyModal'])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
+                $scope.success = res.data.success
                 $scope.student.submissions.splice(index, 1)
             }, function(err) {
                 console.log(err.data.error)
@@ -61,13 +62,18 @@ angular.module('controllers.student', ['vesparny.fancyModal'])
         $scope.openEmailModal = function() {
             $fancyModal.open({
                 template: `
-                <div ng-show="msg.error" ng-cloak="ng-cloak" class="alert alert-dismissible alert-danger">
-                  <button type="button" ng-click="msg.error = null" class="close">×</button>
-                  <p ng-bind="msg.error"></p>
-                </div>
-                <div ng-show="msg.success" ng-cloak="ng-cloak" class="alert alert-dismissible alert-success">
-                  <button type="button" ng-click="msg.success = null" class="close">×</button>
-                  <p ng-bind="msg.success"></p>
+                <div ng-controller="StudentCtrl">
+                    <h3>Enter response message here</h3>
+                    <textarea id="emailContent" ng-model="emailMsg"></textarea>
+                    <button ng-click="sendMail()" class="btn btn-info">Submit Email</button>
+                    <div ng-show="msg.error" ng-cloak="ng-cloak" class="alert alert-dismissible alert-danger">
+                      <button type="button" ng-click="msg.error = null" class="close">×</button>
+                      <p ng-bind="msg.error"></p>
+                    </div>
+                    <div ng-show="msg.success" ng-cloak="ng-cloak" class="alert alert-dismissible alert-success">
+                      <button type="button" ng-click="msg.success = null" class="close">×</button>
+                      <p ng-bind="msg.success"></p>
+                    </div>
                 </div>
                 `
             })
