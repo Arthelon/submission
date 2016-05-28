@@ -1,6 +1,6 @@
 var router = require('express').Router()
 var models = require('../models')
-var validateRoom = require('../util').validateRoom
+var validateRoom = require('../util').clientValidateRoom
 
 router.route('/:room_path')
     .get(validateRoom, function (req, res) {
