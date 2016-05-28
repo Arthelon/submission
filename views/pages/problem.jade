@@ -37,7 +37,7 @@ block content
                                 td {{sub.timestamp| date: "MMM dd, HH:mm"}}
                                 td {{sub.files.length}}
                                     i.fa.fa-times.cross(ng-click='removeSubmission($index)')
-                    .text-center(ng-if='submissions.length == 0')
+                    .text-center(ng-if='submissions.length == 0' ng-cloak)
                         .alert.alert-dismissible.alert-warning
                             button.fa.fa-close.close(type='button', data-dismiss='alert')
                             p No submissions found

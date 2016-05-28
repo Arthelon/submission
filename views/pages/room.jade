@@ -55,7 +55,7 @@ block content
                                         td {{submission.timestamp | date: "MMM dd, HH:mm"}}
                                         td {{submission.files.length}}
                                             i.fa.fa-times.cross(ng-click='removeSubmission($index)')
-                            .text-center(ng-if='submissions.length == 0')
+                            .text-center(ng-if='submissions.length == 0' ng-cloak)
                                 .alert.alert-dismissible.alert-warning
                                     button.fa.fa-close.close(type='button', data-dismiss='alert')
                                     p No submissions found
@@ -73,12 +73,12 @@ block content
                                         td {{problem.desc}}
                                         td {{problem.submissions.length}}
                                             i.fa.fa-times.cross(ng-click='removeProblem($index)')
-                            .text-center(ng-if='problems.length == 0')
+                            .text-center(ng-if='problems.length == 0' ng-cloak)
                                 .alert.alert-dismissible.alert-warning
                                     button.fa.fa-close.close(type='button', data-dismiss='alert')
                                     p No problems found
                             .row
-                                .btns.text-center
+                                .btns.text-center(ng-cloak)
                                     a(ng-href='/problem/{{room_path}}') Create Problem
                         div(ng-switch-when='students')
                             table.table.table-striped.table-hover(ng-if='students.length > 0' ng-cloak)
@@ -93,7 +93,7 @@ block content
                                             a(ng-href='/room/{{room_path}}/student/{{student._id}}') {{student.name}}
                                         td {{student.email}}
                                         td {{student.submissions.length}}
-                            .text-center(ng-if='students.length == 0')
+                            .text-center(ng-if='students.length == 0' ng-cloak)
                                 .alert.alert-dismissible.alert-warning
                                     button.fa.fa-close.close(type='button', data-dismiss='alert')
                                     p No students found
@@ -101,7 +101,6 @@ block content
 
         else
             div(ng-controller='RoomFormControl')
-                .container
                     .row.text-center
                         h1 #{room_name}
                         p #{room_desc}

@@ -28,7 +28,7 @@ block content
                                 td {{room.desc}}
                                 td {{room.submissions.length}}
                                     i.fa.fa-times.cross(ng-click='removeRoom($index)')
-            .row(ng-if='rooms.length == 0')
+            .row(ng-if='rooms.length == 0' ng-cloak)
                 .col-md-4.col-md-offset-4
                     .alert.alert-dismissible.alert-warning
                         button.fa.fa-close.close(type='button', data-dismiss='alert')
