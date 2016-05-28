@@ -1,7 +1,12 @@
 angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
     .controller('RoomCtrl', ['$scope', '$http', '$location', function($scope, $http, $location, $log) {
-        $scope.room_path, $scope.error, $scope.success, $scope.room_path, $scope.students, $scope.problems = null
+        $scope.room_path, $scope.room_path, $scope.students, $scope.problems = null
         $scope.selectedTab = 'submissions'
+        $scope.msg = {
+            success: null,
+            error: null
+        }
+
 
         $scope.loadPath = function() {
             var loc = $location.absUrl().split('/')
@@ -13,10 +18,10 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     room_path: $scope.room_path
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
+                $scope.setSuccess(res.data.success)
                 $scope.submissions = res.data.submissions
             }, function(err) {
-                $scope.error = err.data.error
+                $scope.setError(err.data.error)
                 console.log(err)
             })
         }
@@ -36,11 +41,11 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                         room_path: $scope.room_path
                     }
                 }).then(function(res) {
-                    $scope.success = res.data.success
+                    $scope.setSuccess(res.data.success)
                     $scope.problems = res.data.problems
                     console.log(res.data)
                 }, function(err) {
-                    $scope.error = err.data.error
+                    $scope.setError(err.data.error)
                     console.log(err)
                 })
             }
@@ -55,10 +60,10 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
+                $scope.setSuccess(res.data.success)
                 $scope.submissions.splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error || err.error
+                $scope.setError(err.data.error)
             })
 
         }
@@ -71,17 +76,18 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
+                $scope.setSuccess(res.data.success)
                 $scope.problems.splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error || err.error
+                $scope.setError(err.data.error)
             })
         }
         $scope.setSuccess = function(msg) {
-            $scope.success = msg
+            $scope.msg.error = null;
+            $scope.msg.success = msg
         }
         $scope.setError = function(msg) {
-            $scope.error = msg
+            $scope.msg.error = msg
         }
         $scope.setStack = function(stack) {
             $scope.stack = stack
@@ -145,26 +151,25 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
                         transformRequest: angular.identity,
                         headers: {'Content-Type': undefined}
                     })
-                    .success(function (res) {
+                    .then(function (res) {
                         console.log(res)
-                        $scope.setSuccess(res.success)
+                        $scope.setSuccess(res.data.success)
                         $window.localStorage.setItem('attempts', null)
                         $scope.form = jQuery.extend({}, defaultForm)
                         $scope.editor = fillerText
                         fd = new FormData()
-                    })
-                    .error(function (err) {
+                    }, function (err) {
                         console.log(err)
-                        if (err.stack) {
-                            $scope.setStack(err.stack)
+                        if (err.data.stack) {
+                            $scope.setStack(err.data.stack)
                         }
-                        if (err.attempt) {
+                        if (err.data.attempt) {
                             var attempts = JSON.parse($window.localStorage.getItem('attempts')) || []
-                            attempts.push(err.attempt)
+                            attempts.push(err.data.attempt)
                             $window.localStorage.setItem('attempts', JSON.stringify(attempts))
                             console.log(attempts)
                         }
-                        $scope.setError(err.error || err.data.error)
+                        $scope.setError(err.data.error)
                     });
                 }
             }

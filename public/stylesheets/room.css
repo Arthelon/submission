@@ -57,3 +57,8 @@ label {
 .form-group .col-lg-10 {
     margin-bottom: 20px;
 }
+
+#stack {
+    margin: 10px auto;
+    width: 50%;
+}

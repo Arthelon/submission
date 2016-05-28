@@ -1,6 +1,6 @@
-.alert.alert-dismissible.alert-danger(ng-if='error' ng-cloak)
-    button.close(type='button', data-dismiss='alert') ×
-    p(ng-bind='error')
-.alert.alert-dismissible.alert-success(ng-if='success' ng-cloak)
-    button.close(type='button', data-dismiss='alert') ×
-    p(ng-bind='success')
+.alert.alert-dismissible.alert-danger(ng-show='msg.error' ng-cloak)
+    button.close(type='button' ng-click="msg.error = null") ×
+    p(ng-bind="msg.error")
+.alert.alert-dismissible.alert-success(ng-show='msg.success' ng-cloak)
+    button.close(type='button' ng-click="msg.success = null") ×
+    p(ng-bind="msg.success")
