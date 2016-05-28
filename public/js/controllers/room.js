@@ -128,9 +128,9 @@ angular.module('controllers.room', ['ngAnimate', 'app.services', 'ui.ace'])
         }
         $scope.submit = function() {
             if ($scope.editor != fillerText && $scope.file) {
-                $scope.error = 'Can\'t accept submissions from both file(s) and text editor'
+                $scope.setError('Can\'t accept submissions from both file(s) and text editor')
             } else if ($scope.editor == fillerText && !$scope.file) {
-                $scope.error = 'Please submit data'
+                $scope.setError('Please submit data')
             } else {
                 var fd = new FormData()
                 for (var key in $scope.form) {

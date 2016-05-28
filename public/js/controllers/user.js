@@ -1,5 +1,9 @@
 angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
     .controller('UserCtrl', function($window, $log, $http, jwtHelper, $scope) {
+        $scope.msg = {
+            success: null,
+            error: null
+        }
         loadUser()
         // updateForm = FormlyFormController
         $scope.fields = [
@@ -91,14 +95,14 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
             }
             $http.put('/api/users', data).then(function(res) {
                 $log.log(res.data)
-                $scope.success = res.data.success
+                $scope.msg.success = res.data.success
                 var userData = jwtHelper.decodeToken(res.data.token)
                 $window.localStorage.setItem('JWT', res.data.token)
                 $window.localStorage.setItem('user', JSON.stringify(userData))
                 loadUser()
                 $scope.model = angular.copy($scope.user)
             }, function(err) {
-                $scope.error = err.data.error
+                $scope.msg.error = err.data.error
             })
         }
 

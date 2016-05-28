@@ -1,6 +1,10 @@
 angular.module('controllers.problem', [])
     .controller('ProblemCtrl', ['$scope', '$http', '$location', '$log', function($scope, $http, $location, $log) {
         $scope.toggle = true
+        $scope.msg = {
+            success: null,
+            error: null
+        }
         $scope.toggleForm = false
         $scope.loadPath = function() {
             var loc = $location.absUrl().split('/')
@@ -15,15 +19,12 @@ angular.module('controllers.problem', [])
                         room_path: $scope.room_path
                     }
                 }).then(function(res) {
-                    $scope.success = res.data.success
                     $scope.problems = res.data.problems
                     $scope.submissions = res.data.submissions
                     $scope.tests = res.data.tests
                     $scope.desc = res.data.prob_desc
-                    console.log(res.data)
                 }, function(err) {
-                    $scope.error = err.data.error
-                    console.log(err)
+                    console.log(err.data)
                 })
             }
         }
@@ -37,10 +38,9 @@ angular.module('controllers.problem', [])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
                 $scope.submissions.splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error
+                console.log(err.data)
             })
         }
         $scope.removeTest = function(id, type, index) {
@@ -55,18 +55,16 @@ angular.module('controllers.problem', [])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
                 $scope.tests[type].splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error
-                console.log(err)
+                console.log(err.data)
             })
         }
         $scope.setSuccess = function(msg) {
-            $scope.success = msg
+            $scope.msg.success = msg
         }
         $scope.setError = function(msg) {
-            $scope.error = msg
+            $scope.msg.error = msg
         }
         $scope.addCase = function(inp, out) {
             $scope.tests.cases.push({in: inp, out: out})
@@ -95,7 +93,7 @@ angular.module('controllers.problem', [])
                 $scope.case = {in:'', out:''}
             }, function(err) {
                 $scope.setError(err.data.error)
-                console.log(err)
+                console.log(err.data)
             })
         }
         $scope.submitMatch = function() {

@@ -4,7 +4,7 @@ angular.module('controllers.dashboard', [])
             $http.get('/api/rooms').then(function(res) {
                 $scope.rooms = res.data.rooms
             }, function(err) {
-                $scope.error = err.data.error
+                console.log(err.data)
             })
         }
         $scope.removeRoom = function(index) {
@@ -16,11 +16,9 @@ angular.module('controllers.dashboard', [])
                     'Content-Type': 'application/json'
                 }
             }).then(function(res) {
-                $scope.success = res.data.success
                 $scope.rooms.splice(index, 1)
             }, function(err) {
-                $scope.error = err.data.error
-                console.log(err)
+                console.log(err.data)
             })
         }
 

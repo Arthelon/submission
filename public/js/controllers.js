@@ -1,5 +1,9 @@
 angular.module('app.controllers', ['angular-jwt'])
     .controller('CreateProbCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+        $scope.msg = {
+            success: null,
+            error: null
+        }
         $scope.form = {
             name: '',
             desc: ''
@@ -11,28 +15,36 @@ angular.module('app.controllers', ['angular-jwt'])
                 name: $scope.form.name,
                 desc: $scope.form.desc
             }).then(function(res) {
-                $scope.success = res.data.success
+                $scope.msg.success = res.data.success
                 $scope.form = {
                     name: '',
                     desc: ''
                 }
             }, function(err) {
-                $scope.error = err.data.error
+                $scope.msg.error = err.data.error
             })
         }
     }])
     .controller('CreateRoomCtrl', function($scope, $http) {
+        $scope.msg = {
+            success: null,
+            error: null
+        }
         $scope.form = {}
         $scope.submit = function() {
             $http.post('/api/rooms' , $scope.form).then(function(res) {
-                $scope.success = res.data.success || res.data
+                $scope.msg.success = res.data.success
                 $scope.form = {}
             }, function(err) {
-                $scope.error = err.data.error || err.data
+                $scope.msg.error = err.data.error
             })
         }
     })
     .controller('RegisterCtrl', function($scope, $http, $log) {
+        $scope.msg = {
+            success: null,
+            error: null
+        }
         $scope.form = {
             username: '',
             password: '',
@@ -44,15 +56,15 @@ angular.module('app.controllers', ['angular-jwt'])
         }
         $scope.register = function() {
             if ($scope.form.password != $scope.form.password2) {
-                $scope.error = 'Passwords do not match'
+                $scope.msg.error = 'Passwords do not match'
                 $scope.form.password2 = ''
             } else {
                 $http.post('/api/users', $scope.form).then(function(res) {
-                    $scope.success = res.data.success
+                    $scope.msg.success = res.data.success
                     $scope.form = {}
                 }, function(err) {
                     $log.log(err)
-                    $scope.error = err.data.error
+                    $scope.msg.error = err.data.error
                 })
             }
         }
@@ -61,6 +73,10 @@ angular.module('app.controllers', ['angular-jwt'])
         $scope.user = {
             username: '',
             password: ''
+        }
+        $scope.msg = {
+            success: null,
+            error: null
         }
         $scope.login = function() {
             $http({
@@ -74,12 +90,12 @@ angular.module('app.controllers', ['angular-jwt'])
                     $http.post('/login', $scope.user).then(function(){
                         $window.location = '/dashboard'
                     }, function(err) {
-                        $scope.error = err.data.error
+                        $scope.msg.error = err.data.error
                     })
                 },
                 function(err) {
                     console.log(err)
-                    $scope.error = err.data.error
+                    $scope.msg.error = err.data.error
                 }
             )
         }

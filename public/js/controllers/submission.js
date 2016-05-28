@@ -5,8 +5,12 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
         $scope.room_path = loc[loc.length - 3]
         $scope.submission_id = loc[loc.length - 1]
         $scope.emailMsg = ''
+        $scope.msg = {
+            success: null,
+            error: null
+        }
 
-        $scope.success, $scope.error, $scope.submission, $scope.attempts = null
+        $scope.submission, $scope.attempts = null
         $scope.chart = {
             data: [[]],
             labels: []
@@ -20,10 +24,8 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
                 }
             }).then(function (succ) {
                 $scope.submission = succ.data.submission
-                $scope.success = succ.data.success
             }, function (err) {
-                console.log(err.error)
-                $scope.error = err.error
+                console.log(err.data)
             })
         }
         $scope.loadAttempts = function () {
@@ -33,7 +35,6 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
                 }
             }).then(function (succ) {
                 $scope.attempts = _.orderBy(succ.data.attempts, ['timestamp'], ['desc'])
-                $scope.success = succ.data.success
 
                 _.forEach($scope.attempts, function (val) {
                     $scope.chart.data[0].push(val.rating)
@@ -41,13 +42,12 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
                     $scope.chart.labels.push(date.getDay() + '/' + date.getMonth() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes())
                 })
             }, function (err) {
-                console.log(err.error)
-                $scope.error = err.error
+                console.log(err.data)
             })
         }
         $scope.sendMail = function () {
             if (!$scope.emailMsg) {
-                $scope.error = 'Please enter email content'
+                $scope.msg.error = 'Please enter email content'
             } else {
                 $http.post('/api/students/email/' + $scope.submission.student._id, {
                     message: $scope.emailMsg,
@@ -55,11 +55,11 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
                 }).then(function (succ) {
                     $scope.emailMsg = ''
                     console.log(succ.data)
-                    $scope.error = ''
-                    $scope.success = succ.data.success
+                    $scope.msg.error = null
+                    $scope.msg.success = succ.data.success
                     $timeout($fancyModal.close, 2000)
                 }, function (err) {
-                    $scope.error = err.data.error
+                    $scope.msg.error = err.data.error
                     console.log(err.data.error)
                 })
             }
@@ -67,18 +67,13 @@ angular.module('controllers.submission', ['chart.js', 'vesparny.fancyModal'])
         $scope.openEmailModal = function () {
             $fancyModal.open({
                 template: `
-                <div ng-controller="SubmissionCtrl">
-                    <h3>Enter response message here</h3>
-                    <textarea id="emailContent" ng-model="emailMsg"></textarea>
-                    <button ng-click="sendMail()" class="btn btn-info">Submit Email</button>
-                    <div ng-if="error" class="alert alert-dismissible alert-danger">
-                        <button type="button" data-dismiss="alert" class="close">×</button>
-                        <p ng-bind="error"></p>
-                    </div>
-                    <div ng-if="success" class="alert alert-dismissible alert-success">
-                        <button type="button" data-dismiss="alert" class="close">×</button>
-                        <p ng-bind="success"></p>
-                    </div>
+                <div ng-show="msg.error" ng-cloak="ng-cloak" class="alert alert-dismissible alert-danger">
+                  <button type="button" ng-click="msg.error = null" class="close">×</button>
+                  <p ng-bind="msg.error"></p>
+                </div>
+                <div ng-show="msg.success" ng-cloak="ng-cloak" class="alert alert-dismissible alert-success">
+                  <button type="button" ng-click="msg.success = null" class="close">×</button>
+                  <p ng-bind="msg.success"></p>
                 </div>
                 `
             })
