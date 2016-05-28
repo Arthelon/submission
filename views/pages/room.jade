@@ -101,9 +101,9 @@ block content
 
         else
             div(ng-controller='RoomFormControl')
-                    .row.text-center
-                        h1 #{room_name}
-                        p #{room_desc}
+                .row.text-center
+                    h1 #{room_name}
+                    p #{room_desc}
                 .panel.panel-default
                     .panel-body
                         form#uploadForm.col-lg-4
@@ -142,7 +142,7 @@ block content
                     include ../partials/messages
                     pre#stack(ng-if='stack')
                         code.nohighlight(ng-bind='stack')
-            block script
-                script(src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js")
+block script
+    script(src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js")
 
 
