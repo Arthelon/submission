@@ -1,1 +1,1 @@
-web: bower install; npm start
+web: npm start

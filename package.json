@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "gulp templates && nodemon"
+    "dev": "gulp templates && nodemon",
+    "postinstall": "bower install"
   },
   "dependencies": {
     "angular": "1.5.x",
