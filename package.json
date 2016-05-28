@@ -34,7 +34,8 @@
     "python-shell": "0.x.x",
     "serve-favicon": "~2.3.0",
     "sinon": "1.x.x",
-    "api-check": "7.x.x"
+    "api-check": "7.x.x",
+    "bower": "1.7.x"
   },
   "description": "Online judge and submission platform for students and teachers",
   "main": "bin/www",
