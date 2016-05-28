@@ -32,6 +32,7 @@ router.route('/')
      * @apiParam {String} username Users unique ID
      * @apiParam {String} password Users password
      * @apiParam {String} email Users contact email
+     * @apiParam {String} emailPass
      * @apiParam {String} first_name Users first name
      * @apiParam {String} last_name Users last name
      *

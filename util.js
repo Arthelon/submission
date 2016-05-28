@@ -85,7 +85,6 @@ util.validateBody = function(fields) {
     return function(req, res, next) {
         async.each(fields, function(field, done) {
             if (!Object.prototype.hasOwnProperty.call(req.body, field)) { //If field is not found in request body
-                handleResp(res, 400, {error: 'Invalid fields'})
                 return done('Invalid Fields')
             } else {
                 done()
@@ -93,6 +92,8 @@ util.validateBody = function(fields) {
         }, function(err) {
             if (!err) { //Passes request onto next route middleware if all fields are present
                 next()
+            } else {
+                handleResp(res, 400, {error: 'Invalid fields'})
             }
         })
     }

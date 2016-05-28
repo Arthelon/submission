@@ -32,6 +32,7 @@ app.set('view engine', 'jade');
 
 //Express Middleware
 app.use('/api', token.unless({path: [
+    {url: '/api/users', methods: 'POST'},
     {url: '/api/login', methods: 'POST'},
     {url: '/api/register', methods: 'POST'},
     {url: '/api/problems', methods: 'GET'},
