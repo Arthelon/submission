@@ -47,7 +47,8 @@ router.route('/login')
         }
     })
     .post(passport.authenticate('local'), function (req, res) {
-        res.redirect('/login/google') //If login successful
+        res.status(200)
+        res.end()
     })
 
 router.route('/create_room')
@@ -62,10 +63,10 @@ router.route('/user')
         res.render('pages/user')
     })
 
-router.route('/login/google')
-    .get(passport.authenticate("google", {scope:[]}))
+router.route('/google')
+    .get(passport.authenticate("google", {scope:["email"]}))
     
-router.route("/login/google/return")
+router.route("/google/return")
     .get(passport.authenticate("google", { failureRedirect: '/login' }), function(req, res) {
         res.redirect("/dashboard")
     })

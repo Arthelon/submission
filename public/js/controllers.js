@@ -78,7 +78,6 @@ angular.module('app.controllers', ['angular-jwt'])
             error: null
         }
         $scope.login = function() {
-            console.log("Fired")
             $http({
                 method: 'post',
                 url:'/api/login',
@@ -88,6 +87,7 @@ angular.module('app.controllers', ['angular-jwt'])
                     $window.localStorage.setItem('JWT', res.data.token)
                     $window.localStorage.setItem('user', JSON.stringify(jwtHelper.decodeToken(res.data.token)))
                     $http.post('/login', $scope.user).then(function(){
+                        $window.location = '/google'
                     }, function(err) {
                         $scope.msg.error = err.data.error
                     })
