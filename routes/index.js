@@ -63,7 +63,7 @@ router.route('/user')
     })
 
 router.route('/login/google')
-    .get(passport.authenticate("google"))
+    .get(passport.authenticate("google", {scope:[]}))
     
 router.route("/login/google/return")
     .get(passport.authenticate("google", { failureRedirect: '/login' }), function(req, res) {
