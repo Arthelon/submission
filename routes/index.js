@@ -64,7 +64,9 @@ router.route('/user')
     })
 
 router.route('/google')
-    .get(passport.authenticate("google", {scope:["email"]}))
+    .get(passport.authenticate("google", {scope: ['https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email', "https://mail.google.com"],
+    accessType: 'offline', approvalPrompt: 'force'}))
     
 router.route("/google/return")
     .get(passport.authenticate("google", { failureRedirect: '/login' }), function(req, res) {

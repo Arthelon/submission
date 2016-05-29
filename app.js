@@ -67,10 +67,10 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:3000/google/return",
     passReqToCallback: true
 }, function(req, accessToken, refreshToken, profile, cb) {
-    console.log(profile.emails)
-    req.user.accessToken = accessToken
+    console.log(refreshToken)
+    req.user.access_token = accessToken
     req.user.email = profile.emails[0].value
-    req.user.refreshToken = refreshToken
+    req.user.refresh_token = refreshToken
     req.user.save(function(err) {
         if (err) {
             cb(err, null)

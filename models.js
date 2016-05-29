@@ -41,8 +41,8 @@ var StudentSchema = new Schema({
 var UserSchema = new Schema({
     username: {type: String, unique: true, required: true},
     password: {type: String, required: true, match: [/^[\d\w]{8,}$/, 'Password must be alphanumeric with at least 8 characters']},
-    refresh_token: {type: String, unique: true},
-    acccess_token: {type: String, unique: true},
+    refresh_token: String,
+    access_token: String,
     first_name: {type: String, required: true},
     last_name: {type: String, required: true},
     email: {type: String, unique: true, match: [emailRegex, '{VALUE} is not a valid email address']},

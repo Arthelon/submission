@@ -5,6 +5,7 @@ var models = require('../../models')
 
 var Student = models.Student
 var Room = models.Room
+var User = models.User
 
 var validateRoom = util.validateRoom
 var handleResp = util.handleResp
@@ -66,40 +67,45 @@ router.route('/email/:student_id')
      * @apiSuccess {String} success Success message
      */
     .post(validateRoom, validateBody(['room_path', 'message']), (req, res) => {
-        if (!req.user.refreshToken) {
-            res.redirect("/login/google")
-        } else {
-            Student.findOne({_id: req.params.student_id}, (err, student) => {
-                if (err || !student) handleResp(res, 500, err.message || 'Student not found')
-                else {
-                    var transport = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            xoauth2: xoauth2.createXOAuth2Generator({
-                                user: req.user.email,
-                                clientId: process.env.CLIENT_ID,
-                                clientSecret: process.env.CLIENT_SECRET,
-                                refreshToken: req.user.refreshToken,
-                            })
-                        }
-                    })
-                    transport.sendMail({
-                        from: {
-                            name: req.user.first_name + ' ' + req.user.last_name,
-                            address: req.user.email
-                        },
-                        to: student.email,
-                        subject: 'Submission - Response from ' + req.user.first_name,
-                        text: req.body.message
-                    }, function(err) {
-                        if (err) handleResp(res, 500, err.message)
-                        else {
-                            return handleResp(res, 200, {success: 'Email response sent to '+req.user.email})
-                        }
-                    })
-                }
-            })
-        }
+        Student.findOne({_id: req.params.student_id}, (err, student) => {
+            if (err || !student) handleResp(res, 500, err.message || 'Student not found')
+            else {
+                User.findOne({_id: req.user._id}, function(err, user) {
+                    if (err) handleResp(res, 500, "Internal Server Error")
+                    else {
+                        console.log(user)
+                        var transport = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                xoauth2: xoauth2.createXOAuth2Generator({
+                                    user: user.email,
+                                    clientId: process.env.CLIENT_ID,
+                                    clientSecret: process.env.CLIENT_SECRET,
+                                    refreshToken: user.refresh_token,
+                                    accessToken: user.access_token
+                                })
+                            }
+                        })
+                        transport.sendMail({
+                            from: {
+                                name: req.user.first_name + ' ' + req.user.last_name,
+                                address: req.user.email
+                            },
+                            to: student.email,
+                            subject: 'Submission - Response from ' + req.user.first_name,
+                            text: req.body.message
+                        }, function(err) {
+                            console.log(err)
+                            if (err) handleResp(res, 500, err.message)
+                            else {
+                                return handleResp(res, 200, {success: 'Email response sent to '+req.user.email})
+                            }
+                        })
+                    }
+                })
+            }
+        })
+
     })
 
 module.exports = router
