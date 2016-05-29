@@ -11,6 +11,7 @@ var handleResp = util.handleResp
 var validateBody = util.validateBody
 
 var nodemailer = require('nodemailer')
+var xoauth2 = require("xoauth2")
 
 router.route('/:student_id')
     .get(validateRoom, (req, res) => {
@@ -65,32 +66,40 @@ router.route('/email/:student_id')
      * @apiSuccess {String} success Success message
      */
     .post(validateRoom, validateBody(['room_path', 'message']), (req, res) => {
-        Student.findOne({_id: req.params.student_id}, (err, student) => {
-            if (err || !student) handleResp(res, 500, err.message || 'Student not found')
-            else {
-                var transport = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: req.user.email,
-                        pass: req.user.email_password,
-                    }
-                })
-                transport.sendMail({
-                    from: {
-                        name: req.user.first_name + ' ' + req.user.last_name,
-                        address: req.user.email
-                    },
-                    to: student.email,
-                    subject: 'Submission - Response from ' + req.user.first_name,
-                    text: req.body.message
-                }, function(err) {
-                    if (err) handleResp(res, 500, err.message)
-                    else {
-                        return handleResp(res, 200, {success: 'Email response sent to '+req.user.email})
-                    }
-                })
-            }
-        })
+        if (!req.user.refreshToken) {
+            res.redirect("/login/google")
+        } else {
+            Student.findOne({_id: req.params.student_id}, (err, student) => {
+                if (err || !student) handleResp(res, 500, err.message || 'Student not found')
+                else {
+                    var transport = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            xoauth2: xoauth2.createXOAuth2Generator({
+                                user: req.user.email,
+                                clientId: process.env.CLIENT_ID,
+                                clientSecret: process.env.CLIENT_SECRET,
+                                refreshToken: req.user.refreshToken,
+                            })
+                        }
+                    })
+                    transport.sendMail({
+                        from: {
+                            name: req.user.first_name + ' ' + req.user.last_name,
+                            address: req.user.email
+                        },
+                        to: student.email,
+                        subject: 'Submission - Response from ' + req.user.first_name,
+                        text: req.body.message
+                    }, function(err) {
+                        if (err) handleResp(res, 500, err.message)
+                        else {
+                            return handleResp(res, 200, {success: 'Email response sent to '+req.user.email})
+                        }
+                    })
+                }
+            })
+        }
     })
 
 module.exports = router

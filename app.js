@@ -11,6 +11,7 @@ var expressJwt = require('express-jwt')
 var token = expressJwt({secret: 'dev_secret'})
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy
+var GoogleStrategy = require("passport-google-oauth20").Strategy
 var mongoose = require('mongoose')
 var models = require('./models')
 var cors = require('cors')
@@ -59,6 +60,24 @@ passport.deserializeUser(function(id, done) {
         done(err, user);
     });
 });
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET ,
+    callbackURL: process.env.CALLBACK_URL,
+    passReqToCallback: true
+}, function(req, accessToken, refreshToken, profile, cb) {
+    console.log(profile)
+    req.user.refreshToken = refreshToken
+    console.log("Reached")
+    req.user.save(function(err) {
+        if (err) {
+            cb(err, null)
+        } else {
+            cb(null, req.user)
+        }
+    })
+}))
 
 passport.use(new LocalStrategy(
     function(username, password, done) {

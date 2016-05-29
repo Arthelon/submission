@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "angular": "1.5.x",
+    "api-check": "7.x.x",
     "archiver": "1.x.x",
     "async": "2.0.0-rc.4",
     "body-parser": "1.x.x",
+    "bower": "1.7.x",
     "chai": "3.x.x",
     "cookie-parser": "1.x.x",
     "cors": "2.x.x",
@@ -30,12 +32,12 @@
     "multer": "^1.1.0",
     "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
+    "passport-google-oauth20": "^1.0.0",
     "passport-local": "1.x.x",
     "python-shell": "0.x.x",
     "serve-favicon": "~2.3.0",
     "sinon": "1.x.x",
-    "api-check": "7.x.x",
-    "bower": "1.7.x"
+    "xoauth2": "^1.1.0"
   },
   "description": "Online judge and submission platform for students and teachers",
   "main": "bin/www",

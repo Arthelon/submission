@@ -38,7 +38,7 @@ router.route('/')
      *
      * @apiSuccess {String} success Success message
      */
-    .post(validateBody(['username', 'password', 'email', 'first_name', 'last_name', 'emailPass']), function(req, res) {
+    .post(validateBody(['username', 'password', 'email', 'first_name', 'last_name']), function(req, res) {
         User.findOne({username: req.body.username}, function (err, user) {
             if (err) {
                 return handleResp(res, 400, {error: err.message})
@@ -50,8 +50,7 @@ router.route('/')
                     password: req.body.password,
                     email: req.body.email,
                     first_name: req.body.first_name,
-                    last_name: req.body.last_name,
-                    email_password: req.body.emailPass
+                    last_name: req.body.last_name
                 })
                 new_user.save(function (err) {
                     if (err) {
