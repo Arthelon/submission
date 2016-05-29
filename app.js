@@ -62,14 +62,15 @@ passport.deserializeUser(function(id, done) {
 });
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET ,
-    callbackURL: process.env.CALLBACK_URL,
+    clientID: "1019662578001-286lsm273o2ri98lnqiscr6gfio7tkhs.apps.googleusercontent.com",
+    clientSecret: "gzhaiBKWC1a2vfHclXNqHeFr",
+    callbackURL: "http://localhost:3000/google/return",
     passReqToCallback: true
 }, function(req, accessToken, refreshToken, profile, cb) {
-    console.log(profile)
+    console.log(profile.emails)
+    req.user.accessToken = accessToken
+    req.user.email = profile.emails[0].value
     req.user.refreshToken = refreshToken
-    console.log("Reached")
     req.user.save(function(err) {
         if (err) {
             cb(err, null)

@@ -48,7 +48,6 @@ router.route('/')
                 var new_user = new User({
                     username: req.body.username,
                     password: req.body.password,
-                    email: req.body.email,
                     first_name: req.body.first_name,
                     last_name: req.body.last_name
                 })

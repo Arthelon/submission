@@ -36,15 +36,6 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
             },
             {
                 type: 'input',
-                key: 'email',
-                templateOptions: {
-                    type: 'email',
-                    label: 'Email',
-                    required: true
-                }
-            },
-            {
-                type: 'input',
                 key: 'password',
                 templateOptions: {
                     type: 'password',
@@ -104,7 +95,6 @@ angular.module('controllers.user', ['angular-jwt', 'ngMessages', 'formly'])
                 username: userData.username,
                 first_name: userData.first_name,
                 last_name: userData.last_name,
-                email: userData.email,
             }
         }
 
