@@ -7,7 +7,7 @@ var jwt = require('jsonwebtoken')
 //Helper function that sends JSON responses
 function handleResp(res, status, data) {
     if (!(typeof data == 'object')) {
-        console.log(data)
+        // console.log(data)
         data = {error: data}
     }
     res.status(status)
@@ -74,6 +74,7 @@ util.clientValidateRoom = function(req, res, next) {
             } else if (req.user && req.user._id != room.owner.toString()) {
                 next(new Error('User does not own room'))
             } else {
+                req.room = room
                 next()
             }
         })
