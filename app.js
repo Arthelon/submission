@@ -17,6 +17,8 @@ var models = require('./models')
 var cors = require('cors')
 var handleResp = require('./util').handleResp
 
+require('dotenv').config(); //REMOVE DURING PRODUCTION
+
 //Database Models
 var User = models.User
 var Room = models.Room
