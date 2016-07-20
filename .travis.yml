@@ -5,3 +5,5 @@ before_install:
   - bower install
 node_js:
   - "node"
+env:
+  - DATABASE_URL=127.0.0.1
