@@ -1,4 +1,4 @@
-# submission
+# submission ![build status](https://travis-ci.org/Arthelon/submission.svg?branch=master)
 
 Basic submission + online judge platform for students and teachers
 **UI INCOMPLETE**
