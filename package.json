@@ -28,6 +28,7 @@
     "gulp-jade": "1.x.x",
     "jade": "~1.11.0",
     "jsonwebtoken": "^5.7.0",
+    "mocha": "^2.5.3",
     "mongoose": "^4.4.5",
     "mongoose-findorcreate": "0.x.x",
     "morgan": "~1.6.1",

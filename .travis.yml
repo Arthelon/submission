@@ -1,6 +1,7 @@
 language: node_js
 services: mongodb
+before_install:
+  - npm install
+  - bower install
 node_js:
-  - "6"
-  - "6.1"
   - "node"
