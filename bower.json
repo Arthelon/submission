@@ -22,6 +22,7 @@
     "api-check": "^7.5.5",
     "angular-messages": "^1.5.5",
     "angular-chart.js": "^0.10.2",
-    "angular-fancy-modal": "^0.1.4"
+    "angular-fancy-modal": "^0.1.4",
+    "requirejs": "^2.2.0"
   }
 }
