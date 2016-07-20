@@ -1,0 +1,4 @@
+CLIENT_ID=sample
+CLIENT_SECRET=sample
+CALLBACK_URL=yourcallback
+DATABASE_URL=databaseurl

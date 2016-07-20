@@ -18,6 +18,7 @@
     "cookie-parser": "1.x.x",
     "cors": "2.x.x",
     "debug": "2.x.x",
+    "dotenv": "^2.0.0",
     "express": "~4.13.1",
     "express-jwt": "^3.3.0",
     "express-session": "^1.13.0",
